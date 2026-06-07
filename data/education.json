@@ -1,0 +1,18 @@
+[
+  {
+    "id": "unitec",
+    "type": "degree",
+    "period": "Septiembre 2024 — En curso",
+    "title": "Ingeniería en Sistemas Computacionales",
+    "institution": "Universidad Tecnológica de México (UNITEC)",
+    "description": ""
+  },
+  {
+    "id": "deeplearning-ai",
+    "type": "certification",
+    "period": "Certificación",
+    "title": "Neural Networks and Deep Learning",
+    "institution": "Dictada por Andrew Ng · DeepLearning.AI",
+    "description": "Optimización de redes neuronales profundas (DNN) desde cero usando Python y NumPy."
+  }
+]

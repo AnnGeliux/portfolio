@@ -1,0 +1,87 @@
+{
+    "nav": {
+        "proyectos": "Projects",
+        "educacion": "Education",
+        "habilidades": "Skills",
+        "contacto": "Contact",
+        "lang-short": "ES",
+        "lang-aria": "Switch language to Spanish",
+        "theme-aria": "Switch theme faction"
+    },
+    "faction": {
+        "label": "Faction",
+        "liminal": "Liminal",
+        "arcadia": "Arcadia",
+        "ember": "Ember",
+        "void": "Void",
+        "liminal-desc": "In-between · observation",
+        "arcadia-desc": "Order · Nordic clarity",
+        "ember-desc": "Forge · maker intensity",
+        "void-desc": "Depth · gothic glitch"
+    },
+    "hero": {
+        "eyebrow": "Computer Systems Engineering · Deep Learning",
+        "name": "Angel Francisco",
+        "name-accent": "Palestina Blancas",
+        "tagline": "Computer Systems Engineering student with a technical focus on software engineering and artificial intelligence. Solid mathematical and theoretical foundations in Deep Learning, Transformers, and diffusion models.",
+        "scroll": "Scroll"
+    },
+    "btn": {
+        "email": "Email me",
+        "github": "View GitHub",
+        "download-cv": "Download CV",
+        "activity": "Recent activity"
+    },
+    "perfil": {
+        "heading": "Professional Profile",
+        "subtitle": "A brief look at who I am and where I am heading.",
+        "body-1": "Computer Systems Engineering student with a technical focus on software engineering and artificial intelligence. Solid mathematical and theoretical foundations in <strong>Deep Learning</strong>, <strong>Transformers</strong> and diffusion models, developed in parallel with frontend development and Git version control.",
+        "body-2": "I combine curiosity for generative models with a constant practice of software engineering: build, deploy, iterate. I'm especially interested in the intersection of applied AI and web products that people actually use."
+    },
+    "currently": {
+        "heading": "Currently",
+        "subtitle": "What I'm building, learning, and reading right now."
+    },
+    "highlights": {
+        "categories": "technical categories",
+        "projects": "published projects",
+        "certs": "Andrew Ng certification"
+    },
+    "filters": {
+        "all": "All",
+        "deep-learning": "Deep Learning",
+        "fullstack": "Full-Stack",
+        "automation": "Automation",
+        "empty-title": "Coming soon",
+        "empty-body": "I don't have published projects in this category yet. I'm working on it."
+    },
+    "projects": {
+        "heading": "Experience & Projects",
+        "subtitle": "What I have built and the problems I have tried to solve."
+    },
+    "education": {
+        "heading": "Education",
+        "subtitle": "Academic background and certifications backing my work."
+    },
+    "skills": {
+        "heading": "Skills",
+        "subtitle": "Technical stack grouped by domain, not by years of use."
+    },
+    "blog": {
+        "heading": "Blog",
+        "subtitle": "Short notes on what I'm learning."
+    },
+    "contact": {
+        "heading": "Contact",
+        "subtitle": "Got a project, an idea, or just want to say hi? Get in touch.",
+        "lead": "I'm open to collaborations, internships, and conversations about AI and software development.",
+        "email-cta": "angel.palestina10@gmail.com"
+    },
+    "footer": {
+        "copy": "© {year} Angel Francisco Palestina Blancas · Built with code and coffee.",
+        "email": "Email",
+        "github": "GitHub",
+        "linkedin": "LinkedIn"
+    },
+    "noscript": "Some content is rendered by JavaScript. Please enable JS to view projects, education, and skills."
+}

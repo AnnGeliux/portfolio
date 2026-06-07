@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="es-MX">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#0a0a14" />
+        <meta
+            name="description"
+            content="Portafolio de Angel Francisco Palestina Blancas — Ingeniería en Sistemas Computacionales con enfoque en Deep Learning, Transformers, modelos de difusión y desarrollo full-stack."
+        />
+        <meta name="author" content="Angel Francisco Palestina Blancas" />
+        <meta
+            property="og:title"
+            content="Angel Francisco Palestina | Portafolio"
+        />
+        <meta
+            property="og:description"
+            content="Ingeniería en Sistemas Computacionales · Deep Learning · Full-Stack"
+        />
+        <meta property="og:type" content="profile" />
+        <meta property="og:locale" content="es_MX" />
+        <title>Mi Portafolio</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        />
+
+        <link
+            rel="preload"
+            as="image"
+            href="./assets/fotoPerfil.jpeg"
+            fetchpriority="high"
+        />
+        <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+        <link rel="manifest" href="./manifest.json" />
+        <link rel="stylesheet" href="./css/style.css" />
+
+        <!-- Open Graph / Twitter -->
+        <meta property="og:image" content="./assets/og-image.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Angel Francisco Palestina | Portafolio" />
+        <meta name="twitter:description" content="Ingeniería en Sistemas Computacionales · Deep Learning · Full-Stack" />
+        <meta name="twitter:image" content="./assets/og-image.png" />
+
+        <!-- Schema.org JSON-LD (H.3) -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Person",
+          "name": "Angel Francisco Palestina Blancas",
+          "jobTitle": "Ingeniero en Sistemas Computacionales",
+          "description": "Estudiante de Ingeniería en Sistemas con enfoque en Deep Learning, Transformers, modelos de difusión y desarrollo full-stack.",
+          "knowsAbout": [
+            "Deep Learning",
+            "Transformers",
+            "Diffusion Models",
+            "Full-Stack Development",
+            "Python",
+            "Django",
+            "JavaScript"
+          ],
+          "url": "https://anngeliux.github.io/portfolio/",
+          "image": "https://anngeliux.github.io/portfolio/assets/fotoPerfil.jpeg",
+          "sameAs": [
+            "https://github.com/AnnGeliux",
+            "https://www.linkedin.com/in/angel-palestina"
+          ]
+        }
+        </script>
+
+        <!-- Plausible analytics (H.2 · descomentar y configurar dominio al deployar) -->
+        <!-- <script defer data-domain="anngeliux.github.io" src="https://plausible.io/js/script.js"></script> -->
+        <!-- Pre-paint: aplica la facción persistida antes del primer render.
+             Evita el FOUC (flash de paleta incorrecta) al cargar. -->
+        <script>
+            (function () {
+                try {
+                    var f = localStorage.getItem('faction');
+                    if (f) document.documentElement.setAttribute('data-theme', f);
+                } catch (e) { /* localStorage no disponible: ignora */ }
+            })();
+        </script>
+        <script type="module" src="./js/main.js"></script>
+    </head>
+    <body>
+        <noscript>
+            <p data-i18n="noscript" style="padding:1rem;text-align:center;">
+                Some content is rendered by JavaScript. Please enable JS to view
+                projects, education, and skills.
+            </p>
+        </noscript>
+        <a class="skip-link" href="#main">Saltar al contenido principal</a>
+
+        <!-- Fondos decorativos: estrellas estáticas + fugaces (ver js/modules/stars.js) -->
+        <div class="bg-stars" id="bg-stars" aria-hidden="true"></div>
+        <div class="bg-shooting-stars" id="bg-shooting-stars" aria-hidden="true"></div>
+
+        <header class="site-nav glass" role="banner">
+            <div class="container site-nav__inner">
+                <a
+                    href="#inicio"
+                    class="site-nav__brand"
+                    aria-label="Ir al inicio"
+                >
+                    <span class="site-nav__brand-mark" aria-hidden="true"
+                        >AP</span
+                    >
+                    <span class="site-nav__brand-name">Angel Palestina</span>
+                </a>
+
+                <nav
+                    class="site-nav__links"
+                    aria-label="Navegación principal"
+                >
+                    <ul class="site-nav__list" role="list">
+                        <li>
+                            <a
+                                href="#proyectos"
+                                class="site-nav__link"
+                                data-nav-link
+                                data-i18n="nav.proyectos"
+                                >Proyectos</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#educacion"
+                                class="site-nav__link"
+                                data-nav-link
+                                data-i18n="nav.educacion"
+                                >Educación</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#habilidades"
+                                class="site-nav__link"
+                                data-nav-link
+                                data-i18n="nav.habilidades"
+                                >Habilidades</a
+                            >
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="site-nav__action-group">
+                    <a
+                        href="#contacto"
+                        class="site-nav__cta"
+                        data-nav-link
+                        data-i18n="nav.contacto"
+                    >Contacto</a>
+
+                    <!-- Faction picker: 4 temas narrativos (Liminal / Arcadia / Ember / Void).
+                         Reemplaza al toggle binario de dark/light. La elección persiste
+                         en localStorage bajo la clave "faction". -->
+                    <details class="faction-picker" id="faction-picker">
+                        <summary
+                            class="site-nav__icon-btn"
+                            data-i18n-attr="aria-label:nav.theme-aria"
+                            aria-label="Cambiar facción de tema"
+                        >
+                            <span class="faction-picker__swatch" data-faction-swatch aria-hidden="true"></span>
+                            <span class="faction-picker__name" data-faction-name>Liminal</span>
+                            <svg
+                                class="faction-picker__caret"
+                                aria-hidden="true"
+                                focusable="false"
+                                viewBox="0 0 12 12"
+                            >
+                                <path
+                                    d="M3 4l3 3 3-3"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    fill="none"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+                        </summary>
+                        <ul class="faction-picker__menu" role="listbox" aria-label="Facción de tema">
+                            <li>
+                                <button type="button" data-faction="liminal" role="option">
+                                    <span class="faction-picker__dot" data-faction-dot="liminal" aria-hidden="true"></span>
+                                    <span class="faction-picker__label">
+                                        <strong data-i18n="faction.liminal">Liminal</strong>
+                                        <small data-i18n="faction.liminal-desc">Entre mundos · observación</small>
+                                    </span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" data-faction="arcadia" role="option">
+                                    <span class="faction-picker__dot" data-faction-dot="arcadia" aria-hidden="true"></span>
+                                    <span class="faction-picker__label">
+                                        <strong data-i18n="faction.arcadia">Arcadia</strong>
+                                        <small data-i18n="faction.arcadia-desc">Orden · claridad nórdica</small>
+                                    </span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" data-faction="ember" role="option">
+                                    <span class="faction-picker__dot" data-faction-dot="ember" aria-hidden="true"></span>
+                                    <span class="faction-picker__label">
+                                        <strong data-i18n="faction.ember">Ember</strong>
+                                        <small data-i18n="faction.ember-desc">Forja · intensidad maker</small>
+                                    </span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" data-faction="void" role="option">
+                                    <span class="faction-picker__dot" data-faction-dot="void" aria-hidden="true"></span>
+                                    <span class="faction-picker__label">
+                                        <strong data-i18n="faction.void">Void</strong>
+                                        <small data-i18n="faction.void-desc">Profundidad · glitch gótico</small>
+                                    </span>
+                                </button>
+                            </li>
+                        </ul>
+                    </details>
+
+                    <button
+                        class="site-nav__icon-btn site-nav__lang-toggle js-lang-toggle"
+                        type="button"
+                        aria-label="Cambiar idioma a inglés"
+                        data-i18n-attr="aria-label:nav.lang-aria"
+                    >
+                        <span data-i18n="nav.lang-short">EN</span>
+                    </button>
+                </div>
+
+                <details class="site-nav__menu">
+                    <summary
+                        class="site-nav__toggle"
+                        aria-label="Abrir menú de navegación"
+                    >
+                        <span class="site-nav__toggle-bar"></span>
+                        <span class="site-nav__toggle-bar"></span>
+                        <span class="site-nav__toggle-bar"></span>
+                    </summary>
+                    <div
+                        class="site-nav__panel"
+                        role="dialog"
+                        aria-label="Navegación principal"
+                    >
+                        <ul class="site-nav__list" role="list">
+                            <li>
+                                <a
+                                    href="#proyectos"
+                                    class="site-nav__link"
+                                    data-nav-link
+                                    data-i18n="nav.proyectos"
+                                >Proyectos</a>
+                            </li>
+                            <li>
+                                <a
+                                    href="#educacion"
+                                    class="site-nav__link"
+                                    data-nav-link
+                                    data-i18n="nav.educacion"
+                                >Educación</a>
+                            </li>
+                            <li>
+                                <a
+                                    href="#habilidades"
+                                    class="site-nav__link"
+                                    data-nav-link
+                                    data-i18n="nav.habilidades"
+                                >Habilidades</a>
+                            </li>
+                            <li class="site-nav__panel-cta-wrap">
+                                <a
+                                    href="#contacto"
+                                    class="site-nav__link site-nav__link--cta"
+                                    data-nav-link
+                                    data-i18n="nav.contacto"
+                                >Contacto</a>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </header>
+
+        <main id="main">
+            <!-- HERO -->
+            <section id="inicio" class="hero" aria-labelledby="hero-name">
+                <div class="container hero__inner">
+                    <div class="hero__avatar" data-reveal>
+                        <div class="hero__avatar-ring" aria-hidden="true"></div>
+                        <img
+                            src="./assets/fotoPerfil.jpeg"
+                            alt="Retrato de Angel Francisco Palestina Blancas"
+                            class="hero__avatar-img"
+                            width="240"
+                            height="240"
+                        />
+                    </div>
+
+                    <div class="hero__content" data-reveal>
+                        <span class="hero__eyebrow" data-i18n="hero.eyebrow"
+                            >Ingeniería en Sistemas · Deep Learning</span
+                        >
+                        <h1 id="hero-name" class="hero__name">
+                            <span data-i18n="hero.name">Angel Francisco</span><br />
+                            <span class="hero__name-accent" data-i18n="hero.name-accent"
+                                >Palestina Blancas</span
+                            >
+                        </h1>
+                        <p class="hero__tagline" data-i18n="hero.tagline">
+                            Estudiante de Ingeniería en Sistemas Computacionales
+                            con enfoque técnico en software engineering e
+                            inteligencia artificial. Sólidas bases matemáticas y
+                            teóricas en Deep Learning, Transformers y modelos de
+                            difusión.
+                        </p>
+                        <div class="hero__cta">
+                            <a
+                                href="#"
+                                class="btn btn--primary js-cta-email"
+                            >
+                                <svg
+                                    class="btn__icon"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <rect
+                                        x="2"
+                                        y="4"
+                                        width="20"
+                                        height="16"
+                                        rx="2"
+                                    ></rect>
+                                    <path d="m22 7-10 6L2 7"></path>
+                                </svg>
+                                <span data-i18n="btn.email">Escríbeme</span>
+                            </a>
+                            <a
+                                href="#"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn btn--ghost js-cta-github"
+                            >
+                                <svg
+                                    class="btn__icon"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                >
+                                    <path
+                                        d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.02c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.41-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.55C20.21 21.38 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z"
+                                    />
+                                </svg>
+                                <span data-i18n="btn.github">Ver GitHub</span>
+                            </a>
+                            <a
+                                href="./assets/CV-Angel-Palestina.pdf"
+                                class="btn btn--outline js-cv-download"
+                                aria-label="Descargar CV en PDF"
+                            >
+                                <svg
+                                    class="btn__icon"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <span data-i18n="btn.download-cv">Descargar CV</span>
+                            </a>
+                            <a
+                                href="https://github.com/AnnGeliux?tab=overview"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn btn--ghost js-cta-activity"
+                                aria-label="Ver actividad reciente en GitHub"
+                            >
+                                <svg
+                                    class="btn__icon"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                </svg>
+                                <span data-i18n="btn.activity">Actividad reciente</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <a
+                    href="#perfil"
+                    class="hero__scroll"
+                    aria-label="Desplazarse hacia abajo"
+                >
+                    <span class="hero__scroll-label" data-i18n="hero.scroll">Scroll</span>
+                    <span class="hero__scroll-line" aria-hidden="true"></span>
+                </a>
+            </section>
+
+            <!-- CURRENTLY (G.1) -->
+            <section
+                id="actualmente"
+                class="section"
+                aria-labelledby="actualmente-heading"
+                data-reveal
+            >
+                <div class="container">
+                    <header class="section__header">
+                        <span class="section__eyebrow">01</span>
+                        <h2 id="actualmente-heading" class="section__title" data-i18n="currently.heading">
+                            Actualmente
+                        </h2>
+                        <p class="section__subtitle" data-i18n="currently.subtitle">
+                            Qué estoy construyendo, aprendiendo y leyendo ahora mismo.
+                        </p>
+                    </header>
+
+                    <ul class="currently" id="currently-list" role="list"></ul>
+                </div>
+            </section>
+
+            <!-- PERFIL -->
+            <section
+                id="perfil"
+                class="section"
+                aria-labelledby="perfil-heading"
+                data-reveal
+            >
+                <div class="container">
+                    <header class="section__header">
+                        <span class="section__eyebrow">02</span>
+                        <h2 id="perfil-heading" class="section__title" data-i18n="perfil.heading">
+                            Perfil Profesional
+                        </h2>
+                        <p class="section__subtitle" data-i18n="perfil.subtitle">
+                            Una breve mirada a quién soy y hacia dónde apunto.
+                        </p>
+                    </header>
+
+                    <div class="card glass section__card">
+                        <p data-i18n-html="perfil.body-1">
+                            Estudiante de Ingeniería en Sistemas Computacionales
+                            con enfoque técnico en software engineering e
+                            inteligencia artificial. Sólidas bases matemáticas y
+                            teóricas en <strong>Deep Learning</strong>,
+                            <strong>Transformers</strong> y modelos de difusión
+                            dominadas paralelamente al desarrollo frontend y
+                            control de versiones Git.
+                        </p>
+                        <p data-i18n-html="perfil.body-2">
+                            Combino la curiosidad por los modelos generativos
+                            con una práctica constante de ingeniería de
+                            software: construir, desplegar, iterar. Me interesa
+                            especialmente el cruce entre IA aplicada y productos
+                            web que la gente realmente usa.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROYECTOS -->
+            <section
+                id="proyectos"
+                class="section"
+                aria-labelledby="proyectos-heading"
+            >
+                <div class="container">
+                    <header class="section__header" data-reveal>
+                        <span class="section__eyebrow">03</span>
+                        <h2 id="proyectos-heading" class="section__title" data-i18n="projects.heading">
+                            Experiencia y Proyectos
+                        </h2>
+                        <p class="section__subtitle" data-i18n="projects.subtitle">
+                            Lo que he construido y los problemas que he
+                            intentado resolver.
+                        </p>
+                    </header>
+
+                    <div
+                        class="filter-bar"
+                        role="toolbar"
+                        aria-label="Filtrar proyectos por categoría"
+                    >
+                        <button
+                            class="filter-bar__btn is-active"
+                            type="button"
+                            data-filter="all"
+                            data-i18n="filters.all"
+                        >Todos</button>
+                        <button
+                            class="filter-bar__btn"
+                            type="button"
+                            data-filter="deep-learning"
+                            data-i18n="filters.deep-learning"
+                        >Deep Learning</button>
+                        <button
+                            class="filter-bar__btn"
+                            type="button"
+                            data-filter="fullstack"
+                            data-i18n="filters.fullstack"
+                        >Full-Stack</button>
+                        <button
+                            class="filter-bar__btn"
+                            type="button"
+                            data-filter="automation"
+                            data-i18n="filters.automation"
+                        >Automatización</button>
+                    </div>
+
+                    <ul class="projects" id="projects-list" role="list"></ul>
+
+                    <div class="projects__empty" data-reveal>
+                        <div class="projects__empty-icon" aria-hidden="true">
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.6"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 6v6l4 2"></path>
+                            </svg>
+                        </div>
+                        <h3 class="projects__empty-title" data-i18n="filters.empty-title">
+                            Próximamente
+                        </h3>
+                        <p class="projects__empty-body" data-i18n="filters.empty-body">
+                            Aún no tengo proyectos publicados en esta categoría.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EDUCACIÓN -->
+            <section
+                id="educacion"
+                class="section"
+                aria-labelledby="educacion-heading"
+            >
+                <div class="container">
+                    <header class="section__header" data-reveal>
+                        <span class="section__eyebrow">04</span>
+                        <h2 id="educacion-heading" class="section__title" data-i18n="education.heading">
+                            Educación
+                        </h2>
+                        <p class="section__subtitle" data-i18n="education.subtitle">
+                            Formación académica y certificaciones que respaldan
+                            mi trabajo.
+                        </p>
+                    </header>
+
+                    <ol class="timeline" id="education-list"></ol>
+                </div>
+            </section>
+
+            <!-- HABILIDADES -->
+            <section
+                id="habilidades"
+                class="section"
+                aria-labelledby="habilidades-heading"
+            >
+                <div class="container">
+                    <header class="section__header" data-reveal>
+                        <span class="section__eyebrow">05</span>
+                        <h2 id="habilidades-heading" class="section__title" data-i18n="skills.heading">
+                            Habilidades
+                        </h2>
+                        <p class="section__subtitle" data-i18n="skills.subtitle">
+                            Stack técnico agrupado por dominio, no por años de
+                            uso.
+                        </p>
+                    </header>
+
+                    <ul class="skills" id="skills-list" role="list"></ul>
+                </div>
+            </section>
+
+            <!-- BLOG (G.3) -->
+            <section
+                id="blog"
+                class="section"
+                aria-labelledby="blog-heading"
+            >
+                <div class="container">
+                    <header class="section__header" data-reveal>
+                        <span class="section__eyebrow">06</span>
+                        <h2 id="blog-heading" class="section__title" data-i18n="blog.heading">
+                            Blog
+                        </h2>
+                        <p class="section__subtitle" data-i18n="blog.subtitle">
+                            Notas cortas sobre lo que estoy aprendiendo.
+                        </p>
+                    </header>
+
+                    <ul class="posts" id="posts-list" role="list"></ul>
+                </div>
+            </section>
+
+            <!-- CONTACTO -->
+            <section
+                id="contacto"
+                class="section"
+                aria-labelledby="contacto-heading"
+            >
+                <div class="container">
+                    <header class="section__header" data-reveal>
+                        <span class="section__eyebrow">07</span>
+                        <h2 id="contacto-heading" class="section__title" data-i18n="contact.heading">
+                            Contacto
+                        </h2>
+                        <p class="section__subtitle" data-i18n="contact.subtitle">
+                            ¿Tienes un proyecto, una idea o simplemente quieres
+                            saludar? Escríbeme.
+                        </p>
+                    </header>
+
+                    <div class="card glass contact" data-reveal>
+                        <p class="contact__lead" data-i18n="contact.lead">
+                            Estoy abierto a colaboraciones, prácticas y
+                            conversaciones sobre IA y desarrollo de software.
+                        </p>
+
+                        <div class="contact__actions">
+                            <a
+                                href="mailto:angel.palestina10@gmail.com"
+                                class="btn btn--primary btn--lg js-contact-email"
+                            >
+                                <svg
+                                    class="btn__icon"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <rect
+                                        x="2"
+                                        y="4"
+                                        width="20"
+                                        height="16"
+                                        rx="2"
+                                    ></rect>
+                                    <path d="m22 7-10 6L2 7"></path>
+                                </svg>
+                                <span data-i18n="contact.email-cta">angel.palestina10@gmail.com</span>
+                            </a>
+                            <a
+                                href="https://github.com/AnnGeliux"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn btn--ghost btn--lg js-contact-github"
+                            >
+                                <svg
+                                    class="btn__icon"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                >
+                                    <path
+                                        d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.02c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.41-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.55C20.21 21.38 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z"
+                                    />
+                                </svg>
+                                GitHub
+                            </a>
+                            <a
+                                href="./assets/CV-Angel-Palestina.pdf"
+                                class="btn btn--outline btn--lg js-cv-download"
+                                aria-label="Descargar CV en PDF"
+                            >
+                                <svg
+                                    class="btn__icon"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <span data-i18n="btn.download-cv">Descargar CV</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modal de proyecto (G.2) -->
+        <dialog class="project-modal" id="project-modal" aria-labelledby="project-modal-title"></dialog>
+
+        <footer class="site-footer" role="contentinfo">
+            <div class="container site-footer__inner">
+                <p class="site-footer__copy" data-i18n="footer.copy">
+                    © <span id="year">2025</span> Angel Francisco Palestina
+                    Blancas · Hecho con código y café.
+                </p>
+                <ul class="site-footer__links" role="list">
+                    <li>
+                        <a
+                            href="mailto:angel.palestina10@gmail.com"
+                            class="site-footer__link js-footer-email"
+                            data-i18n="footer.email"
+                            >Email</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="https://github.com/AnnGeliux"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="site-footer__link js-footer-github"
+                            data-i18n="footer.github"
+                            >GitHub</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="https://www.linkedin.com/in/angel-palestina"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="site-footer__link js-footer-linkedin"
+                            data-i18n="footer.linkedin"
+                            >LinkedIn</a
+                        >
+                    </li>
+                </ul>
+            </div>
+        </footer>
+    </body>
+</html>

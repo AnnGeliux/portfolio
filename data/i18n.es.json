@@ -1,0 +1,87 @@
+{
+    "nav": {
+        "proyectos": "Proyectos",
+        "educacion": "Educación",
+        "habilidades": "Habilidades",
+        "contacto": "Contacto",
+        "lang-short": "EN",
+        "lang-aria": "Cambiar idioma a inglés",
+        "theme-aria": "Cambiar facción de tema"
+    },
+    "faction": {
+        "label": "Facción",
+        "liminal": "Liminal",
+        "arcadia": "Arcadia",
+        "ember": "Ember",
+        "void": "Void",
+        "liminal-desc": "Entre mundos · observación",
+        "arcadia-desc": "Orden · claridad nórdica",
+        "ember-desc": "Forja · intensidad maker",
+        "void-desc": "Profundidad · glitch gótico"
+    },
+    "hero": {
+        "eyebrow": "Ingeniería en Sistemas · Deep Learning",
+        "name": "Angel Francisco",
+        "name-accent": "Palestina Blancas",
+        "tagline": "Estudiante de Ingeniería en Sistemas Computacionales con enfoque técnico en software engineering e inteligencia artificial. Sólidas bases matemáticas y teóricas en Deep Learning, Transformers y modelos de difusión.",
+        "scroll": "Scroll"
+    },
+    "btn": {
+        "email": "Escríbeme",
+        "github": "Ver GitHub",
+        "download-cv": "Descargar CV",
+        "activity": "Actividad reciente"
+    },
+    "perfil": {
+        "heading": "Perfil Profesional",
+        "subtitle": "Una breve mirada a quién soy y hacia dónde apunto.",
+        "body-1": "Estudiante de Ingeniería en Sistemas Computacionales con enfoque técnico en software engineering e inteligencia artificial. Sólidas bases matemáticas y teóricas en <strong>Deep Learning</strong>, <strong>Transformers</strong> y modelos de difusión dominadas paralelamente al desarrollo frontend y control de versiones Git.",
+        "body-2": "Combino la curiosidad por los modelos generativos con una práctica constante de ingeniería de software: construir, desplegar, iterar. Me interesa especialmente el cruce entre IA aplicada y productos web que la gente realmente usa."
+    },
+    "currently": {
+        "heading": "Actualmente",
+        "subtitle": "Qué estoy construyendo, aprendiendo y leyendo ahora mismo."
+    },
+    "highlights": {
+        "categories": "categorías técnicas",
+        "projects": "proyectos publicados",
+        "certs": "certificación Andrew Ng"
+    },
+    "filters": {
+        "all": "Todos",
+        "deep-learning": "Deep Learning",
+        "fullstack": "Full-Stack",
+        "automation": "Automatización",
+        "empty-title": "Próximamente",
+        "empty-body": "Aún no tengo proyectos publicados en esta categoría. Estoy trabajando en ello."
+    },
+    "projects": {
+        "heading": "Experiencia y Proyectos",
+        "subtitle": "Lo que he construido y los problemas que he intentado resolver."
+    },
+    "education": {
+        "heading": "Educación",
+        "subtitle": "Formación académica y certificaciones que respaldan mi trabajo."
+    },
+    "skills": {
+        "heading": "Habilidades",
+        "subtitle": "Stack técnico agrupado por dominio, no por años de uso."
+    },
+    "blog": {
+        "heading": "Blog",
+        "subtitle": "Notas cortas sobre lo que estoy aprendiendo."
+    },
+    "contact": {
+        "heading": "Contacto",
+        "subtitle": "¿Tienes un proyecto, una idea o simplemente quieres saludar? Escríbeme.",
+        "lead": "Estoy abierto a colaboraciones, prácticas y conversaciones sobre IA y desarrollo de software.",
+        "email-cta": "angel.palestina10@gmail.com"
+    },
+    "footer": {
+        "copy": "© {year} Angel Francisco Palestina Blancas · Hecho con código y café.",
+        "email": "Email",
+        "github": "GitHub",
+        "linkedin": "LinkedIn"
+    },
+    "noscript": "Some content is rendered by JavaScript. Please enable JS to view projects, education, and skills."
+}

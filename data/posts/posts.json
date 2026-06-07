@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "2026-06-porque-deje-n8n",
+    "date": "2026-06-15",
+    "title": {
+      "es": "Por qué dejé n8n para este workflow",
+      "en": "Why I left n8n for this workflow"
+    },
+    "excerpt": {
+      "es": "Cuándo el low-code se vuelve deuda técnica y cómo migré a Python sin perder la orquestación.",
+      "en": "When low-code becomes technical debt and how I migrated to Python without losing orchestration."
+    },
+    "tags": [
+      "n8n",
+      "Python",
+      "automatización",
+      "refactor"
+    ]
+  }
+]

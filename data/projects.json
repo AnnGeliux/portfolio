@@ -1,0 +1,24 @@
+[
+  {
+    "id": "sistema-gestor-lecturas",
+    "category": "fullstack",
+    "tags": ["Python", "Django", "MariaDB", "JavaScript", "HTML5/CSS3"],
+    "iconSvg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20\"></path></svg>",
+    "cover": "./assets/project-covers/sistema-gestor-lecturas.png",
+    "repoUrl": "https://github.com/AnnGeliux/sistemaGestorLecturas",
+    "liveUrl": "https://sistema-gestor-lecturas.onrender.com",
+    "stars": 0,
+    "commits": 7
+  },
+  {
+    "id": "automatizacion-flujos",
+    "category": "automation",
+    "tags": ["n8n", "Python", "JavaScript ES6", "SQL", "MariaDB"],
+    "iconSvg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83\"></path></svg>",
+    "cover": "./assets/project-covers/challenge-amigo-secreto.png",
+    "repoUrl": "https://github.com/AnnGeliux/challenge-amigo-secreto",
+    "liveUrl": "",
+    "stars": 0,
+    "commits": 1
+  }
+]

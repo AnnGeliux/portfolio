@@ -1,0 +1,19 @@
+{
+  "name": "Angel Palestina · Portafolio",
+  "short_name": "APortfolio",
+  "description": "Portafolio de Angel Francisco Palestina Blancas — Ingeniería en Sistemas con enfoque en Deep Learning, Transformers y desarrollo full-stack.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a0a14",
+  "theme_color": "#0a0a14",
+  "lang": "es-MX",
+  "icons": [
+    {
+      "src": "./assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+    "sistema-gestor-lecturas": {
+        "title": "Reading Management System",
+        "description": "Web application built with Django and MariaDB for managing readings, books, and personal goals. It allows registering literary works, tracking reading progress, taking notes while reading, and visualizing statistics through a modern HTML, CSS, and JavaScript interface.",
+        "details": {
+            "role": "Full-stack developer",
+            "year": 2025,
+            "duration": "3 months",
+            "techStack": [
+                { "name": "Python",    "version": "3.10+" },
+                { "name": "Django",    "version": "5.2.4" },
+                { "name": "MariaDB",   "version": "10.x" },
+                { "name": "Chart.js",  "version": "latest" }
+            ],
+            "challenges": [
+                "Design a data model for progressive goals (yearly, monthly, per-book)",
+                "Implement the stats panel with efficient aggregate queries",
+                "Handle differentiated admin/user permissions without third-party packages"
+            ],
+            "learned": [
+                "How to structure a medium-scale Django project without falling into a monolith",
+                "Template composition patterns with {% include %} and {% extends %}",
+                "The value of tests: this project doesn't have them, the next one will"
+            ]
+        }
+    },
+    "automatizacion-flujos": {
+        "title": "Automation & Workflows",
+        "description": "Creation of automated workflows with n8n to optimize repetitive processes in professional and academic environments, integrating services and databases with minimal friction.",
+        "details": {
+            "role": "Automation developer",
+            "year": 2024,
+            "duration": "Ongoing",
+            "techStack": [
+                { "name": "n8n",          "version": "latest" },
+                { "name": "Python",       "version": "3.10+" },
+                { "name": "JavaScript",   "version": "ES6+" },
+                { "name": "SQL",          "version": "ANSI" },
+                { "name": "MariaDB",      "version": "10.x" }
+            ],
+            "challenges": [
+                "Design workflows resilient to external service failures",
+                "Balance the power of n8n with the maintainability of the adjacent Python code",
+                "Version and document flows so other devs can iterate on them"
+            ],
+            "learned": [
+                "When low-code is the right call, and when to drop down to pure Python",
+                "The hidden cost of 'magical' integrations that fail silently",
+                "How to debug a distributed workflow without centralized logs"
+            ]
+        }
+    }
+}

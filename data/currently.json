@@ -1,0 +1,6 @@
+[
+  { "icon": "→", "label": "Building",  "text": "Sistema de agentes IA con MCP (Jun 2026)" },
+  { "icon": "→", "label": "Learning",  "text": "Diffusion models con SDXL y ComfyUI workflows" },
+  { "icon": "→", "label": "Reading",   "text": "Designing Data-Intensive Applications — ch. 4" },
+  { "icon": "→", "label": "Side proj", "text": "Visualizador de attention maps en transformers" }
+]
