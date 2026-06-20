@@ -1,0 +1,439 @@
+@import "tailwindcss";
+/*
+ * Inter y Space Grotesk (variable, vía @fontsource). El CSS de fontsource declara
+ * un @font-face por subset con unicode-range, así que el navegador solo descarga
+ * los subsets de los glifos que realmente renderiza: para un sitio en español eso
+ * es solo "latin" (cyrillic/greek/vietnamese/latin-ext no se bajan). No hay
+ * subsetting manual que hacer aquí sin reescribir los @font-face a mano.
+ */
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/space-grotesk";
+
+/*
+ * Satoshi (Fontshare — ITF Free Font License, comercial sin atribución).
+ * self-hosteada como archivo variable único en public/fonts/ (path estable,
+ * sin hashear, para poder pre-cargarla con <link rel="preload"> en Layout.astro).
+ * Cubre todo el rango de pesos 300–900 en ~42 KB (antes: 4 estáticos = ~98 KB).
+ * El path lleva el base de GitHub Pages (/portfolio) porque Vite no antepone el
+ * base a las url() absolutas con barra inicial; el base es fijo en astro.config.
+ */
+@font-face {
+  font-family: "Satoshi";
+  src: url("/portfolio/fonts/satoshi-variable.woff2") format("woff2-variations");
+  font-weight: 300 900;
+  font-display: swap;
+}
+
+/*
+ * Tema oscuro basado en clase (.dark en <html>).
+ * En Tailwind v4 se declara el variant manualmente para usar `dark:` por clase
+ * en lugar de por `prefers-color-scheme`.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Tokens de diseño centralizados (CSS-first).
+ * Para iterar el frontend: cambia colores/espaciados aquí y se propagan a
+ * todas las clases `bg-{token}`, `text-{token}`, etc.
+ */
+@theme {
+  --font-sans: "Satoshi", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk Variable", "Satoshi", ui-sans-serif, system-ui, sans-serif;
+
+  /* Paleta principal (modo claro por defecto) */
+  --color-bg: #ffffff;
+  --color-surface: #f5f5f7;
+  --color-fg: #0b0b14;
+  --color-muted: #555562;
+  --color-accent: #6366f1;
+  --color-accent-soft: #a855f7;
+  --color-border: #e5e5ea;
+}
+
+/*
+ * Override de tokens cuando se activa el tema oscuro. La clase `.dark` en
+ * <html> la conmuta el script anti-FOUC de Layout.astro según el valor de
+ * localStorage("portfolio-theme") o, en su defecto, prefers-color-scheme.
+ */
+@layer base {
+  .dark {
+    --color-bg: #0a0a12;
+    --color-surface: #14141f;
+    --color-fg: #ececf2;
+    --color-muted: #9a9aae;
+    --color-accent: #818cf8;
+    --color-accent-soft: #c084fc;
+    --color-border: #232330;
+  }
+
+  html {
+    /* Scroll suave al navegar con la navbar (clic en tabs). Sin scroll-snap:
+       antes usaba `scroll-snap-type: y proximity` + `snap-start` en tickers/hero/
+       footer, pero entorpecía el scroll libre, así que se quitó. */
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    /* Los tickers sólidos usan width:100vw (breakout full-bleed); clip evita la
+       barra de scroll horizontal que eso generaría por el ancho de scrollbar. */
+    overflow-x: clip;
+  }
+
+  /* Foco visible para navegación por teclado (tabs de la navbar, toggle de tema,
+     enlaces). Visible en ambos temas. */
+  a:focus-visible,
+  button:focus-visible,
+  [role="tab"]:focus-visible,
+  [role="switch"]:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/*
+ * Liquid glass (técnica SVG distortion): replica la arquitectura por capas del
+ * componente src/components/ui/liquid-glass.tsx.
+ *   ::before → capa de refracción: backdrop-blur + filter: url(#glass-distortion)
+ *              (feTurbulence + feDisplacementMap + feSpecularLighting).
+ *   ::after  → tinte blanco + highlights interiores (borde brillante).
+ *   contenido → por encima, SIN filtrar (legible).
+ * El <GlassFilter /> (id #glass-distortion) se renderiza una sola vez en
+ * Layout.astro. .glass-card → tarjetas; .glass-pill → badge y botones.
+ */
+@layer components {
+  .glass-card,
+  .glass-pill {
+    position: relative;
+    isolation: isolate;
+    /* Transparente por defecto para que la refracción sea del fondo (gradiente).
+       Respaldo opaco si el navegador no soporta backdrop-filter. */
+    border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
+    box-shadow:
+      0 6px 6px rgba(0, 0, 0, 0.2),
+      0 0 20px rgba(0, 0, 0, 0.1);
+  }
+
+  @supports not (
+    (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+  ) {
+    .glass-card {
+      background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+    }
+    .glass-pill {
+      background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+    }
+  }
+
+  /*
+   * Capa de refracción (z-index: -1) → se pinta DETRÁS del contenido
+   * (incluido texto suelto), así el backdrop-filter no difumina el texto.
+   * blur del backdrop + distorsión SVG (gota de agua).
+   */
+  .glass-card::before,
+  .glass-pill::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    overflow: hidden;
+    isolation: isolate;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    filter: url(#glass-distortion);
+    pointer-events: none;
+  }
+
+  /* Tinte + highlights interiores (también detrás del contenido). */
+  .glass-card::after,
+  .glass-pill::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow:
+      inset 2px 2px 1px 0 rgba(255, 255, 255, 0.22),
+      inset -1px -1px 1px 1px rgba(255, 255, 255, 0.22);
+    pointer-events: none;
+  }
+
+  .glass-pill::after {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  /*
+   * Modo claro: el liquid glass se sintoniza para fondo claro. El borde pasa al
+   * token --color-border (visible sobre blanco), el panel gana un tinte de
+   * superficie translúcido y la sombra es suave (las sombras oscuras del modo
+   * oscuro quedan demasiado duras sobre blanco). El modo oscuro usa los estilos
+   * base de arriba; este bloque solo aplica cuando <html> no lleva .dark.
+   */
+  :where(html:not(.dark)) .glass-card,
+  :where(html:not(.dark)) .glass-pill {
+    border: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      0 10px 30px rgba(0, 0, 0, 0.05);
+  }
+  :where(html:not(.dark)) .glass-card::after,
+  :where(html:not(.dark)) .glass-pill::after {
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+  }
+
+  /*
+   * El Hero es siempre oscuro (shader + scrim), incluso en modo claro. Sus
+   * glass-pills (badge de estado y botones de contacto) deben conservar el
+   * look oscuro —transparentes con highlight sutil— y no la variante light de
+   * arriba, que les pondría un fondo blanco sobre el hero oscuro. Se
+   * sobreescribe la variante clara solo dentro de #hero (mayor especificidad
+   * vía el id, sin necesidad de tocar el componente Hero).
+   */
+  :where(html:not(.dark)) #hero .glass-pill {
+    background: transparent;
+    border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
+    box-shadow:
+      0 6px 6px rgba(0, 0, 0, 0.2),
+      0 0 20px rgba(0, 0, 0, 0.1);
+  }
+  :where(html:not(.dark)) #hero .glass-pill::after {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 2px 2px 1px 0 rgba(255, 255, 255, 0.22),
+      inset -1px -1px 1px 1px rgba(255, 255, 255, 0.22);
+  }
+
+  /*
+   * El texto morfológico (GooeyText) pinta con --color-fg, que en modo claro es
+   * oscuro y se pierde sobre el Hero (siempre oscuro). Es el único consumidor
+   * de --color-fg dentro de #hero (el resto del texto del Hero usa text-white
+   * explícito), así que forzar el token a blanco aquí arregla solo ese texto,
+   * sin tocar a otros elementos.
+   */
+  :where(html:not(.dark)) #hero {
+    --color-fg: #ffffff;
+  }
+
+  /*
+   * Accesibilidad: con movimiento o transparencia reducidos, se desactiva la
+   * refracción/distorsión y se cae a la superficie opaca para legibilidad.
+   */
+  @media (prefers-reduced-motion: reduce),
+    (prefers-reduced-transparency: reduce) {
+    .glass-card,
+    .glass-pill {
+      background: var(--color-surface);
+      box-shadow: none;
+    }
+    .glass-card::before,
+    .glass-pill::before,
+    .glass-card::after,
+    .glass-pill::after {
+      display: none;
+    }
+  }
+
+  /*
+   * Floor ambiental (solo modo claro): gradiente suave de acento fijo detrás de
+   * todo el contenido. Alimenta el backdrop-filter del liquid glass desde el
+   * primer paint (GradientDots se hidrata con client:load y tarda un frame) y
+   * da color a refractar donde los radiales animados quedan dispersos. z-index
+   * -40 pinta por encima de GradientDots (-50) pero por debajo del contenido;
+   * es translúcido, así que los radiales animados siguen viéndose a través.
+   */
+  :where(html:not(.dark)) .ambient-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -40;
+    pointer-events: none;
+    background:
+      radial-gradient(60% 50% at 12% 18%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 70%),
+      radial-gradient(55% 55% at 88% 28%, color-mix(in srgb, var(--color-accent-soft) 12%, transparent), transparent 70%),
+      radial-gradient(80% 60% at 50% 95%, color-mix(in srgb, var(--color-accent) 7%, transparent), transparent 72%);
+  }
+
+  /*
+   * Hover unificado de las tarjetas de secciones (las .glass-card dentro de
+   * <main>): zoom suave + iluminación muy tenue del borde. Quedan excluidos
+   * Hero, Footer y Navbar (todos fuera de <main>). Todas las tarjetas de
+   * sección comparten las mismas propiedades. El borde pasa a un acento suave
+   * y se añade un halo exterior tenue; sin reflow (transform es visual).
+   */
+  main .glass-card {
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+  main .glass-card:hover {
+    transform: scale(1.02);
+    border-color: color-mix(in srgb, var(--color-accent) 28%, transparent);
+    box-shadow:
+      0 12px 32px -10px rgba(0, 0, 0, 0.25),
+      0 0 0 1px color-mix(in srgb, var(--color-accent) 14%, transparent),
+      /* halo exterior en acento: dos capas para un glow más rico y difuso. */
+      0 0 18px -6px color-mix(in srgb, var(--color-accent) 40%, transparent),
+      0 0 40px -12px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  }
+  /* Movimiento reducido: respeta la preferencia; solo conserva el cambio de
+     borde/sombra, sin el zoom. */
+  @media (prefers-reduced-motion: reduce) {
+    main .glass-card {
+      transition: border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+    main .glass-card:hover {
+      transform: none;
+    }
+  }
+
+  /*
+   * Scroll reveal: el contenido de las secciones entra con fade + slide-up al
+   * llegar al viewport. Solo se oculta con JS (la clase .js en <html> la añade
+   * el script anti-FOUC de Layout.astro); sin JS todo queda visible (no se
+   * pierde contenido ni para SEO). Título primero (delay 0), tarjetas después
+   * (stagger vía --reveal-delay inline).
+   * Usa `translate` (propiedad de transform independiente) para el slide-up en
+   * vez de `transform`, de modo que no pise el `transform: scale()` del hover de
+   * .glass-card: ambos aplican a la vez sin conflicto de transición.
+   */
+  .js .reveal-item {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  .reveal-item.is-visible {
+    opacity: 1;
+    translate: 0 0;
+  }
+  /*
+   * Tarjetas glass: el panel (glass + su refracción backdrop-filter del
+   * ::before/::after) NO hace fade —durante opacity<1 el backdrop-filter deja de
+   * muestrear el fondo y el glass se "rellena" al final, que era el "fondo
+   * tardío" que se veía. Se mantiene opacity:1 para que el glass quede
+   * renderizado desde el inicio y el fondo entre a la par de la tarjeta.
+   * El CONTENIDO sí hace fade (fade de los hijos directos del .glass-card), así
+   * sigue habiendo un fade visible sobre el panel sin tocar el backdrop-filter.
+   * El panel además desliza (translate) junto con los títulos. Los pseudo-elementos
+   * ::before/::after no son hijos → no les afecta el fade (el glass queda siempre).
+   */
+  .js .glass-card.reveal-item {
+    opacity: 1;
+  }
+  .js .glass-card.reveal-item > * {
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+  }
+  .glass-card.reveal-item.is-visible > * {
+    opacity: 1;
+  }
+  main .reveal-item {
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+      translate 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+  /* Movimiento reducido: sin slide (translate a 0), solo fade rápido. */
+  @media (prefers-reduced-motion: reduce) {
+    .js .reveal-item {
+      translate: 0 0;
+      transition: opacity 0.4s ease var(--reveal-delay, 0ms);
+    }
+  }
+}
+
+/*
+ * Ticker (marquee) — divisores entre secciones.
+ * Componente: src/components/Ticker.astro. CSS puro, sin hidratación (coherente
+ * con la filosofía del portafolio de evitar islas React innecesarias).
+ *   .ticker        → banda con overflow oculto + máscara que difumina los bordes.
+ *   .ticker-track  → flex que se desplaza; lleva dos mitades idénticas y el
+ *                    bucle va de 0 a -50% (seamless).
+ * Estático por defecto; al pasar el cursor se pone en movimiento (y al salir
+ * se detiene de nuevo). Sin el cambio brusco de dirección de versiones previas.
+ * [data-reverse] → sentido de desplazamiento al hover (variedad entre divisores).
+ * prefers-reduced-motion → estático (incluso al hover).
+ */
+.ticker {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 6%,
+    #000 94%,
+    transparent
+  );
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+/* Variante sólida: fondo negro, sin máscara (el negro llega limpio al borde)
+   y full-bleed (ocupa todo el viewport aunque viva dentro de un contenedor con
+   max-width centrado, vía breakout width:100vw + márgenes negativos). */
+.ticker--solid {
+  -webkit-mask-image: none;
+  mask-image: none;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll var(--ticker-duration, 30s) linear infinite;
+  /* Estático por defecto: la animación existe pero no corre hasta el hover. */
+  animation-play-state: paused;
+  will-change: transform;
+}
+
+/* Variante: desplazamiento en sentido inverso al hacer hover. */
+.ticker[data-reverse] .ticker-track {
+  animation-direction: reverse;
+}
+
+/*
+ * Separador diagonal (.ticker-sep en Ticker.astro). La inclinación depende de
+ * la dirección de scroll del ticker:
+ *   - default (sin data-reverse): el track va 0 → -50%, i.e. se desplaza a la
+ *     IZQUIERDA → diagonal invertida "\".
+ *   - data-reverse: el track va -50% → 0, i.e. se desplaza a la DERECHA →
+ *     diagonal "/".
+ */
+.ticker .ticker-sep {
+  transform: skewX(20deg);
+}
+.ticker[data-reverse] .ticker-sep {
+  transform: skewX(-20deg);
+}
+
+/* Al pasar el cursor, el marquee se pone en movimiento. */
+.ticker:hover .ticker-track {
+  animation-play-state: running;
+}
+
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Accesibilidad: sin animación con movimiento reducido. */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+}
+

@@ -1,0 +1,114 @@
+---
+import { ContactIcon, GithubIcon, LinkedinIcon, type SocialKind } from './ui/social-icons';
+
+interface Profile {
+  fullName: string;
+  email: string;
+  phone: string;
+  github: string;
+  linkedin: string;
+}
+
+interface Props {
+  profile: Profile;
+}
+
+const { profile } = Astro.props;
+const year = new Date().getFullYear();
+
+// Nombre corto para la marca del footer (más legible que el fullName completo).
+const shortName = 'Angel Palestina';
+
+// Enlaces de la columna de contacto: etiqueta amigable + valor a mostrar + href.
+const contacts: { kind: SocialKind; label: string; value: string; href: string }[] = [
+  { kind: 'email', label: 'Email', value: profile.email, href: `mailto:${profile.email}` },
+  { kind: 'phone', label: 'Teléfono', value: profile.phone, href: `tel:${profile.phone}` },
+  { kind: 'github', label: 'GitHub', value: 'AnnGeliux', href: profile.github },
+  {
+    kind: 'linkedin',
+    label: 'LinkedIn',
+    value: 'Angel Palestina',
+    href: profile.linkedin,
+  },
+];
+---
+
+<footer
+  id="contact"
+  class="scroll-mt-20 mx-auto max-w-5xl px-4 py-10 sm:py-14"
+>
+  <div class="glass-card rounded-2xl px-6 py-10 sm:px-10 sm:py-12">
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-12">
+      {/* Columna izquierda: marca + micro-bio + pills sociales */}
+      <div class="flex flex-col gap-4">
+        <p class="text-lg font-semibold text-(--color-fg)">{shortName}</p>
+        <p class="text-sm leading-relaxed text-(--color-muted)">
+          Ingeniería en Sistemas + Deep Learning / IA.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <a
+            href={profile.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="glass-pill inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm text-(--color-fg) transition hover:text-(--color-accent)"
+          >
+            <GithubIcon className="h-4 w-4" /> GitHub
+          </a>
+          <a
+            href={profile.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="glass-pill inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm text-(--color-fg) transition hover:text-(--color-accent)"
+          >
+            <LinkedinIcon className="h-4 w-4" /> LinkedIn
+          </a>
+        </div>
+      </div>
+
+      {/* Columna derecha: bloque de contacto */}
+      <div class="flex flex-col gap-3">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-(--color-fg)">
+          Contacto
+        </h2>
+        <ul class="flex flex-col gap-3 text-sm">
+          {
+            contacts.map((c) => {
+              const external = c.kind === 'github' || c.kind === 'linkedin';
+              return (
+                <li>
+                  <a
+                    href={c.href}
+                    {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                    class="inline-flex items-center gap-3 rounded-md text-(--color-muted) transition hover:text-(--color-accent)"
+                  >
+                    <span class="text-(--color-accent)">
+                      <ContactIcon kind={c.kind} className="h-4 w-4" />
+                    </span>
+                    <span class="flex flex-col">
+                      <span class="text-(--color-fg)">{c.label}</span>
+                      <span class="text-xs text-(--color-muted)">{c.value}</span>
+                    </span>
+                  </a>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </div>
+    </div>
+
+    {/* Barra inferior: copyright + tech stack + volver arriba */}
+    <div
+      class="mt-8 flex flex-col items-center gap-4 border-t border-(--color-border) pt-6 text-xs text-(--color-muted) sm:flex-row sm:justify-between"
+    >
+      <p>© {year} {shortName} · Hecho con Astro, React y Tailwind.</p>
+      <a
+        href="#hero"
+        aria-label="Volver arriba"
+        class="glass-pill inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-(--color-fg) transition hover:text-(--color-accent)"
+      >
+        <span aria-hidden="true">↑</span> Volver arriba
+      </a>
+    </div>
+  </div>
+</footer>

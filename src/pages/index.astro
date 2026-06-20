@@ -1,0 +1,523 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.tsx';
+import Footer from '../components/Footer.astro';
+import { ShaderAnimation } from '../components/ui/shader-lines';
+import Ticker from '../components/Ticker.astro';
+import {
+  Code2,
+  ExternalLink,
+  BadgeCheck,
+  GraduationCap,
+  MapPin,
+  Calendar,
+  BookOpen,
+  Languages as LanguagesIcon,
+} from 'lucide-react';
+
+// Prefijo base para assets en /public (respeta el base de GitHub Pages).
+// BASE_URL puede venir con o sin barra final; normalizamos a sin esta.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const asset = (path: string) => `${base}/${path.replace(/^\//, '')}`;
+
+// Datos de contacto y perfiles (extraídos del CV).
+const profile = {
+  fullName: 'Angel Francisco Palestina Blancas',
+  email: 'aangel.palestina@gmail.com',
+  phone: '5638588959',
+  github: 'https://github.com/AnnGeliux',
+  linkedin:
+    'https://www.linkedin.com/in/angel-francisco-palestina-blancas-2773b7318/',
+};
+
+const summaryLead =
+  'Estudiante de Ingeniería en Sistemas Computacionales con un perfil técnico ' +
+  'enfocado en la ingeniería de software y la implementación de Inteligencia ' +
+  'Artificial. Cuento con bases matemáticas y teóricas sólidas en Deep Learning ' +
+  '(Redes Neuronales Profundas) y experiencia práctica en el ecosistema de IA ' +
+  'avanzada mediante Transformers y modelos de difusión.';
+
+// Segundo párrafo con el nombre del proyecto resaltado en negrita + itálica.
+const summaryBody = [
+  { text: 'Combino ese enfoque en IA con el desarrollo full-stack y el control de versiones con Git para construir aplicaciones funcionales, como mi ' },
+  { text: 'Sistema Gestor de Lecturas en Django', em: true, strong: true },
+  { text: '. Me interesa la optimización de hardware y el cómputo de alto rendimiento para aportar soluciones innovadoras en el mercado actual.' },
+];
+
+// Ejes de enfoque mostrados como chips bajo el resumen.
+const focusAreas = ['Deep Learning', 'Full-Stack', 'IA Generativa'];
+
+// Educación (extraída del CV).
+const education = {
+  institution: 'Universidad Tecnológica de México',
+  degree: 'Ingeniería en Sistemas Computacionales · B.S. en Ciencias de la Computación',
+  location: 'Ciudad de México, México',
+  period: 'Septiembre 2024 — Septiembre 2028 (Expected)',
+};
+
+// Habilidades agrupadas por categoría (extraídas del CV + añadidos).
+const skillGroups = [
+  {
+    category: 'Lenguajes de Programación',
+    items: ['Python', 'JavaScript (ES6)', 'SQL', 'HTML5'],
+  },
+  {
+    category: 'Inteligencia Artificial y Datos',
+    items: [
+      'Deep Learning (DNNs)',
+      'Transformers',
+      'PyTorch',
+      'TensorFlow',
+      'NumPy',
+      'Agentes de IA',
+      'Model Context Protocol (MCP)',
+    ],
+  },
+  {
+    category: 'Ecosistema IA & Generativa',
+    items: [
+      'Hugging Face',
+      'Diffusers',
+      'ComfyUI',
+      'Wan 2.1 (T2I/I2V)',
+      'Ollama',
+      'RAG',
+      'LLMs',
+    ],
+  },
+  {
+    category: 'Desarrollo Web (Full-Stack)',
+    items: ['Django', 'MariaDB', 'MongoDB', 'n8n'],
+  },
+  {
+    category: 'Frontend & UI',
+    items: ['Astro', 'React', 'Tailwind CSS'],
+  },
+  {
+    category: 'Herramientas, DevOps y Metodologías',
+    items: [
+      'Docker',
+      'Git',
+      'GitHub',
+      'Entornos Virtuales (venv)',
+      'VS Code',
+      'Jupyter Notebooks',
+      'Metodologías Ágiles (Scrum)',
+    ],
+  },
+  {
+    category: 'Soft Skills',
+    items: [
+      'Comunicación efectiva',
+      'Trabajo en equipo',
+      'Resolución de problemas',
+      'Aprendizaje autodidacta',
+    ],
+  },
+];
+
+// Lo que estoy aprendiendo ahora mismo.
+const currentlyLearning = [
+  {
+    title: 'Redes Neuronales Convolucionales (CNNs)',
+    detail: 'Continuación de la especialización en Deep Learning.',
+  },
+  {
+    title: 'Certificación MongoDB',
+    detail: 'En progreso.',
+    inProgress: true,
+  },
+];
+
+// Idiomas (extraídos del CV).
+const languages = [
+  { name: 'Español', level: 'Nativo' },
+  { name: 'English', level: 'B1 (Técnico)' },
+];
+
+// Botones de contacto que se muestran dentro del Hero.
+type ContactKind = 'email' | 'phone' | 'github' | 'linkedin';
+const heroContacts: { kind: ContactKind; label: string; href: string }[] = [
+  { kind: 'email', label: profile.email, href: `mailto:${profile.email}` },
+  { kind: 'phone', label: profile.phone, href: `tel:${profile.phone}` },
+  { kind: 'github', label: 'GitHub', href: profile.github },
+  { kind: 'linkedin', label: 'LinkedIn', href: profile.linkedin },
+];
+
+// Palabras que morfean en el Hero (en lo que estoy trabajando/interesado ahora).
+const heroMorphTexts = ['Redes Neuronales', 'Sistemas', 'Agentes', 'Full Stack'];
+
+// Proyectos: destacados primero, luego por fecha desc.
+const projects = (await getCollection('projects')).sort((a, b) => {
+  if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+  return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+});
+
+// Certificaciones: por fecha desc.
+const certifications = (await getCollection('certifications')).sort(
+  (a, b) => b.data.issueDate.valueOf() - a.data.issueDate.valueOf(),
+);
+
+const fmtDate = (d: Date) =>
+  d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short' });
+---
+
+<Layout
+  title="Angel Palestina — Estudiante de Ingeniería en Sistemas especializado en Deep Learning"
+  description="Portafolio de Angel Francisco Palestina Blancas: estudiante de Ingeniería de Sistemas especializado en Deep Learning e IA."
+>
+  <!-- Hero (React + Framer Motion, hidratado al cargar) -->
+  <div id="hero" class="relative">
+    <!-- Fondo: shader WebGL (se hidrata solo cuando es visible) -->
+    <div class="absolute inset-0 -z-20 overflow-hidden pointer-events-none">
+      <ShaderAnimation client:visible />
+    </div>
+    <!-- Scrim radial para mantener el texto del Hero legible sobre el shader -->
+    <div
+      class="absolute inset-0 -z-10 pointer-events-none bg-[radial-gradient(70%_60%_at_50%_50%,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0.25)_60%,transparent_100%)]"
+      aria-hidden="true"
+    >
+    </div>
+    <Hero
+      client:idle
+      firstName="Angel Francisco"
+      lastName="Palestina Blancas"
+      specialty="Estudiante de Ingeniería en Sistemas especializado en Deep Learning"
+      morphTexts={heroMorphTexts}
+      contacts={heroContacts}
+    />
+  </div>
+
+  <!-- Divisor fuerte: Hero → contenido. Full-bleed, fondo negro sólido. -->
+  <Ticker
+    items={['Angel Palestina', 'Deep Learning', 'IA Generativa', 'Full-Stack', 'Transformers', 'Ingeniería de Software']}
+    duration={28}
+    solid
+    class="mb-16"
+  />
+
+  <main class="mx-auto max-w-6xl px-6 pb-24 xl:max-w-7xl 2xl:max-w-[88rem]">
+    <!-- Sobre mí -->
+    <section id="about" scroll-mt-20 aria-labelledby="about-heading">
+      <h2
+        id="about-heading"
+        class="reveal-item mb-6 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+      >
+        Sobre mí
+      </h2>
+      <div class="reveal-item rounded-2xl glass-card p-6 sm:p-8" style="--reveal-delay: 120ms">
+        <div class="space-y-4">
+          <p class="text-base leading-relaxed text-(--color-muted)">
+            {summaryLead}
+          </p>
+          <p class="text-base leading-relaxed text-(--color-muted)">
+            {summaryBody.map((seg) => {
+              const inner = seg.strong ? <strong>{seg.text}</strong> : seg.text;
+              return seg.em ? <em>{inner}</em> : inner;
+            })}
+          </p>
+        </div>
+        <ul class="mt-6 flex flex-wrap gap-2">
+          {focusAreas.map((area) => (
+            <li class="inline-flex items-center gap-1.5 rounded-full border border-(--color-border) bg-(--color-bg) px-3 py-1 text-xs font-semibold text-(--color-fg)">
+              <span class="h-1.5 w-1.5 rounded-full bg-(--color-accent)"></span>
+              {area}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Divisor: Sobre mí → Educación -->
+    <Ticker
+      items={['Bases matemáticas', 'Redes Neuronales Profundas', 'Modelos de Difusión', 'Control de versiones', 'Cómputo de alto rendimiento']}
+      duration={34}
+      reverse
+      solid
+      class="my-16"
+    />
+    <!-- Educación -->
+    <section aria-labelledby="education-heading">
+      <h2
+        id="education-heading"
+        class="reveal-item mb-6 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+      >
+        Educación
+      </h2>
+      <div
+        class="reveal-item flex flex-col gap-4 rounded-2xl glass-card p-6 sm:flex-row sm:items-start sm:gap-6 sm:p-8"
+        style="--reveal-delay: 120ms"
+      >
+        <div
+          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-(--color-bg) text-(--color-accent) ring-1 ring-(--color-border)"
+        >
+          <GraduationCap className="h-6 w-6" />
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-lg font-semibold text-(--color-fg)">
+            {education.institution}
+          </h3>
+          <p class="mt-1 text-sm text-(--color-muted)">{education.degree}</p>
+          <ul
+            class="mt-3 flex flex-col gap-1.5 text-xs text-(--color-muted) sm:flex-row sm:flex-wrap sm:gap-x-5"
+          >
+            <li class="inline-flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5" /> {education.location}
+            </li>
+            <li class="inline-flex items-center gap-1.5">
+              <Calendar className="h-3.5 w-3.5" /> {education.period}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Divisor: Educación → Habilidades -->
+    <Ticker
+      items={['Universidad Tecnológica de México', 'Ciencias de la Computación', '2024 — 2028', 'Bases sólidas']}
+      duration={26}
+      solid
+      class="my-16"
+    />
+    <!-- Habilidades -->
+    <section aria-labelledby="skills-heading">
+      <h2
+        id="skills-heading"
+        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+      >
+        Habilidades
+      </h2>
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        {skillGroups.map((group, i) => (
+          <div
+            class="reveal-item rounded-2xl glass-card p-6"
+            style={`--reveal-delay: ${120 + i * 60}ms`}
+          >
+            <h3 class="text-sm font-semibold uppercase tracking-wide text-(--color-fg)">
+              {group.category}
+            </h3>
+            <ul class="mt-3 flex flex-wrap gap-2">
+              {group.items.map((item) => (
+                <li class="rounded-full bg-(--color-bg) px-2.5 py-1 text-xs font-medium text-(--color-muted) ring-1 ring-(--color-border)">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Divisor: Habilidades → Proyectos -->
+    <Ticker
+      items={['Python', 'PyTorch', 'TensorFlow', 'React', 'Astro', 'Tailwind', 'Docker', 'Hugging Face']}
+      duration={32}
+      reverse
+      solid
+      class="my-16"
+    />
+    <!-- Proyectos -->
+    <section id="projects" scroll-mt-20 aria-labelledby="projects-heading">
+      <h2
+        id="projects-heading"
+        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+      >
+        Proyectos
+      </h2>
+
+      <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        {projects.map((p, i) => (
+          <li
+            class="reveal-item flex flex-col overflow-hidden rounded-2xl glass-card"
+            style={`--reveal-delay: ${120 + i * 60}ms`}
+          >
+            <img
+              src={asset(p.data.coverImage)}
+              alt={`Portada de ${p.data.title}`}
+              loading="lazy"
+              class="aspect-[8/5] w-full object-cover"
+            />
+            <div class="flex flex-1 flex-col p-6">
+              <h3 class="text-lg font-semibold text-(--color-fg)">
+                {p.data.title}
+              </h3>
+              <p class="mt-2 flex-1 text-sm text-(--color-muted)">
+                {p.data.description}
+              </p>
+
+              <ul class="mt-4 flex flex-wrap gap-2">
+                {p.data.technologies.map((t) => (
+                  <li class="rounded-full bg-(--color-bg) px-2.5 py-1 text-xs font-medium text-(--color-muted) ring-1 ring-(--color-border)">
+                    {t}
+                  </li>
+                ))}
+              </ul>
+
+              <div class="mt-5 flex items-center gap-4 text-sm">
+                {p.data.githubUrl && (
+                  <a
+                    href={p.data.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1.5 font-medium text-(--color-accent) hover:underline"
+                  >
+                    <Code2 className="h-4 w-4" /> Código
+                  </a>
+                )}
+                {p.data.demoUrl && (
+                  <a
+                    href={p.data.demoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1.5 font-medium text-(--color-accent) hover:underline"
+                  >
+                    <ExternalLink className="h-4 w-4" /> Demo
+                  </a>
+                )}
+                <span class="ml-auto text-xs text-(--color-muted)">
+                  {fmtDate(p.data.pubDate)}
+                </span>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Divisor: Proyectos → Certificaciones -->
+    <Ticker
+      items={['Sistema Gestor de Lecturas', 'Wan 2.1', 'ComfyUI', 'n8n', 'RAG', 'Ollama']}
+      duration={30}
+      solid
+      class="my-16"
+    />
+    <!-- Certificaciones -->
+    <section id="certs" scroll-mt-20 aria-labelledby="certs-heading">
+      <h2
+        id="certs-heading"
+        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+      >
+        Certificaciones
+      </h2>
+
+      <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        {certifications.map((c, i) => (
+          <li
+            class="reveal-item flex items-start gap-4 rounded-2xl glass-card p-6"
+            style={`--reveal-delay: ${120 + i * 60}ms`}
+          >
+            <img
+              src={asset(c.data.logo)}
+              alt={`Logo de ${c.data.institution}`}
+              loading="lazy"
+              class="h-14 w-14 shrink-0 rounded-xl"
+            />
+            <div class="min-w-0">
+              <h3 class="flex items-start gap-1.5 text-base font-semibold text-(--color-fg)">
+                <span class="flex-1">{c.data.name}</span>
+                <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-(--color-accent)" />
+              </h3>
+              <p class="mt-0.5 text-sm text-(--color-muted)">
+                {c.data.institution} · {fmtDate(c.data.issueDate)}
+              </p>
+              {c.data.credentialUrl && (
+                <a
+                  href={c.data.credentialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-(--color-accent) hover:underline"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" /> Ver credencial
+                </a>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Divisor: Certificaciones → Actualmente aprendiendo -->
+    <Ticker
+      items={['Certificaciones', 'Aprendizaje continuo', 'Model Context Protocol', 'Agentes de IA']}
+      duration={24}
+      reverse
+      solid
+      class="my-16"
+    />
+    <!-- Actualmente aprendiendo -->
+    <section aria-labelledby="learning-heading">
+      <h2
+        id="learning-heading"
+        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+      >
+        Actualmente aprendiendo
+      </h2>
+      <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {currentlyLearning.map((item, i) => (
+          <li
+            class="reveal-item flex items-start gap-4 rounded-2xl glass-card p-6"
+            style={`--reveal-delay: ${120 + i * 60}ms`}
+          >
+            <div
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-(--color-bg) text-(--color-accent) ring-1 ring-(--color-border)"
+            >
+              <BookOpen className="h-5 w-5" />
+            </div>
+            <div class="min-w-0">
+              <h3 class="flex flex-wrap items-center gap-2 text-base font-semibold text-(--color-fg)">
+                {item.title}
+                {item.inProgress && (
+                  <span class="inline-flex items-center gap-1 rounded-full bg-(--color-bg) px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-(--color-accent) ring-1 ring-(--color-border)">
+                    <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-(--color-accent)"></span>
+                    En progreso
+                  </span>
+                )}
+              </h3>
+              <p class="mt-0.5 text-sm text-(--color-muted)">{item.detail}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Divisor: Actualmente aprendiendo → Idiomas -->
+    <Ticker
+      items={['Actualmente aprendiendo', 'Español', 'Inglés', 'Comunicación efectiva', 'Trabajo en equipo']}
+      duration={36}
+      solid
+      class="my-16"
+    />
+    <!-- Idiomas -->
+    <section aria-labelledby="languages-heading">
+      <h2
+        id="languages-heading"
+        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+      >
+        Idiomas
+      </h2>
+      <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {languages.map((lang, i) => (
+          <li
+            class="reveal-item flex items-center gap-4 rounded-2xl glass-card p-6"
+            style={`--reveal-delay: ${120 + i * 60}ms`}
+          >
+            <div
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-(--color-bg) text-(--color-accent) ring-1 ring-(--color-border)"
+            >
+              <LanguagesIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-(--color-fg)">
+                {lang.name}
+              </h3>
+              <p class="text-sm text-(--color-muted)">{lang.level}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </main>
+
+  <Footer profile={profile} />
+</Layout>

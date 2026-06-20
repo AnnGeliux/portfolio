@@ -1,0 +1,7 @@
+# Robots.txt para el portafolio de Ann.
+# Sitio: https://AnnGeliux.github.io/portfolio/
+User-agent: *
+Allow: /
+
+# No hay sitemap (sitio de una sola página); si se añaden más rutas,
+# generar uno con @astrojs/sitemap y referenciarlo aquí.

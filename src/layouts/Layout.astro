@@ -1,0 +1,161 @@
+---
+import '../styles/global.css';
+import { GradientDots } from '../components/ui/gradient-dots';
+import { GlassFilter } from '../components/ui/liquid-glass';
+import Navbar from '../components/Navbar';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Imagen OG absoluta u omitir para usar el SVG por defecto. */
+  ogImage?: string;
+}
+
+const {
+  title,
+  description = 'Portafolio personal de Ann — Software Engineering, Deep Learning e IA.',
+  ogImage,
+} = Astro.props;
+
+// Canonical y OG usan Astro.site para emitir URLs absolutas.
+// Astro.url.pathname YA incluye el base, así que no se le vuelve a prefijar.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const ogRelative = ogImage ?? '/projects/sistema-gestor-lecturas.svg';
+const og = new URL(`${base}/${ogRelative.replace(/^\//, '')}`, Astro.site).toString();
+const favicon = `${base}/favicon.svg`;
+const fullTitle = title.includes('Ann') ? title : `${title} · Ann`;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    {/* Sin FOUC: aplica el tema antes del primer paint. La clase `.dark` se
+        conmuta en <html>; si no hay preferencia guardada, sigue al sistema. */}
+    <script is:inline>
+      (function () {
+        var k = "portfolio-theme";
+        var s;
+        try { s = localStorage.getItem(k); } catch (e) { s = null; }
+        var d = s ? s === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.classList.toggle("dark", d);
+        // Marca que JS está activo: el scroll-reveal oculta los items solo cuando
+        // esto es verdad (sin JS, todo queda visible —no se pierde contenido).
+        document.documentElement.classList.add("js");
+      })();
+    </script>
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="Angel Francisco Palestina Blancas" />
+    <link rel="canonical" href={canonical} />
+
+    {/* El sitio soporta tema claro/oscuro (sin FOUC: ver el script is:inline
+        abajo). color-scheme ayuda a que los UA widgets y el scroll se pinten
+        acordes; theme-color tiñe la barra del navegador en móvil. */}
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a12" />
+
+    {/* Open Graph */}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta property="og:locale" content="es_ES" />
+
+    {/* Twitter */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={og} />
+
+    {/* Enlaces de identidad (rel="me"): asocian el sitio con los perfiles. */}
+    <link rel="me" href="https://github.com/AnnGeliux" />
+    <link
+      rel="me"
+      href="https://www.linkedin.com/in/angel-francisco-palestina-blancas-2773b7318/"
+    />
+
+    {/* Favicon (placeholder por defecto del scaffold) */}
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+
+    {/* Pre-carga la fuente de texto principal (Satoshi variable, same-origin).
+        crossorigin es obligatorio para que el preload reutilice la @font-face. */}
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={`${base}/fonts/satoshi-variable.woff2`}
+      crossorigin
+    />
+
+    {/* Datos estructurados (JSON-LD Person) para rich results / Motores de
+        búsqueda. Coincide con el perfil y contactos del index. */}
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name: 'Angel Francisco Palestina Blancas',
+        alternateName: 'Ann',
+        jobTitle: 'Systems Engineering Student',
+        knowsAbout: [
+          'Deep Learning',
+          'Artificial Intelligence',
+          'Full-Stack Development',
+          'Generative AI',
+        ],
+        url: canonical,
+        email: 'mailto:aangel.palestina@gmail.com',
+        sameAs: [
+          'https://github.com/AnnGeliux',
+          'https://www.linkedin.com/in/angel-francisco-palestina-blancas-2773b7318/',
+        ],
+      })}
+    />
+  </head>
+  <body class="min-h-screen antialiased">
+    {/* Floor ambiental estático (solo modo claro): da color al liquid glass
+       desde el primer paint, antes de que GradientDots se hidrate. */}
+    <div class="ambient-bg" aria-hidden="true"></div>
+    <!-- Fondo de puntos con gradiente animado (fijo detrás de todo). -->
+    <GradientDots
+      client:load
+      duration={20}
+      colorCycleDuration={8}
+      className="fixed! -z-50 pointer-events-none"
+    />
+    {/* Definición única del filtro SVG de liquid glass (refracción real).
+        Las superficies .glass-card/.glass-pill lo referencian por id. */}
+    <GlassFilter />
+    <Navbar client:load />
+    <slot />
+    {/* Scroll reveal: conmuta .is-visible en cada .reveal-item según entre/salga
+        del viewport. Reversible: al scrollear hacia arriba, lo que ya pasó se
+        vuelve a esconder y se re-revela al volver a bajar. Script inline (sin
+        hidratación, coherente con el ticker). Sin IntersectionObserver (JS
+        viejo), revela todo de golpe (fallback). */}
+    <script is:inline>
+      (function () {
+        var items = Array.prototype.slice.call(document.querySelectorAll('.reveal-item'));
+        if (!items.length) return;
+        if (!('IntersectionObserver' in window)) {
+          items.forEach(function (el) { el.classList.add('is-visible'); });
+          return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            e.target.classList.toggle('is-visible', e.isIntersecting);
+          });
+        }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+        items.forEach(function (el) { io.observe(el); });
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,73 @@
+---
+/*
+ * Ticker / marquee infinito usado como divisor entre secciones.
+ *
+ * Es un componente Astro puro (HTML + CSS), sin directiva client: la animación
+ * la hace CSS (.ticker-track en global.css). El marquee está quieto por defecto
+ * y se pone en movimiento al pasar el cursor (:hover → running). Así no se
+ * hidrata ninguna isla extra.
+ *
+ * Props:
+ *  - items:    etiquetas que se repiten para llenar la banda.
+ *  - duration: duración del ciclo en segundos (default 30).
+ *  - reverse:  base en sentido inverso (varía entre divisores).
+ *  - solid:    variante de divisor fuerte: fondo negro sólido, sin máscara de
+ *              bordes y full-bleed (ocupa todo el viewport vía breakout CSS,
+ *              aunque esté dentro de un contenedor con max-width centrado).
+ *  - class:    clases extra para el contenedor (márgenes, etc.).
+ */
+interface Props {
+  items: string[];
+  duration?: number;
+  reverse?: boolean;
+  solid?: boolean;
+  class?: string;
+}
+
+const {
+  items,
+  duration = 30,
+  reverse = false,
+  solid = false,
+  class: className = '',
+} = Astro.props;
+
+// Cada "mitad" debe ser más ancha que el viewport para que el bucle -50% no
+// deje hueco en pantallas grandes; repetimos las etiquetas hasta lograrlo y
+// luego duplicamos esa mitad (track = mitad + mitad idéntica → seamless).
+const rep = Math.max(4, Math.ceil(2000 / (items.length * 100)));
+const half = Array.from({ length: rep }).flatMap(() => items);
+const track = [...half, ...half];
+---
+
+<div
+  class:list={[
+    'ticker',
+    solid
+      ? 'ticker--solid bg-(--color-surface) dark:bg-black'
+      : 'border-y border-(--color-border) bg-(--color-surface)/30 backdrop-blur-[2px]',
+    className,
+  ]}
+  role="presentation"
+  aria-hidden="true"
+  data-reverse={reverse ? '' : undefined}
+>
+  <div class="ticker-track" style={`--ticker-duration:${duration}s`}>
+    {
+      track.map((label) => (
+        <span class="ticker-item relative inline-flex items-center px-6 py-3">
+          {/* Separador diagonal que abarca toda la altura de la banda.
+              La inclinación la define CSS (.ticker-sep) según la dirección
+              de scroll del ticker (ver global.css). */}
+          <span
+            aria-hidden="true"
+            class="ticker-sep absolute inset-y-0 left-2 w-[2px] bg-(--color-accent) opacity-50"
+          />
+          <span class="ml-4 text-sm font-semibold uppercase tracking-[0.2em] text-(--color-fg) dark:text-(--color-muted)">
+            {label}
+          </span>
+        </span>
+      ))
+    }
+  </div>
+</div>

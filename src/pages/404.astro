@@ -1,0 +1,37 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// GitHub Pages sirve este archivo (dist/404.html) para cualquier ruta que no
+// exista bajo /portfolio/. Reutiliza el Layout para heredar tema, fuentes y
+// el fondo de puntos, sin montar las secciones del index.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const home = `${base}/`;
+---
+
+<Layout
+  title="404 — Página no encontrada"
+  description="La página que buscas no existe en este portafolio."
+>
+  <section
+    class="mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center px-6 text-center"
+  >
+    <p
+      class="font-display text-7xl font-bold tracking-tight text-(--color-accent) sm:text-8xl"
+    >
+      404
+    </p>
+    <h1 class="mt-4 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl">
+      Página no encontrada
+    </h1>
+    <p class="mt-3 max-w-md text-base leading-relaxed text-(--color-muted)">
+      La ruta que seguiste no existe. Es posible que el enlace haya cambiado o
+      ya no esté disponible.
+    </p>
+    <a
+      href={home}
+      class="mt-8 inline-flex items-center gap-2 rounded-full glass-pill px-5 py-2.5 text-sm font-medium text-(--color-fg) transition hover:-translate-y-0.5 hover:text-(--color-accent)"
+    >
+      ← Volver al inicio
+    </a>
+  </section>
+</Layout>
