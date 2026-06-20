@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/Hero.tsx';
 import Footer from '../components/Footer.astro';
-import { ShaderAnimation } from '../components/ui/shader-lines';
+import { GrainGradientBackground } from '../components/ui/GrainGradientBackground';
 import Ticker from '../components/Ticker.astro';
 import {
   Code2,
@@ -171,7 +171,7 @@ const fmtDate = (d: Date) =>
   <div id="hero" class="relative">
     <!-- Fondo: shader WebGL (se hidrata solo cuando es visible) -->
     <div class="absolute inset-0 -z-20 overflow-hidden pointer-events-none">
-      <ShaderAnimation client:visible />
+      <GrainGradientBackground client:visible />
     </div>
     <!-- Scrim radial para mantener el texto del Hero legible sobre el shader -->
     <div
