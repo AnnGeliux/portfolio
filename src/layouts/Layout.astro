@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { GradientDots } from '../components/ui/gradient-dots';
+import { ASMRBackground } from '../components/ui/asmr-background';
 import { GlassFilter } from '../components/ui/liquid-glass';
 import Navbar from '../components/Navbar';
 
@@ -121,16 +121,12 @@ const fullTitle = title.includes('Ann') ? title : `${title} · Ann`;
     />
   </head>
   <body class="min-h-screen antialiased">
-    {/* Floor ambiental estático (solo modo claro): da color al liquid glass
-       desde el primer paint, antes de que GradientDots se hidrate. */}
+    {/* Floor ambiental estático: da color al liquid glass desde el primer paint,
+       antes de que ASMRBackground se hidrate. */}
     <div class="ambient-bg" aria-hidden="true"></div>
-    <!-- Fondo de puntos con gradiente animado (fijo detrás de todo). -->
-    <GradientDots
-      client:load
-      duration={20}
-      colorCycleDuration={8}
-      className="fixed! -z-50 pointer-events-none"
-    />
+    <!-- Fondo de partículas ASMR (vórtice magnético reactivo al cursor).
+         Fijo detrás de todo el contenido; el Hero lleva su propio shader encima. -->
+    <ASMRBackground client:load particleCount={990} />
     {/* Definición única del filtro SVG de liquid glass (refracción real).
         Las superficies .glass-card/.glass-pill lo referencian por id. */}
     <GlassFilter />

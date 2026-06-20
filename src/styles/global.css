@@ -246,10 +246,10 @@
   /*
    * Floor ambiental (solo modo claro): gradiente suave de acento fijo detrás de
    * todo el contenido. Alimenta el backdrop-filter del liquid glass desde el
-   * primer paint (GradientDots se hidrata con client:load y tarda un frame) y
-   * da color a refractar donde los radiales animados quedan dispersos. z-index
-   * -40 pinta por encima de GradientDots (-50) pero por debajo del contenido;
-   * es translúcido, así que los radiales animados siguen viéndose a través.
+   * primer paint (ASMRBackground se hidrata con client:load y tarda un frame) y
+   * da color a refractar donde las partículas quedan dispersas. z-index
+   * -40 pinta por encima de ASMRBackground (-50) pero por debajo del contenido;
+   * es translúcido, así que las partículas siguen viéndose a través.
    */
   :where(html:not(.dark)) .ambient-bg {
     position: fixed;
@@ -268,7 +268,7 @@
    * prefers-reduced-motion) o en secciones fuera del Hero. Sin esto, las
    * glass-cards en oscuro refractan un fondo casi uniforme (#0a0a12) y su tinte
    * propio (5% blanco) es imperceptible, así que el panel parece no tener fondo
-   * (visible sobre todo en celular). z-index -40: por encima de GradientDots
+   * (visible sobre todo en celular). z-index -40: por encima de ASMRBackground
    * (-50) y del background-color del body, por debajo del contenido.
    */
   :where(html.dark) .ambient-bg {
