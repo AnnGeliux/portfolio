@@ -158,5 +158,27 @@ const fullTitle = title.includes('Ann') ? title : `${title} · Ann`;
         items.forEach(function (el) { io.observe(el); });
       })();
     </script>
+
+    {/* Kill-switch de service worker: la v1 (Jekyll) registró /sw.js con una
+        estrategia cache-first, así que los visitantes que cargaron la v1 siguen
+        viendo esa versión stale sin importar los nuevos deploys —su SW viejo
+        intercepta todo y responde desde caché. Este SW (public/sw.js) reemplaza
+        al viejo (misma URL /sw.js), vacía todos los caches, se desregistra y
+        recarga la página para mostrar la versión nueva.
+
+        GUARD CRÍTICO: solo se registra si YA hay un SW controlando la página
+        (navigator.serviceWorker.controller). Así: los visitantes NUEVOS (sin SW
+        viejo) no registran nada y no quedan acoplados a un SW; los visitantes con
+        la v1 sí tienen controller → registran el kill-switch → se limpian una
+        sola vez y al desregistrarse el guard deja de cumplirse → sin bucle de
+        recarga. Si el controller del SW viejo fuera null por un edge case (SW en
+        waiting), el visitante se limpia en su próxima visita cuando ya controle. */}
+    <script is:inline>
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/portfolio/sw.js').catch(function () {});
+        });
+      }
+    </script>
   </body>
 </html>
