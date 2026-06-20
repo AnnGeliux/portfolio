@@ -263,6 +263,26 @@
   }
 
   /*
+   * Floor ambiental (modo oscuro): mismo rol que el de modo claro — dar color
+   * que refractar al liquid glass cuando el shader del Hero está apagado (móvil,
+   * prefers-reduced-motion) o en secciones fuera del Hero. Sin esto, las
+   * glass-cards en oscuro refractan un fondo casi uniforme (#0a0a12) y su tinte
+   * propio (5% blanco) es imperceptible, así que el panel parece no tener fondo
+   * (visible sobre todo en celular). z-index -40: por encima de GradientDots
+   * (-50) y del background-color del body, por debajo del contenido.
+   */
+  :where(html.dark) .ambient-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -40;
+    pointer-events: none;
+    background:
+      radial-gradient(60% 50% at 15% 20%, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 70%),
+      radial-gradient(55% 55% at 85% 30%, color-mix(in srgb, var(--color-accent-soft) 12%, transparent), transparent 70%),
+      radial-gradient(80% 60% at 50% 95%, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent 72%);
+  }
+
+  /*
    * Hover unificado de las tarjetas de secciones (las .glass-card dentro de
    * <main>): zoom suave + iluminación muy tenue del borde. Quedan excluidos
    * Hero, Footer y Navbar (todos fuera de <main>). Todas las tarjetas de
