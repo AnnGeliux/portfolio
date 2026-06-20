@@ -82,6 +82,13 @@ export function ASMRBackground({
 
         const PULL_STRENGTH = pullStrength;
         const MAGNETIC_RADIUS = magneticRadius;
+        // Radio de órbita: las partículas se equilibran en un ANILLO a esta
+        // distancia del cursor en vez de colapsar al punto. Por debajo se las
+        // repelle hacia afuera; por encima (hasta MAGNETIC_RADIUS) se atraen.
+        // Sin esto, la atracción puramente radial acumula todo en un blob pegado
+        // al cursor sin importar cuán grande sea MAGNETIC_RADIUS.
+        const ORBIT_RADIUS = Math.round(MAGNETIC_RADIUS * 0.55);
+        const PUSH_STRENGTH = PULL_STRENGTH * 3; // repulsión más fuerte que la atracción
         // Remolino de velocidad CONSTANTE: la componente tangencial se mezcla
         // hacia un objetivo fijo (no un impulso que acumula), así no acelera al
         // acercarse al cursor. SWIRL_RESPONSE controla cuánto tarda en alcanzar
@@ -152,28 +159,49 @@ export function ASMRBackground({
                 const dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
 
                 if (dist < MAGNETIC_RADIUS) {
-                    const force = (MAGNETIC_RADIUS - dist) / MAGNETIC_RADIUS;
-
                     // Radial (hacia el centro): gravedad/atracción.
                     const rx = dx / dist;
                     const ry = dy / dist;
-                    this.vx += rx * force * PULL_STRENGTH;
-                    this.vy += ry * force * PULL_STRENGTH;
+
+                    // Atracción suave hacia el radio de órbita (no al centro):
+                    // por debajo de ORBIT_RADIUS repelimos hacia afuera, por
+                    // encima atraemos hacia adentro. La magnitud crece con la
+                    // distancia al anillo, así las partículas se asientan ahí.
+                    const distFromOrbit = dist - ORBIT_RADIUS;
+                    const radialForce =
+                        -Math.sign(distFromOrbit) *
+                        Math.min(Math.abs(distFromOrbit) / ORBIT_RADIUS, 1) *
+                        PULL_STRENGTH;
+                    this.vx -= rx * radialForce; // -: hacia fuera si distFromOrbit<0
+                    this.vy -= ry * radialForce;
+
+                    // Repulsión extra cerca del núcleo: evita que partículas que
+                    // llegan muy al centro se queden pegadas al cursor.
+                    if (dist < ORBIT_RADIUS) {
+                        const coreForce =
+                            ((ORBIT_RADIUS - dist) / ORBIT_RADIUS) * PUSH_STRENGTH;
+                        this.vx -= rx * coreForce;
+                        this.vy -= ry * coreForce;
+                    }
+
+                    // Proximidad al cursor (0 en el borde del radio, 1 en el centro):
+                    // solo para ponderar el remolino y el glow, no la atracción.
+                    const proximity = (MAGNETIC_RADIUS - dist) / MAGNETIC_RADIUS;
 
                     // Tangencial (remolino): velocidad objetivo CONSTANTE, no un
                     // impulso que se acumula. Mezclamos la componente tangencial
-                    // hacia SWIRL_SPEED ponderado por `force` (entrada/salida suave
-                    // del radio) → el remolino gira siempre a la misma velocidad,
+                    // hacia SWIRL_SPEED ponderado por `proximity` (entrada/salida
+                    // suave del radio) → el remolino gira siempre a la misma velocidad,
                     // sin acelerarse cuando una partícula se acerca al cursor.
                     const tx = -dy / dist; // perpendicular (sentido horario)
                     const ty = dx / dist;
                     const vt = this.vx * tx + this.vy * ty;
-                    const blend = force * SWIRL_RESPONSE;
+                    const blend = proximity * SWIRL_RESPONSE;
                     const newVt = vt + (SWIRL_SPEED - vt) * blend;
                     this.vx += tx * (newVt - vt);
                     this.vy += ty * (newVt - vt);
 
-                    this.frictionGlow = force * 0.7;
+                    this.frictionGlow = proximity * 0.7;
                 } else {
                     this.frictionGlow *= 0.92;
                 }

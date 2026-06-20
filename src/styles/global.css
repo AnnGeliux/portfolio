@@ -192,36 +192,64 @@
   }
 
   /*
-   * El Hero es siempre oscuro (shader + scrim), incluso en modo claro. Sus
-   * glass-pills (badge de estado y botones de contacto) deben conservar el
-   * look oscuro —transparentes con highlight sutil— y no la variante light de
-   * arriba, que les pondría un fondo blanco sobre el hero oscuro. Se
-   * sobreescribe la variante clara solo dentro de #hero (mayor especificidad
-   * vía el id, sin necesidad de tocar el componente Hero).
+   * Hero theme-aware (2026-06-20, revierte el "siempre oscuro" previo).
+   * El shader del hero ya cambia su colorBack por tema (ver
+   * GrainGradientBackground.tsx + .hero-shader-fallback). Para que el hero se
+   * VEA claro en modo claro, su texto, scrim y nombre también siguen el tema:
+   *   - #hero define tokens de color del hero (--hero-fg / -soft / -muted, el
+   *     gradiente del nombre y su sombra). El valor por defecto es el look
+   *     oscuro (texto blanco); :where(html:not(.dark)) #hero los cambia a tinta
+   *     oscura sobre fondo blanco.
+   *   - En modo claro las glass-pills del hero usan la variante light por
+   *     defecto (ya NO se fuerzan oscuras), con texto oscuro legible.
+   *   - GooeyText pinta con --color-fg; en claro lo forzamos a tinta oscura
+   *     (antes era blanco, para el hero siempre-oscuro).
+   *   - El scrim (.hero-scrim en index.astro) es radial oscuro en dark y radial
+   *     claro en light, para separar el texto de los blobs del shader.
    */
-  :where(html:not(.dark)) #hero .glass-pill {
-    background: transparent;
-    border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
-    box-shadow:
-      0 6px 6px rgba(0, 0, 0, 0.2),
-      0 0 20px rgba(0, 0, 0, 0.1);
+  #hero {
+    --hero-fg: #ffffff;
+    --hero-fg-soft: rgba(255, 255, 255, 0.9);
+    --hero-fg-muted: rgba(255, 255, 255, 0.55);
+    --hero-name-gradient: linear-gradient(135deg, #ffffff 0%, #e5e7eb 48%, #9ca3af 100%);
+    --hero-text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
   }
-  :where(html:not(.dark)) #hero .glass-pill::after {
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow:
-      inset 2px 2px 1px 0 rgba(255, 255, 255, 0.22),
-      inset -1px -1px 1px 1px rgba(255, 255, 255, 0.22);
+  :where(html:not(.dark)) #hero {
+    --hero-fg: #0b0b14;
+    --hero-fg-soft: rgba(11, 11, 20, 0.85);
+    --hero-fg-muted: rgba(11, 11, 20, 0.6);
+    --hero-name-gradient: linear-gradient(135deg, #0b0b14 0%, #33333f 48%, #5a5a68 100%);
+    --hero-text-shadow: 0 2px 18px rgba(255, 255, 255, 0.35);
+    /* GooeyText usa --color-fg; en claro va en tinta oscura sobre el hero blanco. */
+    --color-fg: #0b0b14;
   }
 
-  /*
-   * El texto morfológico (GooeyText) pinta con --color-fg, que en modo claro es
-   * oscuro y se pierde sobre el Hero (siempre oscuro). Es el único consumidor
-   * de --color-fg dentro de #hero (el resto del texto del Hero usa text-white
-   * explícito), así que forzar el token a blanco aquí arregla solo ese texto,
-   * sin tocar a otros elementos.
-   */
-  :where(html:not(.dark)) #hero {
-    --color-fg: #ffffff;
+  /* Nombre del hero: gradiente recortado al texto + sombra, ambos por tema. */
+  .hero-name {
+    background-image: var(--hero-name-gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(var(--hero-text-shadow));
+  }
+
+  /* Scrim del hero (index.astro): radial oscuro en dark, radial claro en light. */
+  .hero-scrim {
+    background: radial-gradient(
+      70% 60% at 50% 50%,
+      rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0.25) 60%,
+      transparent 100%
+    );
+  }
+  :where(html:not(.dark)) .hero-scrim {
+    background: radial-gradient(
+      70% 60% at 50% 50%,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0.12) 60%,
+      transparent 100%
+    );
   }
 
   /*

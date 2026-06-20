@@ -173,9 +173,11 @@ const fmtDate = (d: Date) =>
     <div class="absolute inset-0 -z-20 overflow-hidden pointer-events-none">
       <GrainGradientBackground client:visible />
     </div>
-    <!-- Scrim radial para mantener el texto del Hero legible sobre el shader -->
+    <!-- Scrim radial del hero (theme-aware vía .hero-scrim en global.css):
+         oscuro en modo oscuro para legibilidad del texto blanco, claro en modo
+         claro para que el shader blanco se vea y el texto oscuro resalte. -->
     <div
-      class="absolute inset-0 -z-10 pointer-events-none bg-[radial-gradient(70%_60%_at_50%_50%,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0.25)_60%,transparent_100%)]"
+      class="hero-scrim absolute inset-0 -z-10 pointer-events-none"
       aria-hidden="true"
     >
     </div>

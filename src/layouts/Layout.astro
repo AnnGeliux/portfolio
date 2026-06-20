@@ -126,12 +126,7 @@ const fullTitle = title.includes('Ann') ? title : `${title} · Ann`;
     <div class="ambient-bg" aria-hidden="true"></div>
     <!-- Fondo de partículas ASMR (vórtice magnético reactivo al cursor).
          Fijo detrás de todo el contenido; el Hero lleva su propio shader encima. -->
-    <ASMRBackground
-      client:load
-      particleCount={990}
-      magneticRadius={238}
-      pullStrength={0.16}
-    />
+    <ASMRBackground client:load />
     {/* Definición única del filtro SVG de liquid glass (refracción real).
         Las superficies .glass-card/.glass-pill lo referencian por id. */}
     <GlassFilter />

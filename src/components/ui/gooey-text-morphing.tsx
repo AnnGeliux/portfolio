@@ -160,14 +160,14 @@ export function GooeyText({
         <span
           ref={text1Ref}
           className={cn(
-            "absolute inline-block select-none text-center text-lg md:text-xl font-medium text-(--color-fg)",
+            "absolute inline-block select-none text-center text-4xl md:text-5xl font-medium text-(--color-fg)",
             textClassName
           )}
         />
         <span
           ref={text2Ref}
           className={cn(
-            "absolute inline-block select-none text-center text-lg md:text-xl font-medium text-(--color-fg)",
+            "absolute inline-block select-none text-center text-4xl md:text-5xl font-medium text-(--color-fg)",
             textClassName
           )}
         />

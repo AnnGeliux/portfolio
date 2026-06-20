@@ -57,7 +57,7 @@ export default function Hero({
     >
       <motion.div
         variants={item}
-        className="mb-6 inline-flex items-center gap-2 rounded-full glass-pill px-4 py-1.5 text-sm font-medium text-white"
+        className="mb-6 inline-flex items-center gap-2 rounded-full glass-pill px-4 py-1.5 text-sm font-medium text-(--hero-fg)"
       >
         <span className="relative flex h-2 w-2">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-(--color-accent) opacity-75" />
@@ -67,12 +67,12 @@ export default function Hero({
       </motion.div>
 
       <motion.div variants={item} className="flex flex-col items-center">
-        <h1 className="font-display bg-clip-text text-5xl font-bold tracking-tight text-transparent bg-[linear-gradient(135deg,#ffffff_0%,#e5e7eb_48%,#9ca3af_100%)] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)] sm:text-7xl">
+        <h1 className="hero-name font-display text-5xl font-bold tracking-tight sm:text-7xl">
           {firstName}
         </h1>
 
         {lastName && (
-          <span className="mt-2 text-sm font-medium uppercase tracking-[0.25em] text-white/55 sm:text-base">
+          <span className="mt-2 text-sm font-medium uppercase tracking-[0.25em] text-(--hero-fg-muted) sm:text-base">
             {lastName}
           </span>
         )}
@@ -80,7 +80,7 @@ export default function Hero({
 
       <motion.p
         variants={item}
-        className="mt-6 text-xl font-medium text-white/90 sm:text-2xl"
+        className="mt-6 text-xl font-medium text-(--hero-fg-soft) sm:text-2xl"
       >
         {specialty}
       </motion.p>
@@ -91,7 +91,7 @@ export default function Hero({
             texts={morphTexts}
             morphTime={2.5}
             cooldownTime={0.5}
-            className="h-8 md:h-9 w-full max-w-md"
+            className="h-16 md:h-20 w-full max-w-3xl"
             textClassName="font-display tracking-tight"
           />
         </motion.div>
@@ -111,7 +111,7 @@ export default function Hero({
                   {...(external
                     ? { target: '_blank', rel: 'noopener noreferrer' }
                     : {})}
-                  className="inline-flex items-center gap-2 rounded-full glass-pill px-4 py-2 text-sm font-medium text-white/90 transition hover:-translate-y-0.5 hover:border-(--color-accent) hover:text-(--color-accent)"
+                  className="inline-flex items-center gap-2 rounded-full glass-pill px-4 py-2 text-sm font-medium text-(--hero-fg-soft) transition hover:-translate-y-0.5 hover:border-(--color-accent) hover:text-(--color-accent)"
                 >
                   <ContactIcon kind={c.kind} className="h-4 w-4" />
                   {c.label}
