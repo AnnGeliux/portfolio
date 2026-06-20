@@ -4,8 +4,21 @@ import { GrainGradient } from '@paper-design/shaders-react';
 /**
  * Fondo del hero con el shader "grain-gradient" de @paper-design/shaders-react.
  *
- * Config: colors #7300ff/#eba8ff/#00bfff/#2b00ff sobre colorBack #000,
- * softness 0.5, intensity 0.5, noise 0.25, shape "corners", speed 1.
+ * Config: colors #7300ff/#eba8ff/#00bfff/#2b00ff sobre colorBack, softness 0.5,
+ * intensity 0.5, noise 0.25, shape "corners", speed 1.
+ *
+ * Theme-aware: colorBack sigue el tema del portafolio (#000 en oscuro, #fff en
+ * claro), leyendo la clase .dark de <html> con un MutationObserver (la conmuta el
+ * script anti-FOUC de Layout.astro + el theme-toggle). El fallback CSS es también
+ * theme-aware (clase .hero-shader-fallback en global.css, keyed por .dark) para
+ * que el color base coincida desde el primer paint, antes de que el shader mont
+ * —sin flash de hidratación (mismo patrón que .ambient-bg).
+ *
+ * NOTA: históricamente el hero era siempre oscuro y se rechazó una variante clara
+ * del shader. Esto se reactivó a petición explícita (2026-06-20): ahora el fondo
+ * del shader pasa a blanco en modo claro. El texto del hero es blanco y las
+ * glass-pills están estiladas para hero oscuro, así que conviene revisar
+ * contraste/scrim al activar modo claro (ver index.astro + global.css #hero).
  *
  * Guards de rendimiento:
  *  - Hidrata con client:visible (desde index.astro): solo carga al entrar al viewport.
@@ -19,19 +32,9 @@ import { GrainGradient } from '@paper-design/shaders-react';
  *    fluido, 1.5M = más nítido.
  * El shader corre igual en móvil y desktop (parity): GrainGradient + maxPixelCount
  * es lo bastante liviano para GPU móviles. Solo cae al fallback con reduced-motion.
- * El `colorBack #000` opaco mantiene el hero siempre-oscuro (tapa las capas -z-40/-z-50).
  */
 
 const COLORS = ['#7300ff', '#eba8ff', '#00bfff', '#2b00ff'];
-
-// Fallback estático (reduced-motion / pre-mount): los colores de marca sobre negro, sin RAF.
-const FALLBACK_STYLE: React.CSSProperties = {
-  background:
-    'radial-gradient(120% 120% at 25% 15%, rgba(0,191,255,0.18), transparent 55%), ' +
-    'radial-gradient(120% 120% at 80% 90%, rgba(115,0,255,0.22), transparent 55%), ' +
-    'radial-gradient(120% 120% at 90% 10%, rgba(235,168,255,0.12), transparent 50%), ' +
-    '#000',
-};
 
 function prefersReducedMotion(): boolean {
   return (
@@ -56,6 +59,9 @@ export function GrainGradientBackground() {
   );
   const running = intersecting && visible;
 
+  // Tema del portafolio (.dark en <html>): decide el colorBack del shader.
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
   // Decisión de si usamos el shader WebGL o el fallback CSS. Tras el mount,
   // para que el render del servidor y el primer render del cliente coincidan
   // (ambos usan el fallback) y evitar mismatch de hidratación. El shader corre
@@ -65,6 +71,17 @@ export function GrainGradientBackground() {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Sigue el tema (.dark en <html>) para conmutar colorBack en caliente.
+  useEffect(() => {
+    const root = document.documentElement;
+    const read = () =>
+      setTheme(root.classList.contains('dark') ? 'dark' : 'light');
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -90,10 +107,15 @@ export function GrainGradientBackground() {
     };
   }, [useShader]);
 
-  // Fallback CSS (SSR, pre-mount, móvil o reduced-motion).
+  // Fallback CSS (SSR, pre-mount, o reduced-motion). Theme-aware vía la clase
+  // .hero-shader-fallback (global.css, keyed por .dark) → sin flash de tema.
   if (!useShader) {
     return (
-      <div ref={ref} aria-hidden className="absolute inset-0 h-full w-full" style={FALLBACK_STYLE} />
+      <div
+        ref={ref}
+        aria-hidden
+        className="hero-shader-fallback absolute inset-0 h-full w-full"
+      />
     );
   }
 
@@ -104,7 +126,7 @@ export function GrainGradientBackground() {
         height="100%"
         fit="cover"
         colors={COLORS}
-        colorBack="#000000"
+        colorBack={theme === 'dark' ? '#000000' : '#ffffff'}
         softness={0.5}
         intensity={0.5}
         noise={0.25}

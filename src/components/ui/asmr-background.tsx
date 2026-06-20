@@ -7,8 +7,12 @@ import { cn } from '@/lib/utils';
 type ASMRBackgroundProps = {
     /** Densidad objetivo de partículas en escritorio (móvil usa ~1/3). Default 900. */
     particleCount?: number;
-    /** Radio de atracción del vórtice magnético. Default 280. */
+    /** Radio de atracción del vórtice magnético (zona donde giran). Default 280. */
     magneticRadius?: number;
+    /** Fuerza de atracción al cursor ("gravedad"). Default 0.12. */
+    pullStrength?: number;
+    /** Velocidad tangencial CONSTANTE del remolino (px/frame). Default 2.5. */
+    swirlSpeed?: number;
     className?: string;
 };
 
@@ -33,6 +37,8 @@ type ASMRBackgroundProps = {
 export function ASMRBackground({
     particleCount = 900,
     magneticRadius = 280,
+    pullStrength = 0.12,
+    swirlSpeed = 2.5,
     className,
 }: ASMRBackgroundProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -74,9 +80,14 @@ export function ASMRBackground({
         let particles: Particle[] = [];
         const mouse = { x: -1000, y: -1000 };
 
-        const VORTEX_STRENGTH = 0.07;
-        const PULL_STRENGTH = 0.12;
+        const PULL_STRENGTH = pullStrength;
         const MAGNETIC_RADIUS = magneticRadius;
+        // Remolino de velocidad CONSTANTE: la componente tangencial se mezcla
+        // hacia un objetivo fijo (no un impulso que acumula), así no acelera al
+        // acercarse al cursor. SWIRL_RESPONSE controla cuánto tarda en alcanzar
+        // esa velocidad (suaviza la entrada/salida del radio).
+        const SWIRL_SPEED = swirlSpeed;
+        const SWIRL_RESPONSE = 0.08;
 
         // Paleta según tema (los valores son canales RGB para rgba()).
         const palette =
@@ -143,13 +154,24 @@ export function ASMRBackground({
                 if (dist < MAGNETIC_RADIUS) {
                     const force = (MAGNETIC_RADIUS - dist) / MAGNETIC_RADIUS;
 
-                    // Atracción al centro magnético.
-                    this.vx += (dx / dist) * force * PULL_STRENGTH;
-                    this.vy += (dy / dist) * force * PULL_STRENGTH;
+                    // Radial (hacia el centro): gravedad/atracción.
+                    const rx = dx / dist;
+                    const ry = dy / dist;
+                    this.vx += rx * force * PULL_STRENGTH;
+                    this.vy += ry * force * PULL_STRENGTH;
 
-                    // Vórtice perpendicular al radio (swirl).
-                    this.vx += (dy / dist) * force * VORTEX_STRENGTH * 10;
-                    this.vy -= (dx / dist) * force * VORTEX_STRENGTH * 10;
+                    // Tangencial (remolino): velocidad objetivo CONSTANTE, no un
+                    // impulso que se acumula. Mezclamos la componente tangencial
+                    // hacia SWIRL_SPEED ponderado por `force` (entrada/salida suave
+                    // del radio) → el remolino gira siempre a la misma velocidad,
+                    // sin acelerarse cuando una partícula se acerca al cursor.
+                    const tx = -dy / dist; // perpendicular (sentido horario)
+                    const ty = dx / dist;
+                    const vt = this.vx * tx + this.vy * ty;
+                    const blend = force * SWIRL_RESPONSE;
+                    const newVt = vt + (SWIRL_SPEED - vt) * blend;
+                    this.vx += tx * (newVt - vt);
+                    this.vy += ty * (newVt - vt);
 
                     this.frictionGlow = force * 0.7;
                 } else {
@@ -167,9 +189,10 @@ export function ASMRBackground({
                 this.vx += (Math.random() - 0.5) * 0.04;
                 this.vy += (Math.random() - 0.5) * 0.04;
 
-                this.rotation +=
-                    this.rotationSpeed +
-                    (Math.abs(this.vx) + Math.abs(this.vy)) * 0.05;
+                // Rotación CONSTANTE por partícula: solo su rotationSpeed (fija),
+                // sin escalar con la velocidad — así las esquirlas no giran más
+                // rápido cuando el vórtice las acelera.
+                this.rotation += this.rotationSpeed;
 
                 // Wrap de pantalla.
                 if (this.x < -20) this.x = width + 20;
@@ -271,7 +294,7 @@ export function ASMRBackground({
             window.removeEventListener('mouseout', handleMouseLeave);
             cancelAnimationFrame(animationFrameId);
         };
-    }, [theme, reduceMotion, magneticRadius, particleCount]);
+    }, [theme, reduceMotion, magneticRadius, pullStrength, swirlSpeed, particleCount]);
 
     // hidden solo pausa el bucle visualmente: si la pestaña no se ve, el rAF
     // ya se suspende en la mayoría de navegadores; dejamos el flag para coherencia

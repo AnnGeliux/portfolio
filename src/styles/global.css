@@ -244,6 +244,30 @@
   }
 
   /*
+   * Fallback del shader del Hero (reduced-motion / pre-mount / sin WebGL).
+   * Componente: src/components/ui/GrainGradientBackground.tsx. Theme-aware vía
+   * .dark para no parpadear al cargar: el script anti-FOUC de Layout.astro ya
+   * fijó .dark en <html> antes del primer paint, así que el color base coincide
+   * con el colorBack que el shader tomará al montar (client:visible). Mismo
+   * patrón sin-flash que .ambient-bg. En modo claro el fondo base pasa a blanco y
+   * los radiales de marca suben un pelón de alpha para que se lean sobre blanco.
+   */
+  .hero-shader-fallback {
+    background:
+      radial-gradient(120% 120% at 25% 15%, rgba(0, 191, 255, 0.18), transparent 55%),
+      radial-gradient(120% 120% at 80% 90%, rgba(115, 0, 255, 0.22), transparent 55%),
+      radial-gradient(120% 120% at 90% 10%, rgba(235, 168, 255, 0.12), transparent 50%),
+      #000;
+  }
+  :where(html:not(.dark)) .hero-shader-fallback {
+    background:
+      radial-gradient(120% 120% at 25% 15%, rgba(0, 191, 255, 0.22), transparent 55%),
+      radial-gradient(120% 120% at 80% 90%, rgba(115, 0, 255, 0.28), transparent 55%),
+      radial-gradient(120% 120% at 90% 10%, rgba(235, 168, 255, 0.18), transparent 50%),
+      #fff;
+  }
+
+  /*
    * Floor ambiental (solo modo claro): gradiente suave de acento fijo detrás de
    * todo el contenido. Alimenta el backdrop-filter del liquid glass desde el
    * primer paint (ASMRBackground se hidrata con client:load y tarda un frame) y
