@@ -1,7 +1,8 @@
 # Robots.txt para el portafolio de Ann.
-# Sitio: https://AnnGeliux.github.io/portfolio/
+# Sitio: https://anngeliux.github.io/portfolio/
 User-agent: *
 Allow: /
 
-# No hay sitemap (sitio de una sola página); si se añaden más rutas,
-# generar uno con @astrojs/sitemap y referenciarlo aquí.
+# Sitemap generado por @astrojs/sitemap en cada build (sitemap-index.xml
+# referencia a sitemap-0.xml). La URL lleva el base de GitHub Pages.
+Sitemap: https://anngeliux.github.io/portfolio/sitemap-index.xml

@@ -95,6 +95,7 @@ export function ExpandableTabs({ tabs, className, onSelect }: ExpandableTabsProp
             onClick={() => handleSelect(index)}
             transition={transition}
             aria-current={isSelected ? "true" : undefined}
+            aria-label={tab.title}
             className={cn(
               "relative flex items-center rounded-xl px-2 py-2 text-sm font-medium transition-colors duration-300",
               isSelected
@@ -102,7 +103,12 @@ export function ExpandableTabs({ tabs, className, onSelect }: ExpandableTabsProp
                 : "text-(--color-muted) hover:bg-(--color-surface) hover:text-(--color-fg)",
             )}
           >
-            <Icon size={20} strokeWidth={1.75} />
+            <Icon size={20} strokeWidth={1.75} aria-hidden="true" />
+            {/* Texto accesible siempre presente (sr-only) para que el botón tenga
+                un nombre discernible incluso cuando no está seleccionado y solo
+                muestra el icono. Satisface la auditoría de árbol de accesibilidad
+                para agentes IA, además de axe-core/Lighthouse. */}
+            <span className="sr-only">{tab.title}</span>
             <AnimatePresence initial={false}>
               {isSelected && (
                 <motion.span
@@ -112,6 +118,7 @@ export function ExpandableTabs({ tabs, className, onSelect }: ExpandableTabsProp
                   exit="exit"
                   transition={transition}
                   className="overflow-hidden whitespace-nowrap"
+                  aria-hidden="true"
                 >
                   {tab.title}
                 </motion.span>
