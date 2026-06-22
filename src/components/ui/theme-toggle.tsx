@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, usePrefersReducedMotion } from "@/lib/utils";
 
 const STORAGE_KEY = "portfolio-theme";
 
@@ -17,7 +17,7 @@ const STORAGE_KEY = "portfolio-theme";
  * regla `z-index:-1` que mantiene el texto nítido.
  */
 export function ThemeToggle({ className }: { className?: string }) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = usePrefersReducedMotion();
   // Estado inicial desde el DOM: el script anti-FOUC ya puso la clase correcta
   // antes del primer paint, así que el inicializador perezoso la lee sin flicker
   // del icono (antes arrancaba en `true` y se corregía recién en el effect).

@@ -127,11 +127,11 @@ const fullTitle = title.includes('Ann') ? title : `${title} · Ann`;
     <div class="ambient-bg" aria-hidden="true"></div>
     <!-- Fondo de partículas ASMR (vórtice magnético reactivo al cursor).
          Fijo detrás de todo el contenido; el Hero lleva su propio shader encima. -->
-    <ASMRBackground client:load />
+    <ASMRBackground client:idle />
     {/* Definición única del filtro SVG de liquid glass (refracción real).
         Las superficies .glass-card/.glass-pill lo referencian por id. */}
     <GlassFilter />
-    <Navbar client:load />
+    <Navbar client:idle />
     <slot />
     {/* Scroll reveal: conmuta .is-visible en cada .reveal-item según entre/salga
         del viewport. Reversible: al scrollear hacia arriba, lo que ya pasó se

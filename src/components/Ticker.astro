@@ -35,7 +35,9 @@ const {
 // Cada "mitad" debe ser más ancha que el viewport para que el bucle -50% no
 // deje hueco en pantallas grandes; repetimos las etiquetas hasta lograrlo y
 // luego duplicamos esa mitad (track = mitad + mitad idéntica → seamless).
-const rep = Math.max(4, Math.ceil(2000 / (items.length * 100)));
+// Bajamos el multiplicador (antes 2000, floor 4): con 6/8 etiquetas basta
+// rep=3 para cubrir ultrawide → menos <span> y menos HTML (audit de DOM size).
+const rep = Math.max(3, Math.ceil(1400 / (items.length * 100)));
 const half = Array.from({ length: rep }).flatMap(() => items);
 const track = [...half, ...half];
 ---
@@ -56,13 +58,9 @@ const track = [...half, ...half];
     {
       track.map((label) => (
         <span class="ticker-item relative inline-flex items-center px-6 py-3">
-          {/* Separador diagonal que abarca toda la altura de la banda.
-              La inclinación la define CSS (.ticker-sep) según la dirección
-              de scroll del ticker (ver global.css). */}
-          <span
-            aria-hidden="true"
-            class="ticker-sep absolute inset-y-0 left-2 w-[2px] bg-(--color-accent) opacity-50"
-          />
+          {/* Separador diagonal movido a CSS (.ticker-item::before en
+              global.css) para no inflar el DOM: un pseudo-elemento en vez de
+              un <span> por ítem (~1/3 de los spans de la página antes). */}
           <span class="ml-4 text-sm font-semibold uppercase tracking-[0.2em] text-(--color-fg) dark:text-(--color-muted)">
             {label}
           </span>

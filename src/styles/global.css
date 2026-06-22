@@ -1,10 +1,17 @@
 @import "tailwindcss";
 /*
- * Inter y Space Grotesk (variable, vía @fontsource). El CSS de fontsource declara
- * un @font-face por subset con unicode-range, así que el navegador solo descarga
- * los subsets de los glifos que realmente renderiza: para un sitio en español eso
- * es solo "latin" (cyrillic/greek/vietnamese/latin-ext no se bajan). No hay
- * subsetting manual que hacer aquí sin reescribir los @font-face a mano.
+ * Inter y Space Grotesk (variable, vía @fontsource). El CSS de fontsource
+ * declara un @font-face por subset con unicode-range, así que el navegador solo
+ * descarga los subsets de los glifos que realmente renderiza: para un sitio en
+ * español eso es solo "latin" (cyrillic/greek/vietnamese no se bajan en runtime).
+ *
+ * NOTA: los paquetes *variable* de fontsource NO exponen CSS por subset (solo
+ * wght.css/index.css con todos los subsets), así que Vite copia los 11 woff2 a
+ * dist/ aunque el navegador solo pida latin. Eso no afecta Lighthouse (las
+ * fuentes no son JS y las no usadas no se descargan por unicode-range); es solo
+ * peso de deploy. Para limpiarlo habría que reescribir los @font-face a mano
+ * apuntando a los woff2 latin/latin-ext — diferido por no mover la aguja de
+ * performance.
  */
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/space-grotesk";
@@ -474,17 +481,27 @@
 }
 
 /*
- * Separador diagonal (.ticker-sep en Ticker.astro). La inclinación depende de
- * la dirección de scroll del ticker:
+ * Separador diagonal — antes un <span class="ticker-sep"> en Ticker.astro; ahora
+ * un ::before de .ticker-item para no inflar el DOM (los pseudo-elementos no
+ * cuentan como nodos → mejoran el audit de "Avoid an excessive DOM size"; eran
+ * ~1/3 de los <span> de la página). La inclinación depende de la dirección de
+ * scroll del ticker:
  *   - default (sin data-reverse): el track va 0 → -50%, i.e. se desplaza a la
  *     IZQUIERDA → diagonal invertida "\".
  *   - data-reverse: el track va -50% → 0, i.e. se desplaza a la DERECHA →
  *     diagonal "/".
  */
-.ticker .ticker-sep {
+.ticker .ticker-item::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 0.5rem; /* equivale al left-2 del <span> anterior */
+  width: 2px;
+  background: var(--color-accent);
+  opacity: 0.5;
   transform: skewX(20deg);
 }
-.ticker[data-reverse] .ticker-sep {
+.ticker[data-reverse] .ticker-item::before {
   transform: skewX(-20deg);
 }
 

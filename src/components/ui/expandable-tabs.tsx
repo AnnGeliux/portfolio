@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useOnClickOutside } from "usehooks-ts";
-import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
+import { cn, usePrefersReducedMotion } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
 export interface Tab {
@@ -46,14 +45,22 @@ const spanVariants = {
 };
 
 export function ExpandableTabs({ tabs, className, onSelect }: ExpandableTabsProps) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = usePrefersReducedMotion();
   const [selected, setSelected] = React.useState<number | null>(null);
   const outsideClickRef = React.useRef<HTMLDivElement>(null);
 
-  useOnClickOutside(
-    outsideClickRef as React.RefObject<HTMLElement>,
-    () => setSelected(null),
-  );
+  // Reemplaza useOnClickOutside (usehooks-ts) por un listener inline: mismo
+  // comportamiento (cerrar al pulsar fuera del contenedor) sin arrastrar la
+  // dependencia. pointerdown unifica mouse + touch.
+  React.useEffect(() => {
+    const el = outsideClickRef.current;
+    if (!el) return;
+    const onPointer = (e: PointerEvent) => {
+      if (!el.contains(e.target as Node)) setSelected(null);
+    };
+    document.addEventListener("pointerdown", onPointer);
+    return () => document.removeEventListener("pointerdown", onPointer);
+  }, []);
 
   const transition = reduceMotion
     ? { duration: 0 }

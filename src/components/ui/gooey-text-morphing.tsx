@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useReducedMotion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn, usePrefersReducedMotion } from "@/lib/utils";
 
 interface GooeyTextProps {
   texts: string[];
@@ -28,7 +27,7 @@ export function GooeyText({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const text1Ref = React.useRef<HTMLSpanElement>(null);
   const text2Ref = React.useRef<HTMLSpanElement>(null);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = usePrefersReducedMotion();
 
   // Con movimiento reducido: mostrar solo el primer texto de forma estática, sin rAF.
   React.useEffect(() => {

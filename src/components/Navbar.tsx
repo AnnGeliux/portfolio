@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import { useReducedMotion } from "framer-motion";
 import { BadgeCheck, Folder, Home, Mail, User } from "lucide-react";
 import { ExpandableTabs, type Tab } from "./ui/expandable-tabs";
 import { ThemeToggle } from "./ui/theme-toggle";
+import { usePrefersReducedMotion } from "@/lib/utils";
 
 const TABS: Tab[] = [
   { title: "Inicio", icon: Home, href: "#hero" },
@@ -20,7 +20,7 @@ const TABS: Tab[] = [
  * por lo que `scrollIntoView({ block: "start" })` aterriza sin tapar el título.
  */
 export default function Navbar() {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = usePrefersReducedMotion();
   const navRef = useRef<HTMLElement>(null);
 
   const scrollToSection = (href: string | undefined) => {

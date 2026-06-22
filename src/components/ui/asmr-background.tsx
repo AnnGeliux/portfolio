@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { useReducedMotion } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { useEffect, useRef } from 'react';
+import { cn, usePrefersReducedMotion } from '@/lib/utils';
 
 type ASMRBackgroundProps = {
-    /** Densidad objetivo de partículas en escritorio (móvil usa ~1/3). Default 900. */
+    /** Densidad objetivo de partículas en escritorio (móvil usa ~1/3). Default 450. */
     particleCount?: number;
     /** Radio de atracción del vórtice magnético (zona donde giran). Default 280. */
     magneticRadius?: number;
@@ -15,6 +14,34 @@ type ASMRBackgroundProps = {
     swirlSpeed?: number;
     className?: string;
 };
+
+type Theme = 'dark' | 'light';
+
+// Paleta de Canvas (los canales glass/charcoal/glow son RGB para rgba()).
+type Palette = {
+    fill: string;
+    glass: string;
+    charcoal: string;
+    glow: string;
+};
+
+function buildPalette(theme: Theme): Palette {
+    return theme === 'dark'
+        ? {
+              fill: 'rgba(10, 10, 12, 0.18)',
+              glass: '240, 245, 255',
+              charcoal: '80, 80, 85',
+              glow: '180, 220, 255',
+          }
+        : {
+              fill: 'rgba(255, 255, 255, 0.20)',
+              // En claro el "vidrio" pasa al acento del portafolio para que se vea
+              // sobre blanco; el carbón sigue oscuro y visible.
+              glass: '99, 102, 241',
+              charcoal: '64, 64, 72',
+              glow: '120, 140, 210',
+          };
+}
 
 /**
  * Fondo de partículas ASMR (sistema cinético sobre Canvas).
@@ -27,47 +54,47 @@ type ASMRBackgroundProps = {
  * - Consciente del tema claro/oscuro del portafolio: en oscuro replica el look
  *   original (carbón + vidrio sobre lienzo casi negro); en claro reescribe los
  *   colores a partículas carbón + acento sobre lienzo claro para no
- *   ensombrecer la página. Re-inicializa las partículas al conmutar el tema.
+ *   ensombrecer la página. El tema se lee de un ref (paletteRef) que un efecto
+ *   aparte actualiza al conmutar .dark: NO se re-crea el sistema de partículas
+ *   ni se rebindean listeners al cambiar el tema (antes sí → hitch visible).
  * - Respeta prefers-reduced-motion (convención del portafolio): con movimiento
  *   reducido pinta un único frame estático, sin bucle de animación.
- * - Pausa el bucle cuando la pestaña no es visible (ahorro de CPU, igual que
- *   GradientDots).
+ * - Pausa el bucle cuando la pestaña no es visible (document.hidden) y lo cap
+ *   a ~30fps (el efecto es lento; visualmente idéntico, mitada el main-thread).
  * - Densidad escalada por dispositivo (móvil ~1/3) para mantener FPS.
+ * - mousemove se batchea por frame (se aplica dentro de render) en vez de
+ *   ejecutarse por cada evento de puntero; resize se debouncea por rAF.
  */
 export function ASMRBackground({
-    particleCount = 900,
+    particleCount = 450,
     magneticRadius = 280,
     pullStrength = 0.12,
     swirlSpeed = 2.5,
     className,
 }: ASMRBackgroundProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const reduceMotion = useReducedMotion();
-    const [hidden, setHidden] = useState(false);
-    // 'dark' | 'light', sincronizado con la clase .dark de <html>.
-    const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-
-    // Pausar el render cuando la pestaña pasa a segundo plano.
-    useEffect(() => {
-        const onVisibilityChange = () => setHidden(document.hidden);
-        document.addEventListener('visibilitychange', onVisibilityChange);
-        return () =>
-            document.removeEventListener('visibilitychange', onVisibilityChange);
-    }, []);
+    const reduceMotion = usePrefersReducedMotion();
+    // Paleta en un ref: el efecto del tema la actualiza sin tocar el bucle.
+    const paletteRef = useRef<Palette>(buildPalette('dark'));
 
     // Sigue el tema del portafolio (la clase .dark la conmuta el script anti-FOUC
-    // de Layout.astro y el theme-toggle). Re-inicializa las partículas al cambiar.
+    // de Layout.astro y el theme-toggle). Solo actualiza paletteRef.current:
+    // el bucle lee el ref cada frame, así los colores cambian sin reconstruir
+    // el sistema de partículas ni rebinear listeners.
     useEffect(() => {
         const root = document.documentElement;
         const read = () =>
-            setTheme(root.classList.contains('dark') ? 'dark' : 'light');
+            (paletteRef.current = buildPalette(
+                root.classList.contains('dark') ? 'dark' : 'light',
+            ));
         read();
         const observer = new MutationObserver(read);
         observer.observe(root, { attributes: true, attributeFilter: ['class'] });
         return () => observer.disconnect();
     }, []);
 
-    // Bucle de Canvas. Se re-crea al cambiar tema o la preferencia de movimiento.
+    // Bucle de Canvas. Se re-crea al cambiar la preferencia de movimiento o los
+    // parámetros físicos, PERO NO al cambiar el tema (va por paletteRef).
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -79,6 +106,8 @@ export function ASMRBackground({
         let animationFrameId = 0;
         let particles: Particle[] = [];
         const mouse = { x: -1000, y: -1000 };
+        // Último evento de puntero pendiente de aplicar (batcheo por frame).
+        let pendingMouse: { x: number; y: number } | null = null;
 
         const PULL_STRENGTH = pullStrength;
         const MAGNETIC_RADIUS = magneticRadius;
@@ -96,24 +125,6 @@ export function ASMRBackground({
         const SWIRL_SPEED = swirlSpeed;
         const SWIRL_RESPONSE = 0.08;
 
-        // Paleta según tema (los valores son canales RGB para rgba()).
-        const palette =
-            theme === 'dark'
-                ? {
-                      fill: 'rgba(10, 10, 12, 0.18)',
-                      glass: '240, 245, 255',
-                      charcoal: '80, 80, 85',
-                      glow: '180, 220, 255',
-                  }
-                : {
-                      fill: 'rgba(255, 255, 255, 0.20)',
-                      // En claro el "vidrio" pasa al acento del portafolio para que
-                      // se vea sobre blanco; el carbón sigue oscuro y visible.
-                      glass: '99, 102, 241',
-                      charcoal: '64, 64, 72',
-                      glow: '120, 140, 210',
-                  };
-
         const isMobile = window.innerWidth < 768;
         const count = isMobile ? Math.round(particleCount / 3) : particleCount;
 
@@ -124,7 +135,7 @@ export function ASMRBackground({
             vy = 0;
             size = 0;
             alpha = 0;
-            color = '';
+            isGlass = false;
             rotation = 0;
             rotationSpeed = 0;
             frictionGlow = 0;
@@ -139,9 +150,9 @@ export function ASMRBackground({
                 this.size = Math.random() * 1.5 + 0.5;
                 this.vx = (Math.random() - 0.5) * 0.2;
                 this.vy = (Math.random() - 0.5) * 0.2;
-                // 70% carbón, 30% vidrio/acentos.
-                const isGlass = Math.random() > 0.7;
-                this.color = isGlass ? palette.glass : palette.charcoal;
+                // 70% carbón, 30% vidrio/acentos. El color real se resuelve en
+                // draw() leyendo paletteRef (así cambia con el tema sin re-alloc).
+                this.isGlass = Math.random() > 0.7;
                 this.alpha = Math.random() * 0.4 + 0.1;
                 this.rotation = Math.random() * Math.PI * 2;
                 this.rotationSpeed = (Math.random() - 0.5) * 0.05;
@@ -235,13 +246,14 @@ export function ASMRBackground({
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.rotation);
 
+                const pal = paletteRef.current;
+                const color = this.isGlass ? pal.glass : pal.charcoal;
                 const finalAlpha = Math.min(this.alpha + this.frictionGlow, 0.9);
-                ctx.fillStyle = `rgba(${this.color}, ${finalAlpha})`;
+                ctx.fillStyle = `rgba(${color}, ${finalAlpha})`;
 
-                if (this.frictionGlow > 0.3) {
-                    ctx.shadowBlur = 8 * this.frictionGlow;
-                    ctx.shadowColor = `rgba(${palette.glow}, ${this.frictionGlow})`;
-                }
+                // Sin shadowBlur: es una de las ops Canvas 2D más caras (re-raster
+                // del shadow por draw, 100+ por frame). El rastro por alpha del
+                // motion-blur sigue dando la sensación de glow.
 
                 // Geometría de esquirla afilada.
                 ctx.beginPath();
@@ -263,39 +275,53 @@ export function ASMRBackground({
             for (let i = 0; i < count; i++) particles.push(new Particle());
         };
 
-        const render = () => {
+        let lastTs = 0;
+        const render = (ts: number) => {
+            animationFrameId = requestAnimationFrame(render);
+            // Pausa real cuando la pestaña no es visible (ahorro de CPU).
+            if (document.hidden) return;
+            // Cap a ~30fps: el efecto es lento, visualmente idéntico, y mitada
+            // el tiempo de main-thread.
+            if (ts - lastTs < 32) return;
+            lastTs = ts;
+
+            // Aplica el último evento de puntero pendiente (batcheo por frame
+            // en vez de escribir en cada mousemove).
+            if (pendingMouse) {
+                mouse.x = pendingMouse.x;
+                mouse.y = pendingMouse.y;
+                pendingMouse = null;
+            }
+
             // Motion-blur tenue: velo del color de fondo que difumina el rastro.
-            ctx.fillStyle = palette.fill;
+            ctx.fillStyle = paletteRef.current.fill;
             ctx.fillRect(0, 0, width, height);
 
             for (const p of particles) {
                 p.update();
                 p.draw();
             }
-
-            animationFrameId = requestAnimationFrame(render);
         };
 
         const renderStatic = () => {
             // Frame único sin bucle (movimiento reducido): fondo limpio + partículas.
-            ctx.fillStyle = palette.fill;
+            ctx.fillStyle = paletteRef.current.fill;
             ctx.fillRect(0, 0, width, height);
             for (const p of particles) p.draw();
         };
 
         const handleMouseMove = (e: MouseEvent) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
+            pendingMouse = { x: e.clientX, y: e.clientY };
         };
         const handleTouchMove = (e: TouchEvent) => {
             if (e.touches[0]) {
-                mouse.x = e.touches[0].clientX;
-                mouse.y = e.touches[0].clientY;
+                pendingMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
             }
         };
         const handleMouseLeave = () => {
             mouse.x = -1000;
             mouse.y = -1000;
+            pendingMouse = null;
         };
 
         init();
@@ -308,11 +334,15 @@ export function ASMRBackground({
                 passive: true,
             });
             window.addEventListener('mouseout', handleMouseLeave);
-            render();
+            requestAnimationFrame(render);
         }
 
-        // Resize: re-init para repartir partículas en el nuevo tamaño.
-        const onResize = () => init();
+        // Resize: debouncea por rAF para no re-allocar el array en cada evento.
+        let resizeRaf = 0;
+        const onResize = () => {
+            cancelAnimationFrame(resizeRaf);
+            resizeRaf = requestAnimationFrame(() => init());
+        };
         window.addEventListener('resize', onResize);
 
         return () => {
@@ -321,13 +351,9 @@ export function ASMRBackground({
             window.removeEventListener('touchmove', handleTouchMove);
             window.removeEventListener('mouseout', handleMouseLeave);
             cancelAnimationFrame(animationFrameId);
+            cancelAnimationFrame(resizeRaf);
         };
-    }, [theme, reduceMotion, magneticRadius, pullStrength, swirlSpeed, particleCount]);
-
-    // hidden solo pausa el bucle visualmente: si la pestaña no se ve, el rAF
-    // ya se suspende en la mayoría de navegadores; dejamos el flag para coherencia
-    // con GradientDots y evitar re-render innecesario del efecto.
-    void hidden;
+    }, [reduceMotion, magneticRadius, pullStrength, swirlSpeed, particleCount]);
 
     return (
         <div className={cn('fixed inset-0 -z-50 pointer-events-none', className)}>
