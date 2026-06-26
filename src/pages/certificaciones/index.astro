@@ -1,0 +1,120 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Ticker from '../../components/Ticker.astro';
+import { BadgeCheck, ExternalLink, ArrowLeft } from 'lucide-react';
+import { profile } from '../../data/profile';
+import { asset } from '../../lib/asset';
+
+// Hub de certificaciones: agrupa por especialización cuando la hay.
+const certifications = (await getCollection('certifications')).sort(
+  (a, b) => b.data.issueDate.valueOf() - a.data.issueDate.valueOf(),
+);
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const pageUrl = new URL(Astro.url.pathname, Astro.site).toString();
+
+const fmtDate = (d: Date) => d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short' });
+
+const itemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  '@id': `${pageUrl}#itemlist`,
+  name: 'Certificaciones — Angel Palestina',
+  itemListElement: certifications.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    url: new URL(`${base}/certificaciones/${c.id}/`, Astro.site).toString(),
+    name: c.data.name,
+  })),
+};
+---
+
+<Layout
+  title={`Certificaciones — ${profile.shortName}`}
+  description={`Certificaciones de ${profile.fullName}: especialización en Deep Learning de DeepLearning.AI. ${profile.taglineEs}.`}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(itemList)} />
+  </Fragment>
+
+  <main id="main" class="mx-auto max-w-6xl px-6 py-32 xl:max-w-7xl 2xl:max-w-[88rem]">
+    <nav aria-label="Migas de pan" class="reveal-item is-visible mb-6">
+      <ol class="flex flex-wrap items-center gap-2 text-sm text-(--color-muted)">
+        <li><a href={`${base}/`} class="hover:text-(--color-accent)">Inicio</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="text-(--color-fg)" aria-current="page">Certificaciones</li>
+      </ol>
+    </nav>
+
+    <h1 class="reveal-item is-visible font-display text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
+      Certificaciones
+    </h1>
+    <p class="reveal-item is-visible mt-4 max-w-2xl text-lg leading-relaxed text-(--color-muted)">
+      Credenciales en Deep Learning e IA, centradas en la especialización de
+      DeepLearning.AI. Cada una tiene su página con el temario y lo que aprendí.
+    </p>
+
+    <Ticker
+      items={['Deep Learning', 'DeepLearning.AI', 'Redes Neuronales', 'Transformers', 'IA Generativa']}
+      duration={32}
+      reverse
+      solid
+      class="my-12"
+    />
+
+    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+      {certifications.map((c, i) => (
+        <li
+          class="reveal-item is-visible flex items-start gap-4 rounded-2xl glass-card p-6"
+          style={`--reveal-delay: ${120 + i * 60}ms`}
+        >
+          <img
+            src={asset(c.data.logo)}
+            alt={`Logo de ${c.data.institution}`}
+            width={56}
+            height={56}
+            loading="lazy"
+            class="h-14 w-14 shrink-0 rounded-xl"
+          />
+          <div class="min-w-0">
+            <h2 class="flex items-start gap-1.5 text-base font-semibold text-(--color-fg)">
+              <a
+                href={`${base}/certificaciones/${c.id}/`}
+                class="flex-1 hover:text-(--color-accent) hover:underline"
+              >
+                {c.data.name}
+              </a>
+              <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-(--color-accent)" />
+            </h2>
+            <p class="mt-0.5 text-sm text-(--color-muted)">
+              {c.data.institution} · {fmtDate(c.data.issueDate)}
+            </p>
+            {c.data.specialization && (
+              <p class="mt-1 text-xs font-medium text-(--color-accent)">{c.data.specialization}</p>
+            )}
+            {c.data.credentialUrl && (
+              <a
+                href={c.data.credentialUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-(--color-accent) hover:underline"
+              >
+                <ExternalLink className="h-3.5 w-3.5" /> Ver credencial
+              </a>
+            )}
+          </div>
+        </li>
+      ))}
+    </ul>
+
+    <div class="mt-12">
+      <a
+        href={`${base}/`}
+        class="inline-flex items-center gap-2 rounded-full glass-pill px-5 py-2.5 text-sm font-medium text-(--color-fg) transition hover:-translate-y-0.5 hover:text-(--color-accent)"
+      >
+        <ArrowLeft className="h-4 w-4" /> Volver al inicio
+      </a>
+    </div>
+  </main>
+</Layout>

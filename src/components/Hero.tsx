@@ -1,4 +1,3 @@
-import { motion, type Variants } from 'framer-motion';
 import { GooeyText } from './ui/gooey-text-morphing';
 import { ContactIcon, type SocialKind } from './ui/social-icons';
 
@@ -22,24 +21,13 @@ interface HeroProps {
   contacts?: ContactLink[];
 }
 
-// Variantes compartidas: fade in + desplazamiento hacia arriba.
-const container: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15, delayChildren: 0.1 },
-  },
-};
-
-const item: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  },
-};
-
+/*
+ * Animación de entrada: antes con framer-motion (variantes `container`/`item`
+ * con staggerChildren), ahora CSS puro. La sección lleva `.hero-enter` y cada
+ * hijo directo hace fade-in + translateY(24px)→0 con stagger por nth-child
+ * (ver @keyframes hero-enter en global.css). Al ser CSS, arranca en el primer
+ * paint sin esperar a la hidratación idle de la isla React.
+ */
 export default function Hero({
   firstName,
   lastName,
@@ -49,24 +37,16 @@ export default function Hero({
   contacts = [],
 }: HeroProps) {
   return (
-    <motion.section
-      className="relative z-10 mx-auto flex max-w-4xl flex-col items-center px-6 py-28 text-center sm:py-36"
-      variants={container}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div
-        variants={item}
-        className="mb-6 inline-flex items-center gap-2 rounded-full glass-pill px-4 py-1.5 text-sm font-medium text-(--hero-fg)"
-      >
+    <section className="hero-enter relative z-10 mx-auto flex max-w-4xl flex-col items-center px-6 py-28 text-center sm:py-36">
+      <div className="mb-6 inline-flex items-center gap-2 rounded-full glass-pill px-4 py-1.5 text-sm font-medium text-(--hero-fg)">
         <span className="relative flex h-2 w-2">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-(--color-accent) opacity-75" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-(--color-accent)" />
         </span>
         <span>{status}</span>
-      </motion.div>
+      </div>
 
-      <motion.div variants={item} className="flex flex-col items-center">
+      <div className="flex flex-col items-center">
         <h1 className="hero-name font-display text-5xl font-bold tracking-tight sm:text-7xl">
           {firstName}
         </h1>
@@ -76,17 +56,14 @@ export default function Hero({
             {lastName}
           </span>
         )}
-      </motion.div>
+      </div>
 
-      <motion.p
-        variants={item}
-        className="mt-6 text-xl font-medium text-(--hero-fg-soft) sm:text-2xl"
-      >
+      <p className="mt-6 text-xl font-medium text-(--hero-fg-soft) sm:text-2xl">
         {specialty}
-      </motion.p>
+      </p>
 
       {morphTexts && morphTexts.length > 0 && (
-        <motion.div variants={item} className="mt-8 flex w-full justify-center">
+        <div className="mt-8 flex w-full justify-center">
           <GooeyText
             texts={morphTexts}
             morphTime={2.5}
@@ -94,14 +71,11 @@ export default function Hero({
             className="h-16 md:h-20 w-full max-w-3xl"
             textClassName="font-display tracking-tight"
           />
-        </motion.div>
+        </div>
       )}
 
       {contacts.length > 0 && (
-        <motion.ul
-          variants={item}
-          className="mt-8 flex flex-wrap items-center justify-center gap-3"
-        >
+        <ul className="mt-8 flex flex-wrap items-center justify-center gap-3">
           {contacts.map((c) => {
             const external = c.kind === 'github' || c.kind === 'linkedin';
             return (
@@ -119,8 +93,8 @@ export default function Hero({
               </li>
             );
           })}
-        </motion.ul>
+        </ul>
       )}
-    </motion.section>
+    </section>
   );
 }

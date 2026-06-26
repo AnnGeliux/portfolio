@@ -1,0 +1,19 @@
+{
+  "name": "Angel Palestina — Portafolio",
+  "short_name": "Angel Palestina",
+  "description": "Portafolio de Angel Francisco Palestina Blancas — Desarrollador Full-Stack & Deep Learning en CDMX.",
+  "start_url": "/portfolio/",
+  "scope": "/portfolio/",
+  "display": "standalone",
+  "background_color": "#0a0a12",
+  "theme_color": "#0a0a12",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/portfolio/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

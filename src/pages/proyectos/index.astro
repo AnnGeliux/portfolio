@@ -1,0 +1,135 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Ticker from '../../components/Ticker.astro';
+import { Code2, ExternalLink, ArrowLeft } from 'lucide-react';
+import { profile } from '../../data/profile';
+import { asset } from '../../lib/asset';
+
+// Hub de proyectos: lista todos los proyectos con enlace interno a su página
+// detalle. Reusa el mismo sort que la home (destacados primero, luego fecha).
+const projects = (await getCollection('projects')).sort((a, b) => {
+  if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+  return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+});
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const pageUrl = new URL(Astro.url.pathname, Astro.site).toString();
+
+const fmtDate = (d: Date) => d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short' });
+
+// ItemList: posiciona cada proyecto para rich results y enlazado explícito.
+const itemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  '@id': `${pageUrl}#itemlist`,
+  name: 'Proyectos — Angel Palestina',
+  itemListElement: projects.map((p, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    url: new URL(`${base}/proyectos/${p.id}/`, Astro.site).toString(),
+    name: p.data.title,
+  })),
+};
+---
+
+<Layout
+  title={`Proyectos — ${profile.shortName}`}
+  description={`Proyectos de ${profile.fullName}: aplicaciones full-stack, Deep Learning e IA. ${profile.taglineEs}.`}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(itemList)} />
+  </Fragment>
+
+  <main id="main" class="mx-auto max-w-6xl px-6 py-32 xl:max-w-7xl 2xl:max-w-[88rem]">
+    <nav aria-label="Migas de pan" class="reveal-item is-visible mb-6">
+      <ol class="flex flex-wrap items-center gap-2 text-sm text-(--color-muted)">
+        <li><a href={`${base}/`} class="hover:text-(--color-accent)">Inicio</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="text-(--color-fg)" aria-current="page">Proyectos</li>
+      </ol>
+    </nav>
+
+    <h1 class="reveal-item is-visible font-display text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
+      Proyectos
+    </h1>
+    <p class="reveal-item is-visible mt-4 max-w-2xl text-lg leading-relaxed text-(--color-muted)">
+      Aplicaciones full-stack y experimentos de Deep Learning e IA. Cada proyecto
+      tiene su página con contexto, arquitectura y lo que aprendí.
+    </p>
+
+    <Ticker
+      items={['Python', 'Django', 'React', 'Astro', 'PyTorch', 'Deep Learning']}
+      duration={32}
+      solid
+      class="my-12"
+    />
+
+    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+      {projects.map((p, i) => (
+        <li
+          class="reveal-item is-visible flex flex-col overflow-hidden rounded-2xl glass-card"
+          style={`--reveal-delay: ${120 + i * 60}ms`}
+        >
+          <a href={`${base}/proyectos/${p.id}/`} class="group block">
+            <img
+              src={asset(p.data.coverImage)}
+              alt={`Portada de ${p.data.title}`}
+              width={1600}
+              height={1000}
+              loading="lazy"
+              class="aspect-[8/5] w-full object-cover transition group-hover:opacity-90"
+            />
+          </a>
+          <div class="flex flex-1 flex-col p-6">
+            <h2 class="text-lg font-semibold text-(--color-fg)">
+              <a href={`${base}/proyectos/${p.id}/`} class="hover:text-(--color-accent) hover:underline">
+                {p.data.title}
+              </a>
+            </h2>
+            <p class="mt-2 flex-1 text-sm text-(--color-muted)">{p.data.description}</p>
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {p.data.technologies.map((t) => (
+                <li class="rounded-full bg-(--color-bg) px-2.5 py-1 text-xs font-medium text-(--color-muted) ring-1 ring-(--color-border)">
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <div class="mt-5 flex items-center gap-4 text-sm">
+              {p.data.githubUrl && (
+                <a
+                  href={p.data.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 font-medium text-(--color-accent) hover:underline"
+                >
+                  <Code2 className="h-4 w-4" /> Código
+                </a>
+              )}
+              {p.data.demoUrl && (
+                <a
+                  href={p.data.demoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 font-medium text-(--color-accent) hover:underline"
+                >
+                  <ExternalLink className="h-4 w-4" /> Demo
+                </a>
+              )}
+              <span class="ml-auto text-xs text-(--color-muted)">{fmtDate(p.data.pubDate)}</span>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+
+    <div class="mt-12">
+      <a
+        href={`${base}/`}
+        class="inline-flex items-center gap-2 rounded-full glass-pill px-5 py-2.5 text-sm font-medium text-(--color-fg) transition hover:-translate-y-0.5 hover:text-(--color-accent)"
+      >
+        <ArrowLeft className="h-4 w-4" /> Volver al inicio
+      </a>
+    </div>
+  </main>
+</Layout>

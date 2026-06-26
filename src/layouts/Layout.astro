@@ -3,28 +3,62 @@ import '../styles/global.css';
 import { ASMRBackground } from '../components/ui/asmr-background';
 import { GlassFilter } from '../components/ui/liquid-glass';
 import Navbar from '../components/Navbar';
+// Identidad canónica del autor — FUENTE ÚNICA DE VERDAD (ver src/data/profile.ts).
+// Permite que <title>, meta description, JSON-LD y contactos compartan el mismo
+// vector disambiguador (rol + stack + ciudad) para que "Angel Palestina" resuelva
+// a la PERSONA y no al tópimo homónimo. Los *Slug son los @id estables del @graph.
+import { profile, personSlug, websiteSlug, webPageSlug } from '../data/profile';
 
 interface Props {
   title: string;
   description?: string;
   /** Imagen OG absoluta u omitir para usar el SVG por defecto. */
   ogImage?: string;
+  /** Tipo de OG: 'website' (home/hubs) o 'article' (páginas detalle). */
+  ogType?: 'website' | 'article';
+  /** Si true, emite robots noindex y canonicaliza a la home (para el 404). */
+  noindex?: boolean;
+  /** Fecha ISO (YYYY-MM-DD) para article:published_time en páginas detalle. */
+  publishedTime?: string;
+  /** Fecha ISO (YYYY-MM-DD) para article:modified_time en páginas detalle. */
+  modifiedTime?: string;
+  /** Tags para article:tag + JSON-LD keywords en páginas detalle. */
+  articleTags?: string[];
 }
 
 const {
   title,
-  description = 'Portafolio personal de Ann — Software Engineering, Deep Learning e IA.',
+  description = profile.blurbEs,
   ogImage,
+  ogType = 'website',
+  noindex = false,
+  publishedTime,
+  modifiedTime,
+  articleTags = [],
 } = Astro.props;
 
 // Canonical y OG usan Astro.site para emitir URLs absolutas.
 // Astro.url.pathname YA incluye el base, así que no se le vuelve a prefijar.
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+// Raíz del sitio (entity home de la Persona + url del WebSite): independiente de
+// la ruta actual, así el 404 no publica @ids basura en el JSON-LD.
+const homeUrl = new URL(`${base}/`, Astro.site).toString();
 const ogRelative = ogImage ?? '/projects/sistema-gestor-lecturas.svg';
 const og = new URL(`${base}/${ogRelative.replace(/^\//, '')}`, Astro.site).toString();
 const favicon = `${base}/favicon.svg`;
-const fullTitle = title.includes('Ann') ? title : `${title} · Ann`;
+const faviconIco = `${base}/favicon.ico`;
+const ogImageAlt = `Portafolio de ${profile.fullName} — ${profile.taglineEs}`;
+// Sufija la marca corta solo si el título aún no la trae (evita duplicar en home).
+const fullTitle = title.includes(profile.shortName)
+  ? title
+  : `${title} · ${profile.shortName}`;
+// En noindex (404), canonicaliza a la home en vez de a la URL inexistente.
+const canonicalHref = noindex ? homeUrl : canonical;
+const robotsContent = noindex
+  ? 'noindex, follow'
+  : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+const isArticle = ogType === 'article';
 ---
 
 <!doctype html>
@@ -51,9 +85,19 @@ const fullTitle = title.includes('Ann') ? title : `${title} · Ann`;
 
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content={robotsContent} />
     <meta name="google-site-verification" content="YZWwdS6QSuusYwFsyXja9zYZe6biSHG7bR49d2SOb_0" />
-    <meta name="author" content="Angel Francisco Palestina Blancas" />
-    <link rel="canonical" href={canonical} />
+    <meta name="author" content={profile.fullName} />
+    <meta name="application-name" content={profile.siteName} />
+    <meta name="apple-mobile-web-app-title" content={profile.siteName} />
+    {/* Referrer policy: los enlaces salientes (GitHub/LinkedIn/credenciales) no
+        filtran la URL completa del portafolio al destino. */}
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    {/* Evita que iOS Safari auto-linkee teléfono/email/dirección en el texto. */}
+    <meta name="format-detection" content="telephone=no,email=no,address=no" />
+    <link rel="canonical" href={canonicalHref} />
+    {/* Descubrimiento del sitemap además de robots.txt. */}
+    <link rel="sitemap" type="application/xml" href={`${base}/sitemap-index.xml`} />
 
     {/* El sitio soporta tema claro/oscuro (sin FOUC: ver el script is:inline
         abajo). color-scheme ayuda a que los UA widgets y el scroll se pinten
@@ -63,31 +107,60 @@ const fullTitle = title.includes('Ann') ? title : `${title} · Ann`;
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a12" />
 
     {/* Open Graph */}
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={profile.siteName} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    <meta property="og:url" content={canonicalHref} />
     <meta property="og:image" content={og} />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta property="og:locale" content="es_ES" />
+    {/* El contenido mezcla español + nombres de cursos en inglés; declara la
+        variante para que los scrapers la considieren. */}
+    <meta property="og:locale:alternate" content="en_US" />
+    {isArticle && (
+      <>
+        <meta property="article:author" content={profile.fullName} />
+        {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+        {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+        {articleTags.map((t) => <meta property="article:tag" content={t} />)}
+      </>
+    )}
 
     {/* Twitter */}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={og} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     {/* Enlaces de identidad (rel="me"): asocian el sitio con los perfiles. */}
-    <link rel="me" href="https://github.com/AnnGeliux" />
+    <link rel="me" href={profile.github} />
+    <link rel="me" href={profile.linkedin} />
+
+    {/* Favicon: SVG (principal) + .ico (compatibilidad con UAs antiguos) + manifest. */}
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+    <link rel="icon" type="image/x-icon" href={faviconIco} />
+    <link rel="alternate icon" type="image/svg+xml" href={favicon} />
+    <link rel="manifest" href={`${base}/site.webmanifest`} />
+    {/* Feed RSS: superficie de descubrimiento extra (lectores de feeds). */}
     <link
-      rel="me"
-      href="https://www.linkedin.com/in/angel-francisco-palestina-blancas-2773b7318/"
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${profile.siteName} — Portafolio`}
+      href={`${base}/rss.xml`}
     />
 
-    {/* Favicon (placeholder por defecto del scaffold) */}
-    <link rel="icon" type="image/svg+xml" href={favicon} />
-
-    {/* Pre-carga la fuente de texto principal (Satoshi variable, same-origin).
-        crossorigin es obligatorio para que el preload reutilice la @font-face. */}
+    {/* Pre-carga las fuentes del LCP (same-origin). crossorigin es obligatorio
+        para que el preload reutilice las @font-face. Space Grotesk latin es la
+        del <h1> del Hero (elemento LCP); Satoshi la del cuerpo. */}
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={`${base}/fonts/space-grotesk-latin.woff2`}
+      crossorigin
+    />
     <link
       rel="preload"
       as="font"
@@ -96,32 +169,98 @@ const fullTitle = title.includes('Ann') ? title : `${title} · Ann`;
       crossorigin
     />
 
-    {/* Datos estructurados (JSON-LD Person) para rich results / Motores de
-        búsqueda. Coincide con el perfil y contactos del index. */}
+    {/* Datos estructurados (JSON-LD @graph: Person + WebSite + WebPage) para
+       rich results. Person expone el vector disambiguador completo (nombre + rol
+       + ciudad + universidad + idiomas + skills) para que "Angel Palestina"
+       resuelva a la persona y no al tópimo; WebSite la ancla al dominio
+       (publisher = Person) y alimenta sitelinks; WebPage describe la página
+       actual (isPartOf WebSite, about Person). Los @id son absolutos y estables.
+       Las páginas de detalle inyectan su propio JSON-LD (CreativeWork /
+       EducationalOccupationalCredential / BreadcrumbList) vía el slot `head`. */}
     <script
       type="application/ld+json"
       set:html={JSON.stringify({
         '@context': 'https://schema.org',
-        '@type': 'Person',
-        name: 'Angel Francisco Palestina Blancas',
-        alternateName: 'Ann',
-        jobTitle: 'Systems Engineering Student',
-        knowsAbout: [
-          'Deep Learning',
-          'Artificial Intelligence',
-          'Full-Stack Development',
-          'Generative AI',
-        ],
-        url: canonical,
-        email: 'mailto:aangel.palestina@gmail.com',
-        sameAs: [
-          'https://github.com/AnnGeliux',
-          'https://www.linkedin.com/in/angel-francisco-palestina-blancas-2773b7318/',
+        '@graph': [
+          {
+            '@type': 'Person',
+            '@id': `${homeUrl}${personSlug}`,
+            name: profile.fullName,
+            givenName: profile.givenName,
+            familyName: profile.familyName,
+            alternateName: profile.alternateNames,
+            jobTitle: profile.role,
+            description: profile.blurbEs,
+            disambiguatingDescription: profile.taglineEs,
+            url: homeUrl,
+            image: og,
+            email: `mailto:${profile.email}`,
+            telephone: `+52 ${profile.phone}`,
+            sameAs: [profile.github, profile.linkedin],
+            homeLocation: { '@type': 'City', name: profile.city },
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: profile.city,
+              addressCountry: profile.country,
+            },
+            nationality: { '@type': 'Country', name: 'México' },
+            alumniOf: {
+              '@type': 'CollegeOrUniversity',
+              name: profile.education.institution,
+            },
+            knowsAbout: [
+              'Deep Learning',
+              'Redes Neuronales',
+              'Transformers',
+              'Inteligencia Artificial',
+              'IA Generativa',
+              'PyTorch',
+              'TensorFlow',
+              'Full-Stack Development',
+              'Django',
+              'React',
+              'Astro',
+              'Python',
+            ],
+            knowsLanguage: ['es', 'en'],
+          },
+          {
+            '@type': 'WebSite',
+            '@id': `${homeUrl}${websiteSlug}`,
+            url: homeUrl,
+            name: profile.siteName,
+            inLanguage: 'es',
+            publisher: { '@id': `${homeUrl}${personSlug}` },
+          },
+          {
+            '@type': 'WebPage',
+            '@id': `${canonicalHref}${webPageSlug}`,
+            url: canonicalHref,
+            name: fullTitle,
+            description,
+            inLanguage: 'es',
+            isPartOf: { '@id': `${homeUrl}${websiteSlug}` },
+            about: { '@id': `${homeUrl}${personSlug}` },
+            ...(isArticle && articleTags.length
+              ? { keywords: articleTags.join(', ') }
+              : {}),
+          },
         ],
       })}
     />
+
+    {/* JSON-LD / meta adicional inyectado por cada página (p. ej. CreativeWork,
+        EducationalOccupationalCredential, BreadcrumbList, ItemList). */}
+    <slot name="head" />
   </head>
   <body class="min-h-screen antialiased">
+    {/* Skip-to-content: primero en el body para que el tab lo alcance de inmediato. */}
+    <a
+      href="#main"
+      class="sr-only z-[100] rounded-full glass-pill px-4 py-2 text-sm font-medium text-(--color-fg) focus:not-sr-only focus:absolute focus:left-3 focus:top-3"
+    >
+      Saltar al contenido
+    </a>
     {/* Floor ambiental estático: da color al liquid glass desde el primer paint,
        antes de que ASMRBackground se hidrate. */}
     <div class="ambient-bg" aria-hidden="true"></div>
@@ -167,12 +306,12 @@ const fullTitle = title.includes('Ann') ? title : `${title} · Ann`;
         viejo) no registran nada y no quedan acoplados a un SW; los visitantes con
         la v1 sí tienen controller → registran el kill-switch → se limpian una
         sola vez y al desregistrarse el guard deja de cumplirse → sin bucle de
-        recarga. Si el controller del SW viejo fuera null por un edge case (SW en
-        waiting), el visitante se limpia en su próxima visita cuando ya controle. */}
-    <script is:inline>
+        recarga. La ruta del SW se construye con el base del sitio (def:vars) para
+        que sirva también al migrar a dominio propio. */}
+    <script is:inline define:vars={{ swPath: `${base}/sw.js` }}>
       if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
         window.addEventListener('load', function () {
-          navigator.serviceWorker.register('/portfolio/sw.js').catch(function () {});
+          navigator.serviceWorker.register(swPath).catch(function () {});
         });
       }
     </script>

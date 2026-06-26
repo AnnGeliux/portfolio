@@ -9,8 +9,15 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    // Lista de tecnologías/herramientas usadas (chips en la UI).
+    // Resumen corto para meta description de la página detalle (opcional; si
+    // se omite, se usa `description`). Mejor para SEO que reusar el del card.
+    summary: z.string().optional(),
+    // Lista de tecnologías/herramientas usadas (chips en la UI + article:tag).
     technologies: z.array(z.string()).default([]),
+    // Categoría/tema (agrupación opcional para hubs y keywords).
+    category: z.string().optional(),
+    // Temas cubiertos (para ItemList/keywords en la página detalle).
+    topics: z.array(z.string()).default([]),
     // Ruta del archivo de portada dentro de /public (ej: /projects/foo.png).
     coverImage: z.string(),
     // Fecha usada para ordenar (YYYY-MM-DD).
@@ -28,6 +35,14 @@ const certifications = defineCollection({
   schema: z.object({
     name: z.string(),
     institution: z.string(),
+    // Resumen corto para meta description (opcional).
+    summary: z.string().optional(),
+    // Temas/competencias cubiertas (EducationalOccupationalCredential).
+    topics: z.array(z.string()).default([]),
+    // Especialización a la que pertenece (agrupa cursos en el hub).
+    specialization: z.string().optional(),
+    // ID de la credencial (estructurado, opcional).
+    credentialId: z.string().optional(),
     // Fecha de emisión (YYYY-MM-DD).
     issueDate: z.coerce.date(),
     // Ruta del logo dentro de /public.

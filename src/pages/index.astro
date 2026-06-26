@@ -5,6 +5,9 @@ import Hero from '../components/Hero.tsx';
 import Footer from '../components/Footer.astro';
 import { GrainGradientBackground } from '../components/ui/GrainGradientBackground';
 import Ticker from '../components/Ticker.astro';
+// Identidad canónica del autor — FUENTE ÚNICA DE VERDAD (compartida con el
+// Layout, el JSON-LD y el Footer). Cambiar los datos en src/data/profile.ts.
+import { profile } from '../data/profile';
 import {
   Code2,
   ExternalLink,
@@ -20,16 +23,6 @@ import {
 // BASE_URL puede venir con o sin barra final; normalizamos a sin esta.
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const asset = (path: string) => `${base}/${path.replace(/^\//, '')}`;
-
-// Datos de contacto y perfiles (extraídos del CV).
-const profile = {
-  fullName: 'Angel Francisco Palestina Blancas',
-  email: 'aangel.palestina@gmail.com',
-  phone: '5638588959',
-  github: 'https://github.com/AnnGeliux',
-  linkedin:
-    'https://www.linkedin.com/in/angel-francisco-palestina-blancas-2773b7318/',
-};
 
 const summaryLead =
   'Estudiante de Ingeniería en Sistemas Computacionales con un perfil técnico ' +
@@ -164,8 +157,8 @@ const fmtDate = (d: Date) =>
 ---
 
 <Layout
-  title="Angel Palestina — Estudiante de Ingeniería en Sistemas especializado en Deep Learning"
-  description="Portafolio de Angel Francisco Palestina Blancas: estudiante de Ingeniería de Sistemas especializado en Deep Learning e IA."
+  title={`${profile.shortName} — ${profile.taglineEs}`}
+  description={profile.blurbEs}
 >
   <!-- Hero (React + Framer Motion, hidratado al cargar) -->
   <div id="hero" class="relative">
@@ -199,7 +192,7 @@ const fmtDate = (d: Date) =>
     class="mb-16"
   />
 
-  <main class="mx-auto max-w-6xl px-6 pb-24 xl:max-w-7xl 2xl:max-w-[88rem]">
+  <main id="main" class="mx-auto max-w-6xl px-6 pb-24 xl:max-w-7xl 2xl:max-w-[88rem]">
     <!-- Sobre mí -->
     <section id="about" scroll-mt-20 aria-labelledby="about-heading">
       <h2
@@ -240,7 +233,7 @@ const fmtDate = (d: Date) =>
       class="my-16"
     />
     <!-- Educación -->
-    <section aria-labelledby="education-heading">
+    <section id="education" scroll-mt-20 aria-labelledby="education-heading">
       <h2
         id="education-heading"
         class="reveal-item mb-6 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
@@ -283,7 +276,7 @@ const fmtDate = (d: Date) =>
       class="my-16"
     />
     <!-- Habilidades -->
-    <section aria-labelledby="skills-heading">
+    <section id="skills" scroll-mt-20 aria-labelledby="skills-heading">
       <h2
         id="skills-heading"
         class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
@@ -334,15 +327,28 @@ const fmtDate = (d: Date) =>
             class="reveal-item flex flex-col overflow-hidden rounded-2xl glass-card"
             style={`--reveal-delay: ${120 + i * 60}ms`}
           >
-            <img
-              src={asset(p.data.coverImage)}
-              alt={`Portada de ${p.data.title}`}
-              loading="lazy"
-              class="aspect-[8/5] w-full object-cover"
-            />
+            <a
+              href={`${base}/proyectos/${p.id}/`}
+              aria-label={`Ver detalles de ${p.data.title}`}
+              class="group block"
+            >
+              <img
+                src={asset(p.data.coverImage)}
+                alt={`Portada de ${p.data.title}`}
+                width={1600}
+                height={1000}
+                loading="lazy"
+                class="aspect-[8/5] w-full object-cover transition group-hover:opacity-90"
+              />
+            </a>
             <div class="flex flex-1 flex-col p-6">
               <h3 class="text-lg font-semibold text-(--color-fg)">
-                {p.data.title}
+                <a
+                  href={`${base}/proyectos/${p.id}/`}
+                  class="hover:text-(--color-accent) hover:underline"
+                >
+                  {p.data.title}
+                </a>
               </h3>
               <p class="mt-2 flex-1 text-sm text-(--color-muted)">
                 {p.data.description}
@@ -412,12 +418,19 @@ const fmtDate = (d: Date) =>
             <img
               src={asset(c.data.logo)}
               alt={`Logo de ${c.data.institution}`}
+              width={56}
+              height={56}
               loading="lazy"
               class="h-14 w-14 shrink-0 rounded-xl"
             />
             <div class="min-w-0">
               <h3 class="flex items-start gap-1.5 text-base font-semibold text-(--color-fg)">
-                <span class="flex-1">{c.data.name}</span>
+                <a
+                  href={`${base}/certificaciones/${c.id}/`}
+                  class="flex-1 hover:text-(--color-accent) hover:underline"
+                >
+                  {c.data.name}
+                </a>
                 <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-(--color-accent)" />
               </h3>
               <p class="mt-0.5 text-sm text-(--color-muted)">
@@ -448,7 +461,7 @@ const fmtDate = (d: Date) =>
       class="my-16"
     />
     <!-- Actualmente aprendiendo -->
-    <section aria-labelledby="learning-heading">
+    <section id="learning" scroll-mt-20 aria-labelledby="learning-heading">
       <h2
         id="learning-heading"
         class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
@@ -491,7 +504,7 @@ const fmtDate = (d: Date) =>
       class="my-16"
     />
     <!-- Idiomas -->
-    <section aria-labelledby="languages-heading">
+    <section id="languages" scroll-mt-20 aria-labelledby="languages-heading">
       <h2
         id="languages-heading"
         class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"

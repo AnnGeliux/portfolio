@@ -1,24 +1,20 @@
 @import "tailwindcss";
 /*
- * Inter y Space Grotesk (variable, vía @fontsource). El CSS de fontsource
- * declara un @font-face por subset con unicode-range, así que el navegador solo
- * descarga los subsets de los glifos que realmente renderiza: para un sitio en
- * español eso es solo "latin" (cyrillic/greek/vietnamese no se bajan en runtime).
+ * Inter (variable, vía @fontsource). El CSS de fontsource declara un @font-face
+ * por subset con unicode-range, así que el navegador solo descarga los subsets
+ * de los glifos que renderiza: para un sitio en español es "latin".
  *
- * NOTA: los paquetes *variable* de fontsource NO exponen CSS por subset (solo
- * wght.css/index.css con todos los subsets), así que Vite copia los 11 woff2 a
- * dist/ aunque el navegador solo pida latin. Eso no afecta Lighthouse (las
- * fuentes no son JS y las no usadas no se descargan por unicode-range); es solo
- * peso de deploy. Para limpiarlo habría que reescribir los @font-face a mano
- * apuntando a los woff2 latin/latin-ext — diferido por no mover la aguja de
- * performance.
+ * Space Grotesk se self-hostea (latin + latin-ext en public/fonts/) en lugar de
+ * @import "@fontsource-variable/space-grotesk": así Vite NO copia los 11 woff2 a
+ * dist/ (solo 2 subsets), y el subset latin —el del <h1> LCP del Hero— se puede
+ * pre-cargar con <link rel="preload"> en Layout.astro. Los @font-face de Satoshi
+ * y Space Grotesk están aquí (paths con el base de GitHub Pages, como Satoshi).
  */
 @import "@fontsource-variable/inter";
-@import "@fontsource-variable/space-grotesk";
 
 /*
  * Satoshi (Fontshare — ITF Free Font License, comercial sin atribución).
- * self-hosteada como archivo variable único en public/fonts/ (path estable,
+ * Self-hosteada como archivo variable único en public/fonts/ (path estable,
  * sin hashear, para poder pre-cargarla con <link rel="preload"> en Layout.astro).
  * Cubre todo el rango de pesos 300–900 en ~42 KB (antes: 4 estáticos = ~98 KB).
  * El path lleva el base de GitHub Pages (/portfolio) porque Vite no antepone el
@@ -29,6 +25,29 @@
   src: url("/portfolio/fonts/satoshi-variable.woff2") format("woff2-variations");
   font-weight: 300 900;
   font-display: swap;
+}
+
+/*
+ * Space Grotesk (variable) self-hosteada, solo latin + latin-ext. Latin cubre el
+ * <h1> del Hero (ASCII) y es el archivo que pre-carga el Layout (font LCP);
+ * latin-ext cubre los acentos del español en los encabezados. Path con el base de
+ * GitHub Pages, igual que Satoshi. Unicode-ranges idénticos a los de fontsource.
+ */
+@font-face {
+  font-family: "Space Grotesk Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 700;
+  src: url("/portfolio/fonts/space-grotesk-latin.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: "Space Grotesk Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 700;
+  src: url("/portfolio/fonts/space-grotesk-latin-ext.woff2") format("woff2-variations");
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
 }
 
 /*
@@ -229,6 +248,40 @@
     --hero-text-shadow: 0 2px 18px rgba(255, 255, 255, 0.35);
     /* GooeyText usa --color-fg; en claro va en tinta oscura sobre el hero blanco. */
     --color-fg: #0b0b14;
+  }
+
+  /*
+   * Animación de entrada del Hero (reemplazo CSS de framer-motion, 2026-06-22).
+   * Cada hijo directo de .hero-enter hace fade-in + translateY(24px)→0 con
+   * cubic-bezier easeOutQuint y stagger por nth-child (delayChildren 0.1s +
+   * staggerChildren 0.15s, igual que las variantes originales). Al ser CSS
+   * arranca en el primer paint, sin esperar a la hidratación idle de la isla.
+   */
+  .hero-enter > * {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: hero-enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .hero-enter > *:nth-child(1) { animation-delay: 0.10s; }
+  .hero-enter > *:nth-child(2) { animation-delay: 0.25s; }
+  .hero-enter > *:nth-child(3) { animation-delay: 0.40s; }
+  .hero-enter > *:nth-child(4) { animation-delay: 0.55s; }
+  .hero-enter > *:nth-child(5) { animation-delay: 0.70s; }
+
+  @keyframes hero-enter {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Accesibilidad: sin animación de entrada con movimiento reducido. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-enter > * {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
   }
 
   /* Nombre del hero: gradiente recortado al texto + sombra, ambos por tema. */
@@ -526,3 +579,59 @@
   }
 }
 
+
+/*
+ * Prose para los cuerpos markdown de las páginas detalle (proyectos/certs).
+ * Tailwind v4 no autoestila el HTML anidado, así que se declaran los estilos
+ * básicos para que el contenido renderizado (h2/h3/p/ul/a/strong) sea legible
+ * y coherente con el resto del sitio.
+ */
+.prose-project {
+  line-height: 1.7;
+}
+.prose-project > :first-child {
+  margin-top: 0;
+}
+.prose-project > :last-child {
+  margin-bottom: 0;
+}
+.prose-project h2 {
+  margin: 2rem 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-fg);
+}
+.prose-project h3 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-fg);
+}
+.prose-project p {
+  margin: 0.75rem 0;
+}
+.prose-project ul {
+  margin: 0.75rem 0;
+  padding-left: 1.4rem;
+  list-style: disc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.prose-project a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-project strong {
+  color: var(--color-fg);
+  font-weight: 600;
+}
+.prose-project code {
+  font-size: 0.875em;
+  background: var(--color-surface);
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+}

@@ -1,33 +1,26 @@
 ---
 import { ContactIcon, GithubIcon, LinkedinIcon, type SocialKind } from './ui/social-icons';
-
-interface Profile {
-  fullName: string;
-  email: string;
-  phone: string;
-  github: string;
-  linkedin: string;
-}
+import { profile as canonicalProfile } from '../data/profile';
 
 interface Props {
-  profile: Profile;
+  profile: typeof canonicalProfile;
 }
 
 const { profile } = Astro.props;
 const year = new Date().getFullYear();
 
 // Nombre corto para la marca del footer (más legible que el fullName completo).
-const shortName = 'Angel Palestina';
+const shortName = profile.shortName;
 
 // Enlaces de la columna de contacto: etiqueta amigable + valor a mostrar + href.
 const contacts: { kind: SocialKind; label: string; value: string; href: string }[] = [
   { kind: 'email', label: 'Email', value: profile.email, href: `mailto:${profile.email}` },
   { kind: 'phone', label: 'Teléfono', value: profile.phone, href: `tel:${profile.phone}` },
-  { kind: 'github', label: 'GitHub', value: 'AnnGeliux', href: profile.github },
+  { kind: 'github', label: 'GitHub', value: profile.githubHandle, href: profile.github },
   {
     kind: 'linkedin',
     label: 'LinkedIn',
-    value: 'Angel Palestina',
+    value: profile.shortName,
     href: profile.linkedin,
   },
 ];

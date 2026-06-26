@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
-import { cn, usePrefersReducedMotion } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "portfolio-theme";
 
@@ -17,7 +16,6 @@ const STORAGE_KEY = "portfolio-theme";
  * regla `z-index:-1` que mantiene el texto nítido.
  */
 export function ThemeToggle({ className }: { className?: string }) {
-  const reduceMotion = usePrefersReducedMotion();
   // Estado inicial desde el DOM: el script anti-FOUC ya puso la clase correcta
   // antes del primer paint, así que el inicializador perezoso la lee sin flicker
   // del icono (antes arrancaba en `true` y se corregía recién en el effect).
@@ -63,21 +61,16 @@ export function ThemeToggle({ className }: { className?: string }) {
         className,
       )}
     >
-      <motion.span
-        animate={{ x: isDark ? 0 : 28 }}
-        transition={
-          reduceMotion
-            ? { duration: 0 }
-            : { type: "spring", stiffness: 500, damping: 30 }
-        }
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-surface) text-(--color-fg) shadow"
+      <span
+        style={{ transform: isDark ? "translateX(0)" : "translateX(28px)" }}
+        className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-surface) text-(--color-fg) shadow transition-transform duration-300 ease-out motion-reduce:transition-none"
       >
         {isDark ? (
           <Moon className="h-4 w-4" strokeWidth={1.75} />
         ) : (
           <Sun className="h-4 w-4" strokeWidth={1.75} />
         )}
-      </motion.span>
+      </span>
     </button>
   );
 }

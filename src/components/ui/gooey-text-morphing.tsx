@@ -45,6 +45,10 @@ export function GooeyText({
 
     let rafId = 0;
     let running = true;
+    // ¿El contenedor está en el viewport? Lo lleva el IntersectionObserver; lo
+    // consulta onVisibility para reanudar al volver a la pestaña sin esperar a
+    // un nuevo evento de intersección.
+    let intersecting = true;
     let textIndex = texts.length - 1;
     let time = new Date();
     let morph = 0;
@@ -112,6 +116,7 @@ export function GooeyText({
     // Al volver a ser visible se reanuda desde donde quedó; sin cambio visual.
     const intersectionObserver = new IntersectionObserver(
       ([entry]) => {
+        intersecting = entry.isIntersecting;
         if (entry.isIntersecting && !running) {
           running = true;
           time = new Date(); // evita un salto de dt enorme tras la pausa
@@ -126,12 +131,31 @@ export function GooeyText({
     );
     if (containerRef.current) intersectionObserver.observe(containerRef.current);
 
+    // Pausar también cuando la pestaña pasa a segundo plano (mismo ahorro que
+    // ASMRBackground y el shader del Hero). Al volver, reanuda solo si sigue
+    // en viewport (intersecting), sin depender de un nuevo evento de IO.
+    const onVisibility = () => {
+      if (document.hidden) {
+        if (running) {
+          running = false;
+          cancelAnimationFrame(rafId);
+          rafId = 0;
+        }
+      } else if (intersecting && !running) {
+        running = true;
+        time = new Date();
+        animate();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     animate();
 
     return () => {
       running = false;
       cancelAnimationFrame(rafId);
       intersectionObserver.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [texts, morphTime, cooldownTime, reduceMotion]);
 
