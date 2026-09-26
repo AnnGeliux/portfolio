@@ -1,0 +1,35 @@
+# Angel Palestina — Desarrollador Full-Stack & Deep Learning
+
+> Portafolio de Angel Francisco Palestina Blancas (Ann / Anngeliux), estudiante de Ingeniería en Sistemas especializado en Inteligencia Artificial. Ciudad de México.
+
+Perfil, certificaciones, proyectos y artículos — escritos mientras aprendo, no después. Los datos estructurados (JSON-LD Person) de cada página son la fuente canónica de identidad.
+
+## Perfil
+
+- [Sobre mí](https://angelpalestina.dev/sobre-mi/): trayectoria, stack y en qué estoy trabajando ahora.
+- [GitHub](https://github.com/AnnGeliux): código y contribuciones.
+- [LinkedIn](https://www.linkedin.com/in/angel-francisco-palestina-blancas-2773b7318/): perfil profesional.
+- [Contacto](mailto:aangel.palestina@gmail.com): aangel.palestina@gmail.com
+
+## Certificaciones
+
+- [Índice de certificaciones](https://angelpalestina.dev/certificaciones/): las 10 credenciales con fecha, institución y URL de verificación.
+- [Deep Learning Specialization — DeepLearning.AI](https://angelpalestina.dev/certificaciones/neural-networks-and-deep-learning/): redes neuronales, ajuste de hiperparámetros, CNNs y estructura de proyectos ML (4 cursos).
+- [MCP: Build Rich-Context AI Apps with Anthropic](https://angelpalestina.dev/certificaciones/mcp-build-rich-context-ai-apps-with-anthropic/): Model Context Protocol para agentes con contexto externo.
+- [AMD AI Academy](https://angelpalestina.dev/certificaciones/amd-ai-agents-101/): 5 cursos — agentes de IA (101 y 201), modelos de difusión, Hugging Face e IA en hardware AMD.
+
+## Proyectos
+
+- [Sistema gestor de lecturas](https://angelpalestina.dev/proyectos/sistema-gestor-lecturas/): full-stack para registrar y seguir lecturas — arquitectura y decisiones de diseño documentadas.
+
+## Blog
+
+- [Blog](https://angelpalestina.dev/blog/): lo que he aprendido, con contexto — transformers, modelos de difusión, redes neuronales, construyendo en público.
+- [Transformers sin fórmulas: la intuición de la atención](https://angelpalestina.dev/blog/transformers-sin-formulas-la-intuicion-de-la-atencion/)
+- [Modelos de difusión: cómo una IA aprende a pintar](https://angelpalestina.dev/blog/modelos-de-difusion-como-una-ia-aprende-a-pintar/)
+- [Lo que aprendí construyendo mi primera red neuronal](https://angelpalestina.dev/blog/lo-que-aprendi-construyendo-mi-primera-red-neuronal/)
+
+## Otros
+
+- [Portafolio (home)](https://angelpalestina.dev/)
+- [RSS](https://angelpalestina.dev/rss.xml)
