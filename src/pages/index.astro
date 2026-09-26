@@ -28,9 +28,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const asset = (path: string) => `${base}/${path.replace(/^\//, '')}`;
 
 const summaryLead =
-  'Estudiante de Ingeniería en Sistemas Computacionales enfocado en la ingeniería ' +
-  'de software y la implementación de Inteligencia Artificial. Trabajo en tres ' +
-  'frentes que se alimentan entre sí:';
+  'Soy un estudiante de Ingeniería en Sistemas Computacionales enfocado en la ' +
+  'ingeniería de software y la implementación de Inteligencia Artificial. ' +
+  'Trabajo en tres frentes que se alimentan entre sí:';
 
 // Los tres frentes, renderizados como mini-tarjetas con icono.
 const focusAreas = [
@@ -248,7 +248,7 @@ const fmtDate = (d: Date) =>
       </h2>
       <div class="reveal-item rounded-2xl glass-card p-6 sm:p-8" style="--reveal-delay: 120ms">
         <p class="text-xl font-bold tracking-tight text-(--color-fg)">
-          ¡Hola! Soy {profile.shortName} 👋
+          Hola, soy {profile.shortName} 👋
         </p>
         <p class="mt-3 text-base leading-relaxed text-(--color-muted)">
           {summaryLead}
@@ -268,16 +268,12 @@ const fmtDate = (d: Date) =>
           ))}
         </div>
         <p class="mt-6 text-base leading-relaxed text-(--color-muted)">
-          Esto es solo el resumen — la historia completa, con contexto, está en
-          el Sobre mí.
-        </p>
-        <p class="mt-3 text-sm">
+          Si te interesa saber más sobre mí,{' '}
           <a
             href={`${base}/sobre-mi/`}
-            class="inline-flex items-center gap-1.5 font-medium text-(--color-accent) hover:underline"
-          >
-            Conoce mi historia →
-          </a>
+            class="font-medium text-(--color-accent) hover:underline"
+          >aquí</a>{' '}
+          puedes conocer más detalles de mí.
         </p>
       </div>
     </section>
