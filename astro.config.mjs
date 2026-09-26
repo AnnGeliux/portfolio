@@ -6,13 +6,12 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  // GitHub Pages: el sitio se sirve en anngeliux.github.io/portfolio
+  // Dominio propio: https://angelpalestina.dev (GitHub Pages + CNAME).
   // (host en minúsculas = forma canónica; @astrojs/sitemap lo emite así, así
-  // que site debe ir en minúsculas para que canonical/OG/JSON-LD/sitemap coincidan).
-  // Para migrar a dominio custom (anngeliux.dev): cambiar site y dejar base: '/'
-  // + crear public/CNAME con el dominio.
-  site: 'https://anngeliux.github.io',
-  base: '/portfolio',
+  //  que site debe ir en minúsculas para que canonical/OG/JSON-LD/sitemap coincidan).
+  // Legacy: anngeliux.github.io/portfolio (redirige a este dominio).
+  site: 'https://angelpalestina.dev',
+  base: '/',
   // Slash final consistente → evita que el sitemap duplique /portfolio y /portfolio/.
   trailingSlash: 'always',
   output: 'static',
