@@ -1,0 +1,104 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Ticker from '../../components/Ticker.astro';
+import { ArrowLeft, Calendar } from 'lucide-react';
+import { profile } from '../../data/profile';
+
+// Hub del blog: lista todos los posts publicados (drafts fuera) ordenados por
+// fecha descendente. Igual patrón que el hub de proyectos.
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const pageUrl = new URL(Astro.url.pathname, Astro.site).toString();
+
+const fmtDate = (d: Date) => d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short' });
+
+// ItemList: posiciona cada post para rich results.
+const itemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  '@id': `${pageUrl}#itemlist`,
+  name: `Blog — ${profile.shortName}`,
+  itemListElement: posts.map((p, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    url: new URL(`${base}/blog/${p.id}/`, Astro.site).toString(),
+    name: p.data.title,
+  })),
+};
+---
+
+<Layout
+  title={`Blog — ${profile.shortName}`}
+  description={`Artículos sobre Deep Learning, IA y desarrollo full-stack por ${profile.fullName}. ${profile.taglineEs}.`}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(itemList)} />
+  </Fragment>
+
+  <main id="main" class="mx-auto max-w-6xl px-6 py-32 xl:max-w-7xl 2xl:max-w-[88rem]">
+    <nav aria-label="Migas de pan" class="reveal-item is-visible mb-6">
+      <ol class="flex flex-wrap items-center gap-2 text-sm text-(--color-muted)">
+        <li><a href={`${base}/`} class="hover:text-(--color-accent)">Inicio</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="text-(--color-fg)" aria-current="page">Blog</li>
+      </ol>
+    </nav>
+
+    <h1 class="reveal-item is-visible font-display text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
+      Blog
+    </h1>
+    <p class="reveal-item is-visible mt-4 max-w-2xl text-lg leading-relaxed text-(--color-muted)">
+      Artículos sobre Deep Learning, IA generativa y desarrollo full-stack —
+      escritos mientras aprendo, no después.
+    </p>
+
+    <Ticker
+      items={['Deep Learning', 'Transformers', 'Modelos de Difusión', 'PyTorch', 'Django', 'React']}
+      duration={32}
+      solid
+      class="my-12"
+    />
+
+    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+      {posts.map((p, i) => (
+        <li
+          class="reveal-item is-visible flex flex-col rounded-2xl glass-card"
+          style={`--reveal-delay: ${120 + i * 60}ms`}
+        >
+          <div class="flex flex-1 flex-col p-6">
+            <span class="inline-flex w-fit items-center gap-1.5 rounded-full bg-(--color-bg) px-2.5 py-1 text-xs font-medium text-(--color-muted) ring-1 ring-(--color-border)">
+              <Calendar className="h-3.5 w-3.5" />
+              {fmtDate(p.data.pubDate)}
+            </span>
+            <h2 class="mt-4 text-lg font-semibold text-(--color-fg)">
+              <a href={`${base}/blog/${p.id}/`} class="hover:text-(--color-accent) hover:underline">
+                {p.data.title}
+              </a>
+            </h2>
+            <p class="mt-2 flex-1 text-sm text-(--color-muted)">{p.data.summary ?? p.data.description}</p>
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {p.data.tags.map((t) => (
+                <li class="rounded-full bg-(--color-bg) px-2.5 py-1 text-xs font-medium text-(--color-muted) ring-1 ring-(--color-border)">
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </li>
+      ))}
+    </ul>
+
+    <div class="mt-12">
+      <a
+        href={`${base}/`}
+        class="inline-flex items-center gap-2 rounded-full glass-pill px-5 py-2.5 text-sm font-medium text-(--color-fg) transition hover:-translate-y-0.5 hover:text-(--color-accent)"
+      >
+        <ArrowLeft className="h-4 w-4" /> Volver al inicio
+      </a>
+    </div>
+  </main>
+</Layout>

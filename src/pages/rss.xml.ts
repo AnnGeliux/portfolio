@@ -16,8 +16,16 @@ export async function GET(context: APIContext) {
 
   const projects = await getCollection('projects');
   const certifications = await getCollection('certifications');
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
 
   const items = [
+    ...posts.map((b) => ({
+      title: b.data.title,
+      description: b.data.summary ?? b.data.description,
+      pubDate: b.data.pubDate,
+      link: `blog/${b.id}/`,
+      categories: b.data.tags,
+    })),
     ...projects.map((p) => ({
       title: p.data.title,
       description: p.data.summary ?? p.data.description,

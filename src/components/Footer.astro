@@ -9,6 +9,17 @@ interface Props {
 const { profile } = Astro.props;
 const year = new Date().getFullYear();
 
+// Base del sitio (GitHub Pages) para los enlaces internos del footer.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Navegación interna: enlaza los hubs y las páginas indexables del portafolio.
+const navLinks: { label: string; href: string }[] = [
+  { label: 'Sobre mí', href: `${base}/sobre-mi/` },
+  { label: 'Proyectos', href: `${base}/proyectos/` },
+  { label: 'Certificaciones', href: `${base}/certificaciones/` },
+  { label: 'Blog', href: `${base}/blog/` },
+];
+
 // Nombre corto para la marca del footer (más legible que el fullName completo).
 const shortName = profile.shortName;
 
@@ -31,7 +42,7 @@ const contacts: { kind: SocialKind; label: string; value: string; href: string }
   class="scroll-mt-20 mx-auto max-w-5xl px-4 py-10 sm:py-14"
 >
   <div class="glass-card rounded-2xl px-6 py-10 sm:px-10 sm:py-12">
-    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-12">
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-12">
       {/* Columna izquierda: marca + micro-bio + pills sociales */}
       <div class="flex flex-col gap-4">
         <p class="text-lg font-semibold text-(--color-fg)">{shortName}</p>
@@ -56,6 +67,27 @@ const contacts: { kind: SocialKind; label: string; value: string; href: string }
             <LinkedinIcon className="h-4 w-4" /> LinkedIn
           </a>
         </div>
+      </div>
+
+      {/* Columna central: navegación del sitio (enlazado interno para SEO) */}
+      <div class="flex flex-col gap-3">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-(--color-fg)">
+          Explora
+        </h2>
+        <ul class="flex flex-col gap-2 text-sm">
+          {
+            navLinks.map((l) => (
+              <li>
+                <a
+                  href={l.href}
+                  class="text-(--color-muted) transition hover:text-(--color-accent)"
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
       </div>
 
       {/* Columna derecha: bloque de contacto */}

@@ -1,0 +1,33 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0a12"/>
+      <stop offset="1" stop-color="#13132a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.18" r="0.6">
+      <stop offset="0" stop-color="#6366f1" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- Acento superior izquierdo -->
+  <rect x="72" y="92" width="8" height="120" rx="4" fill="#a0a1ff"/>
+
+  <!-- Etiqueta de rol -->
+  <text x="100" y="118" fill="#a0a1ff" font-size="26" font-weight="600" letter-spacing="2">PORTAFOLIO · DESARROLLADOR</text>
+
+  <!-- Nombre (marca corta) -->
+  <text x="96" y="300" fill="#ffffff" font-size="116" font-weight="700" letter-spacing="-1">Angel Palestina</text>
+
+  <!-- Vector de contexto disambiguador: rol + stack + ciudad -->
+  <text x="100" y="380" fill="#cbd0e6" font-size="40" font-weight="500">Desarrollador Full-Stack &amp; Deep Learning · CDMX</text>
+
+  <!-- Stack / keywords co-ocurrencia -->
+  <text x="100" y="452" fill="#8b90b8" font-size="28" font-weight="400">Deep Learning · IA Generativa · Astro · React · Python · PyTorch</text>
+
+  <!-- Site URL -->
+  <text x="100" y="560" fill="#6b7193" font-size="26" font-weight="500">anngeliux.github.io/portfolio</text>
+</svg>

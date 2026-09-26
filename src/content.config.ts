@@ -51,4 +51,24 @@ const certifications = defineCollection({
   }),
 });
 
-export const collections = { projects, certifications };
+// Colección del blog: artículos técnicos/educativos en español.
+// Cada archivo .md/.mdx en src/content/blog define un post.
+// Alimenta /blog/ (hub), /blog/{slug}/ (detalle con BlogPosting) y el RSS.
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    // Resumen corto para meta description (opcional; default: description).
+    summary: z.string().optional(),
+    // Tags (chips en la UI + article:tag + keywords).
+    tags: z.array(z.string()).default([]),
+    // Portada dentro de /public (opcional; si se omite, la UI la esconde).
+    coverImage: z.string().optional(),
+    pubDate: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { projects, certifications, blog };
