@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/Hero.tsx';
 import Footer from '../components/Footer.astro';
-import { GrainGradientBackground } from '../components/ui/GrainGradientBackground';
+import { NeuroNoiseBackground } from '../components/ui/NeuroNoiseBackground';
 import Ticker from '../components/Ticker.astro';
 // Identidad canónica del autor — FUENTE ÚNICA DE VERDAD (compartida con el
 // Layout, el JSON-LD y el Footer). Cambiar los datos en src/data/profile.ts.
@@ -209,7 +209,7 @@ const fmtDate = (d: Date) =>
   <div id="hero" class="relative">
     <!-- Fondo: shader WebGL (se hidrata solo cuando es visible) -->
     <div class="absolute inset-0 -z-20 overflow-hidden pointer-events-none">
-      <GrainGradientBackground client:visible />
+      <NeuroNoiseBackground client:visible />
     </div>
     <!-- Scrim radial del hero (theme-aware vía .hero-scrim en global.css):
          oscuro en modo oscuro para legibilidad del texto blanco, claro en modo

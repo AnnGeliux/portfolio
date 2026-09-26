@@ -24,8 +24,12 @@ export default defineConfig({
     // Si se añaden páginas de proyecto, crearlas en src/pages y se listan solas.
     sitemap({
       // Excluye el 404 (Google prohíbe URLs no indexables en el sitemap) y,
-      // por seguridad, cualquier variante sin slash final.
-      filter: (page) => !page.includes('/404') && page.endsWith('/'),
+      // por seguridad, cualquier variante sin slash final. /playground es una
+      // herramienta interna de decisión visual: nunca al sitemap.
+      filter: (page) =>
+        !page.includes('/404') &&
+        !page.includes('/playground') &&
+        page.endsWith('/'),
     }),
   ],
 

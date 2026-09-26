@@ -1,0 +1,35 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ShaderGallery from '../../components/playground/ShaderGallery';
+import RawShaderLines from '../../components/ui/RawShaderLines';
+
+// Playground interno para elegir shaders del hero. No indexado.
+---
+
+<Layout title="Playground — Shaders | Angel Palestina" noindex={true}>
+  <section class="mx-auto max-w-6xl px-4 py-16">
+    <header class="mb-10">
+      <h1 class="text-3xl font-bold">Shader Playground</h1>
+      <p class="mt-2 opacity-70">
+        Candidatos para el fondo del hero. Todos corriendo en vivo con la paleta
+        del sitio. Último recuadro: el viejo shader-lines recreado en WebGL
+        crudo (sin three.js).
+      </p>
+    </header>
+
+    <ShaderGallery client:visible />
+
+    <figure class="mt-6 overflow-hidden rounded-xl border" style="border-color: var(--color-border, #ffffff22)">
+      <div
+        class="hero-shader-fallback relative block aspect-[16/9] w-full"
+        style="background: #000"
+      >
+        <RawShaderLines client:visible />
+      </div>
+      <figcaption class="p-3 text-sm">
+        <strong>RawShaderLines (viejo favorito, WebGL crudo)</strong>
+        <span> — el look del commit 071c18d pero en ~3 KB y corre en móvil.</span>
+      </figcaption>
+    </figure>
+  </section>
+</Layout>
