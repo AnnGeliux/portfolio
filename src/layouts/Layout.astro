@@ -114,9 +114,10 @@ const isArticle = ogType === 'article';
     <meta property="og:url" content={canonicalHref} />
     <meta property="og:image" content={og} />
     <meta property="og:image:alt" content={ogImageAlt} />
-    <meta property="og:locale" content="es_ES" />
+    {/* Todo el contenido es español (México); locale principal es_MX. */}
+    <meta property="og:locale" content="es_MX" />
     {/* El contenido mezcla español + nombres de cursos en inglés; declara la
-        variante para que los scrapers la considieren. */}
+        variante para que los scrapers la consideren. */}
     <meta property="og:locale:alternate" content="en_US" />
     {isArticle && (
       <>

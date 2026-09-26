@@ -26,3 +26,4 @@ pnpm-debug.log*
 # Claude Code: settings.local.json es personal (override local de permisos,
 # no se comparte). settings.json sí se versiona si se quiere compartir.
 .claude/settings.local.json
+.hermes/
