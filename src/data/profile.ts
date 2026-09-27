@@ -61,13 +61,13 @@ export const profile: Profile = {
   linkedin:
     'https://www.linkedin.com/in/angel-francisco-palestina-blancas-2773b7318/',
   siteName: 'Angel Palestina',
-  role: 'Desarrollador Full-Stack & Deep Learning',
+  role: 'AI & Full-Stack Developer',
   city: 'Ciudad de México',
   cityShort: 'CDMX',
   country: 'MX',
-  taglineEs: 'Desarrollador Full-Stack & Deep Learning · CDMX',
+  taglineEs: 'AI & Full-Stack Developer · CDMX',
   blurbEs:
-    'Desarrollador full-stack & Deep Learning en Ciudad de México. ' +
+    'AI & Full-Stack Developer en Ciudad de México. ' +
     'Construyo software con IA: de Transformers a sistemas multiagente y ' +
     'herramientas para depurar el Model Context Protocol. Portafolio de ' +
     'Angel Francisco Palestina Blancas, estudiante de Ingeniería en ' +

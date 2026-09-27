@@ -59,113 +59,70 @@ const education = {
   period: 'Septiembre 2024 — Septiembre 2028 (Expected)',
 };
 
-// Habilidades agrupadas por categoría (extraídas del CV + añadidos).
+// Habilidades core — respaldadas por proyectos y certificaciones.
 const skillGroups = [
   {
-    category: 'Lenguajes de Programación',
-    items: ['Python', 'TypeScript', 'JavaScript (ES6)', 'SQL', 'HTML5'],
+    category: 'Lenguajes',
+    items: ['Python', 'TypeScript', 'JavaScript (ES6)', 'SQL'],
   },
   {
-    category: 'Inteligencia Artificial y Datos',
+    category: 'Inteligencia Artificial',
     items: [
-      'Deep Learning (DNNs)',
       'Transformers',
       'PyTorch',
       'TensorFlow',
-      'NumPy',
-    ],
-  },
-  {
-    category: 'Agentes IA y Automatización',
-    items: [
+      'LLMs',
+      'RAG',
       'Agentes de IA',
       'Model Context Protocol (MCP)',
-      'Orquestación multiagente (Hermes)',
-      'Enrutamiento de LLMs (OpenRouter)',
-      'Automatización programada (cron)',
-      'Automatización web (Playwright)',
-      'Integración WhatsApp API',
-      'Scripting y automatización con Python',
-      'JSON-RPC 2.0',
-      'LLMOps',
-      'Prompt Engineering',
-      'Chatbots',
-      'Task Automation',
-    ],
-  },
-  {
-    category: 'Ecosistema IA & Generativa',
-    items: [
       'Hugging Face',
-      'Diffusers',
-      'ComfyUI',
-      'Modelos de difusión (text-to-image/video)',
-      'Wan 2.1 (T2I/I2V)',
       'Ollama',
-      'ROCm',
-      'RAG',
-      'LLMs',
     ],
   },
   {
-    category: 'Desarrollo Web (Full-Stack)',
+    category: 'Full-Stack Web',
     items: [
       'Django',
       'NestJS',
-      'Prisma ORM',
       'PostgreSQL',
-      'MongoDB (Mongoose)',
-      'MariaDB',
-      'n8n',
-      'REST APIs',
-    ],
-  },
-  {
-    category: 'Frontend & UI',
-    items: [
-      'Astro',
+      'Prisma ORM',
+      'MongoDB',
       'React',
       'Next.js (App Router)',
-      'React Native (Expo)',
+      'Astro',
       'Electron',
+      'React Native (Expo)',
       'Tailwind CSS',
     ],
   },
   {
-    category: 'Herramientas, DevOps y Metodologías',
+    category: 'DevOps & Herramientas',
     items: [
       'Docker',
       'Git',
-      'GitHub',
       'GitHub Actions (CI/CD)',
-      'GitHub Pages',
+      'Playwright',
+      'Testing (Vitest, node:test)',
       'Monorepos (pnpm workspaces + Turborepo)',
       'Cloudflare Tunnel',
       'Auth & RBAC (Clerk)',
-      'Testing (Vitest, node:test)',
-      'Entornos Virtuales (venv)',
-      'VS Code',
-      'Jupyter Notebooks',
-      'Metodologías Ágiles (Scrum)',
-    ],
-  },
-  {
-    category: 'Soft Skills',
-    items: [
-      'Comunicación efectiva',
-      'Trabajo en equipo',
-      'Resolución de problemas',
-      'Aprendizaje autodidacta',
     ],
   },
 ];
 
-// Lo que estoy aprendiendo ahora mismo.
+// Lo que estoy explorando ahora mismo.
 const currentlyLearning = [
   {
-    title: 'Certificación MongoDB',
-    detail: 'En progreso.',
-    inProgress: true,
+    title: 'Arquitecturas agénticas',
+    detail: 'Sistemas multiagente, orquestación y enrutamiento de LLMs.',
+  },
+  {
+    title: 'MCP tooling',
+    detail: 'Herramientas para depurar y construir sobre Model Context Protocol.',
+  },
+  {
+    title: 'Inferencia eficiente',
+    detail: 'Modelos locales, cuantización y despliegue en GPU (Ollama, ROCm).',
   },
 ];
 
@@ -238,129 +195,9 @@ const fmtDate = (d: Date) =>
   />
 
   <main id="main" class="mx-auto max-w-6xl px-6 pb-24 xl:max-w-7xl 2xl:max-w-[88rem]">
-    <!-- Sobre mí -->
-    <section id="about" scroll-mt-20 aria-labelledby="about-heading">
-      <h2
-        id="about-heading"
-        class="reveal-item mb-6 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
-      >
-        Sobre mí
-      </h2>
-      <div class="reveal-item rounded-2xl glass-card p-6 sm:p-8" style="--reveal-delay: 120ms">
-        <p class="text-xl font-bold tracking-tight text-(--color-fg)">
-          Hola, soy {profile.shortName} 👋
-        </p>
-        <p class="mt-3 text-base leading-relaxed text-(--color-muted)">
-          {summaryLead}
-        </p>
-        <div class="mt-6 grid gap-4 sm:grid-cols-3">
-          {focusAreas.map((area, i) => (
-            <div
-              class="reveal-item rounded-xl border border-(--color-border) bg-(--color-bg) p-4 sm:p-5"
-              style={`--reveal-delay: ${180 + i * 90}ms`}
-            >
-              <div class="flex items-center gap-2.5">
-                <area.icon className="h-5 w-5 text-(--color-accent)" />
-                <h3 class="text-sm font-bold tracking-tight text-(--color-fg)">{area.title}</h3>
-              </div>
-              <p class="mt-2 text-sm leading-relaxed text-(--color-muted)">{area.text}</p>
-            </div>
-          ))}
-        </div>
-        <p class="mt-6 text-base leading-relaxed text-(--color-muted)">
-          Si te interesa saber más sobre mí,{' '}
-          <a
-            href={`${base}/sobre-mi/`}
-            class="font-medium text-(--color-accent) hover:underline"
-          >aquí</a>{' '}
-          puedes conocer más detalles de mí.
-        </p>
-      </div>
-    </section>
-
-    <!-- Divisor: Sobre mí → Educación -->
+    <!-- Divisor: Hero → Proyectos -->
     <Ticker
-      items={['Bases matemáticas', 'Redes Neuronales Profundas', 'Modelos de Difusión', 'Control de versiones', 'Cómputo de alto rendimiento']}
-      duration={34}
-      reverse
-      solid
-      class="my-16"
-    />
-    <!-- Educación -->
-    <section id="education" scroll-mt-20 aria-labelledby="education-heading">
-      <h2
-        id="education-heading"
-        class="reveal-item mb-6 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
-      >
-        Educación
-      </h2>
-      <div
-        class="reveal-item flex flex-col gap-4 rounded-2xl glass-card p-6 sm:flex-row sm:items-start sm:gap-6 sm:p-8"
-        style="--reveal-delay: 120ms"
-      >
-        <div
-          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-(--color-bg) text-(--color-accent) ring-1 ring-(--color-border)"
-        >
-          <GraduationCap className="h-6 w-6" />
-        </div>
-        <div class="min-w-0">
-          <h3 class="text-lg font-semibold text-(--color-fg)">
-            {education.institution}
-          </h3>
-          <p class="mt-1 text-sm text-(--color-muted)">{education.degree}</p>
-          <ul
-            class="mt-3 flex flex-col gap-1.5 text-xs text-(--color-muted) sm:flex-row sm:flex-wrap sm:gap-x-5"
-          >
-            <li class="inline-flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5" /> {education.location}
-            </li>
-            <li class="inline-flex items-center gap-1.5">
-              <Calendar className="h-3.5 w-3.5" /> {education.period}
-            </li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- Divisor: Educación → Habilidades -->
-    <Ticker
-      items={['Universidad Tecnológica de México', 'Ciencias de la Computación', '2024 — 2028', 'Bases sólidas']}
-      duration={26}
-      solid
-      class="my-16"
-    />
-    <!-- Habilidades -->
-    <section id="skills" scroll-mt-20 aria-labelledby="skills-heading">
-      <h2
-        id="skills-heading"
-        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
-      >
-        Habilidades
-      </h2>
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-        {skillGroups.map((group, i) => (
-          <div
-            class="reveal-item rounded-2xl glass-card p-6"
-            style={`--reveal-delay: ${120 + i * 60}ms`}
-          >
-            <h3 class="text-sm font-semibold uppercase tracking-wide text-(--color-fg)">
-              {group.category}
-            </h3>
-            <ul class="mt-3 flex flex-wrap gap-2">
-              {group.items.map((item) => (
-                <li class="rounded-full bg-(--color-bg) px-2.5 py-1 text-xs font-medium text-(--color-muted) ring-1 ring-(--color-border)">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <!-- Divisor: Habilidades → Proyectos -->
-    <Ticker
-      items={['Python', 'PyTorch', 'TensorFlow', 'React', 'Astro', 'Tailwind', 'Docker', 'Hugging Face']}
+      items={['Sistema Gestor de Lecturas', 'MCP Inspector', 'itCoffee', 'Agentes IA', 'RAG', 'Ollama']}
       duration={32}
       reverse
       solid
@@ -447,9 +284,136 @@ const fmtDate = (d: Date) =>
       </ul>
     </section>
 
-    <!-- Divisor: Proyectos → Certificaciones -->
+    <!-- Divisor: Proyectos → Habilidades -->
     <Ticker
-      items={['Sistema Gestor de Lecturas', 'Wan 2.1', 'ComfyUI', 'n8n', 'RAG', 'Ollama']}
+      items={['Python', 'PyTorch', 'TensorFlow', 'React', 'Astro', 'Tailwind', 'Docker', 'Hugging Face']}
+      duration={26}
+      solid
+      class="my-16"
+    />
+    <!-- Habilidades -->
+    <section id="skills" scroll-mt-20 aria-labelledby="skills-heading">
+      <h2
+        id="skills-heading"
+        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+      >
+        Habilidades
+      </h2>
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        {skillGroups.map((group, i) => (
+          <div
+            class="reveal-item rounded-2xl glass-card p-6"
+            style={`--reveal-delay: ${120 + i * 60}ms`}
+          >
+            <h3 class="text-sm font-semibold uppercase tracking-wide text-(--color-fg)">
+              {group.category}
+            </h3>
+            <ul class="mt-3 flex flex-wrap gap-2">
+              {group.items.map((item) => (
+                <li class="rounded-full bg-(--color-bg) px-2.5 py-1 text-xs font-medium text-(--color-muted) ring-1 ring-(--color-border)">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Divisor: Habilidades → Sobre mí -->
+    <Ticker
+      items={['Sobre mí', 'Ingeniería en Sistemas Computacionales', 'Inteligencia Artificial', 'CDMX']}
+      duration={26}
+      solid
+      class="my-16"
+    />
+    <!-- Sobre mí -->
+    <section id="about" scroll-mt-20 aria-labelledby="about-heading">
+      <h2
+        id="about-heading"
+        class="reveal-item mb-6 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+      >
+        Sobre mí
+      </h2>
+      <div class="reveal-item rounded-2xl glass-card p-6 sm:p-8" style="--reveal-delay: 120ms">
+        <p class="text-xl font-bold tracking-tight text-(--color-fg)">
+          Hola, soy {profile.shortName} 👋
+        </p>
+        <p class="mt-3 text-base leading-relaxed text-(--color-muted)">
+          {summaryLead}
+        </p>
+        <div class="mt-6 grid gap-4 sm:grid-cols-3">
+          {focusAreas.map((area, i) => (
+            <div
+              class="reveal-item rounded-xl border border-(--color-border) bg-(--color-bg) p-4 sm:p-5"
+              style={`--reveal-delay: ${180 + i * 90}ms`}
+            >
+              <div class="flex items-center gap-2.5">
+                <area.icon className="h-5 w-5 text-(--color-accent)" />
+                <h3 class="text-sm font-bold tracking-tight text-(--color-fg)">{area.title}</h3>
+              </div>
+              <p class="mt-2 text-sm leading-relaxed text-(--color-muted)">{area.text}</p>
+            </div>
+          ))}
+        </div>
+        <p class="mt-6 text-base leading-relaxed text-(--color-muted)">
+          Si te interesa saber más sobre mí,{' '}
+          <a
+            href={`${base}/sobre-mi/`}
+            class="font-medium text-(--color-accent) hover:underline"
+          >aquí</a>{' '}
+          puedes conocer más detalles de mí.
+        </p>
+      </div>
+    </section>
+
+    <!-- Divisor: Sobre mí → Educación -->
+    <Ticker
+      items={['Bases matemáticas', 'Redes Neuronales Profundas', 'Modelos de Difusión', 'Control de versiones', 'Cómputo de alto rendimiento']}
+      duration={34}
+      reverse
+      solid
+      class="my-16"
+    />
+    <!-- Educación -->
+    <section id="education" scroll-mt-20 aria-labelledby="education-heading">
+      <h2
+        id="education-heading"
+        class="reveal-item mb-6 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+      >
+        Educación
+      </h2>
+      <div
+        class="reveal-item flex flex-col gap-4 rounded-2xl glass-card p-6 sm:flex-row sm:items-start sm:gap-6 sm:p-8"
+        style="--reveal-delay: 120ms"
+      >
+        <div
+          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-(--color-bg) text-(--color-accent) ring-1 ring-(--color-border)"
+        >
+          <GraduationCap className="h-6 w-6" />
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-lg font-semibold text-(--color-fg)">
+            {education.institution}
+          </h3>
+          <p class="mt-1 text-sm text-(--color-muted)">{education.degree}</p>
+          <ul
+            class="mt-3 flex flex-col gap-1.5 text-xs text-(--color-muted) sm:flex-row sm:flex-wrap sm:gap-x-5"
+          >
+            <li class="inline-flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5" /> {education.location}
+            </li>
+            <li class="inline-flex items-center gap-1.5">
+              <Calendar className="h-3.5 w-3.5" /> {education.period}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Divisor: Educación → Certificaciones -->
+    <Ticker
+      items={['Certificaciones', 'Credenciales verificables', 'Aprendizaje continuo', 'Deep Learning']}
       duration={30}
       solid
       class="my-16"
@@ -506,21 +470,21 @@ const fmtDate = (d: Date) =>
       </ul>
     </section>
 
-    <!-- Divisor: Certificaciones → Actualmente aprendiendo -->
+    <!-- Divisor: Certificaciones → Explorando ahora -->
     <Ticker
-      items={['Certificaciones', 'Aprendizaje continuo', 'Model Context Protocol', 'Agentes de IA']}
+      items={['Model Context Protocol', 'Arquitecturas agénticas', 'Inferencia local', 'Explorando ahora']}
       duration={24}
       reverse
       solid
       class="my-16"
     />
-    <!-- Actualmente aprendiendo -->
+    <!-- Explorando ahora -->
     <section id="learning" scroll-mt-20 aria-labelledby="learning-heading">
       <h2
         id="learning-heading"
         class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
       >
-        Actualmente aprendiendo
+        Explorando ahora
       </h2>
       <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {currentlyLearning.map((item, i) => (
@@ -536,12 +500,6 @@ const fmtDate = (d: Date) =>
             <div class="min-w-0">
               <h3 class="flex flex-wrap items-center gap-2 text-base font-semibold text-(--color-fg)">
                 {item.title}
-                {item.inProgress && (
-                  <span class="inline-flex items-center gap-1 rounded-full bg-(--color-bg) px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-(--color-accent) ring-1 ring-(--color-border)">
-                    <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-(--color-accent)"></span>
-                    En progreso
-                  </span>
-                )}
               </h3>
               <p class="mt-0.5 text-sm text-(--color-muted)">{item.detail}</p>
             </div>
@@ -550,9 +508,9 @@ const fmtDate = (d: Date) =>
       </ul>
     </section>
 
-    <!-- Divisor: Actualmente aprendiendo → Idiomas -->
+    <!-- Divisor: Explorando ahora → Idiomas -->
     <Ticker
-      items={['Actualmente aprendiendo', 'Español', 'Inglés', 'Comunicación efectiva', 'Trabajo en equipo']}
+      items={['Español nativo', 'English B1', 'Idiomas', 'Comunicación global']}
       duration={36}
       solid
       class="my-16"

@@ -1,14 +1,13 @@
 import { useRef } from "react";
-import { BadgeCheck, Folder, Home, Mail, User } from "lucide-react";
+import { Folder, Home, Mail, User } from "lucide-react";
 import { ExpandableTabs, type Tab } from "./ui/expandable-tabs";
 import { ThemeToggle } from "./ui/theme-toggle";
 import { usePrefersReducedMotion } from "@/lib/utils";
 
 const TABS: Tab[] = [
   { title: "Inicio", icon: Home, href: "#hero" },
-  { title: "Sobre mí", icon: User, href: "#about" },
   { title: "Proyectos", icon: Folder, href: "#projects" },
-  { title: "Certificaciones", icon: BadgeCheck, href: "#certs" },
+  { title: "Sobre mí", icon: User, href: "#about" },
   { title: "Contacto", icon: Mail, href: "#contact" },
 ];
 
