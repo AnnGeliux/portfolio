@@ -20,6 +20,8 @@ Perfil, certificaciones, proyectos y artículos — escritos mientras aprendo, n
 
 ## Proyectos
 
+- [MCP Inspector](https://angelpalestina.dev/proyectos/mcp-inspect/): proxy MITM para depurar conexiones MCP — captura tráfico JSON-RPC 2.0 con breakpoints editables y validación contra la especificación oficial.
+- [itCoffee](https://angelpalestina.dev/proyectos/itcoffee/): sistema de gestión multi-sucursal para cafeterías — monorepo Next.js + NestJS, PostgreSQL/Prisma y RBAC por sucursal con Clerk Organizations.
 - [Sistema gestor de lecturas](https://angelpalestina.dev/proyectos/sistema-gestor-lecturas/): full-stack para registrar y seguir lecturas — arquitectura y decisiones de diseño documentadas.
 
 ## Blog

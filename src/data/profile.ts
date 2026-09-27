@@ -68,8 +68,10 @@ export const profile: Profile = {
   taglineEs: 'Desarrollador Full-Stack & Deep Learning · CDMX',
   blurbEs:
     'Desarrollador full-stack & Deep Learning en Ciudad de México. ' +
-    'Portafolio de Angel Francisco Palestina Blancas, estudiante de ' +
-    'Ingeniería en Sistemas especializado en Inteligencia Artificial.',
+    'Construyo software con IA: de Transformers a sistemas multiagente y ' +
+    'herramientas para depurar el Model Context Protocol. Portafolio de ' +
+    'Angel Francisco Palestina Blancas, estudiante de Ingeniería en ' +
+    'Sistemas especializado en Inteligencia Artificial.',
   education: {
     institution: 'Universidad Tecnológica de México',
     degree:
