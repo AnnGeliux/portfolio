@@ -13,10 +13,11 @@ Perfil, certificaciones, proyectos y artículos — escritos mientras aprendo, n
 
 ## Certificaciones
 
-- [Índice de certificaciones](https://angelpalestina.dev/certificaciones/): las 10 credenciales con fecha, institución y URL de verificación.
+- [Índice de certificaciones](https://angelpalestina.dev/certificaciones/): las 13 credenciales con fecha, institución y URL de verificación.
 - [Deep Learning Specialization — DeepLearning.AI](https://angelpalestina.dev/certificaciones/neural-networks-and-deep-learning/): redes neuronales, ajuste de hiperparámetros, CNNs y estructura de proyectos ML (4 cursos).
 - [MCP: Build Rich-Context AI Apps with Anthropic](https://angelpalestina.dev/certificaciones/mcp-build-rich-context-ai-apps-with-anthropic/): Model Context Protocol para agentes con contexto externo.
 - [AMD AI Academy](https://angelpalestina.dev/certificaciones/amd-ai-agents-101/): 5 cursos — agentes de IA (101 y 201), modelos de difusión, Hugging Face e IA en hardware AMD.
+- [Introduction to MongoDB — MongoDB Academy](https://angelpalestina.dev/certificaciones/getting-started-with-mongodb-atlas/): 3 cursos — Atlas, modelo de datos documental y MongoDB Shell.
 
 ## Proyectos
 
