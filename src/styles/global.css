@@ -684,3 +684,86 @@
   padding: 0.1rem 0.3rem;
   border-radius: 0.25rem;
 }
+
+/* ============================================================
+ * App loader overlay (Tasks 1-2 del plan flujo-web-integral).
+ * Variantes de preview para Angel (elección pendiente):
+ *   A) .app-loader por defecto → overlay opaco con --color-bg
+ *   B) .app-loader--glass en <html> (vía ?loader=glass) → glass
+ *      translúcido con blur, coherente con .glass-card del sitio.
+ * Retiro: clase .app-ready en <html> (Hero useEffect) con fade
+ * 0.5s; failsafe CSS de auto-retiro a los 2.5s (sin JS / error de
+ * hidratación el contenido SSR siempre queda accesible).
+ * ============================================================ */
+.app-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Variante A — opaco, identidad fuerte */
+  background: var(--color-bg);
+  pointer-events: none;
+}
+
+/* Variante B — glass translúcido (conmutada por ?loader=glass) */
+.app-loader--glass .app-loader {
+  background: color-mix(in srgb, var(--color-bg) 45%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+}
+
+.app-loader-mark {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-fg);
+  animation: app-loader-pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes app-loader-pulse {
+  from {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+/* Retiro: cuando el hero hidrata (o por failsafe), fade + fuera del hit-testing */
+.app-ready .app-loader {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.5s ease,
+    visibility 0s linear 0.5s;
+}
+
+/* Failsafe 100% CSS: si .app-ready nunca llega, auto-retiro a los 2.5s
+   (coincide con el timeout JS de Layout.astro). */
+@keyframes app-loader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.app-loader:not(.app-ready *) {
+  animation: app-loader-failsafe 0.5s ease 2.5s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-loader-mark {
+    animation: none;
+  }
+  .app-ready .app-loader {
+    transition: none;
+  }
+  .app-loader:not(.app-ready *) {
+    animation-duration: 0s;
+  }
+}

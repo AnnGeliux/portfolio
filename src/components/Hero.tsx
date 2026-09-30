@@ -1,6 +1,7 @@
 import { GooeyText } from './ui/gooey-text-morphing';
 import { ContactIcon, type SocialKind } from './ui/social-icons';
 import SdfName from './SdfName';
+import { useEffect } from 'react';
 
 interface ContactLink {
   kind: SocialKind;
@@ -37,6 +38,14 @@ export default function Hero({
   status = 'Actualmente aprendiendo',
   contacts = [],
 }: HeroProps) {
+  /* Señal de arranque (Task 2 del plan flujo-web-integral): este useEffect
+     es la señal REAL de que la isla hidrató — retira el loader overlay
+     (clase .app-ready en <html>, gestionada también con failsafes en
+     Layout.astro). Nada más que observar aquí. */
+  useEffect(() => {
+    document.documentElement.classList.add('app-ready');
+  }, []);
+
   return (
     <section className="hero-enter relative z-10 mx-auto flex max-w-4xl flex-col items-center px-6 py-28 text-center sm:py-36">
       <div className="mb-6 inline-flex items-center gap-2 rounded-full glass-pill px-4 py-1.5 text-sm font-medium text-(--hero-fg)">
