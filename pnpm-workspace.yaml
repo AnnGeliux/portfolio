@@ -4,3 +4,4 @@ allowBuilds:
 patchedDependencies:
   '@crazygl/core@0.1.1': patches/@crazygl__core@0.1.1.patch
   '@crazygl/hero-sdf-lens-blur@0.1.1': patches/@crazygl__hero-sdf-lens-blur@0.1.1.patch
+  '@paper-design/shaders@0.0.76': patches/@paper-design__shaders@0.0.76.patch

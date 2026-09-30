@@ -687,10 +687,11 @@
 
 /* ============================================================
  * App loader overlay (Tasks 1-2 del plan flujo-web-integral).
- * Variantes de preview para Angel (elección pendiente):
- *   A) .app-loader por defecto → overlay opaco con --color-bg
- *   B) .app-loader--glass en <html> (vía ?loader=glass) → glass
- *      translúcido con blur, coherente con .glass-card del sitio.
+ * Variante ÚNICA: glass translúcido — elección de Angel
+ * (2026-09-30, "me gusta el glass"). Se retiró el toggle de
+ * preview (?loader= / sessionStorage) y la variante opaca.
+ * Coherente con .glass-card del sitio; el contenido SSR es
+ * visible desde el primer paint, así que el LCP no se retrasa.
  * Retiro: clase .app-ready en <html> (Hero useEffect) con fade
  * 0.5s; failsafe CSS de auto-retiro a los 2.5s (sin JS / error de
  * hidratación el contenido SSR siempre queda accesible).
@@ -702,16 +703,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Variante A — opaco, identidad fuerte */
-  background: var(--color-bg);
-  pointer-events: none;
-}
-
-/* Variante B — glass translúcido (conmutada por ?loader=glass) */
-.app-loader--glass .app-loader {
+  /* Glass: fondo translúcido + blur, coherente con .glass-card */
   background: color-mix(in srgb, var(--color-bg) 45%, transparent);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
   backdrop-filter: blur(16px) saturate(1.4);
+  pointer-events: none;
 }
 
 .app-loader-mark {

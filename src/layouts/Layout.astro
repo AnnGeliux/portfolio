@@ -274,10 +274,8 @@ const isArticle = ogType === 'article';
     <Navbar client:idle />
     {/* App loader overlay (Task 1 del plan flujo-web-integral): cubre el
         arranque hasta que el hero hidrata (clase .app-ready) o un failsafe.
-        Variantes de preview (decisión de Angel pendiente): A) opaco por
-        defecto, B) glass translúcido vía ?loader=glass (script is:inline
-        abajo, antes de otros módulos, conmuta la clase .app-loader--glass
-        según query param — cero hidratación). */}
+        Variante ÚNICA: glass translúcido — elección de Angel (2026-09-30).
+        Se retiró el preview por query param/sessionStorage. */}
     <div class="app-loader" aria-hidden="true">
       <div class="app-loader-mark">AP</div>
     </div>
@@ -304,24 +302,13 @@ const isArticle = ogType === 'article';
       })();
     </script>
 
-    {/* Loader failsafes + variantes de preview (Task 2 del plan).
+    {/* Loader failsafes (Task 2 del plan).
         El overlay se retira cuando el hero hidrata (Hero.tsx añade
         .app-ready en su useEffect root — señal REAL de hidratación) o por
         failsafe. El reveal IO de arriba NO se condiciona: decisión de Angel
         (2026-09-30) — dejar el toggle actual tal cual, sin cambios. */}
     <script is:inline>
       (function () {
-        // Variante B de preview: ?loader=glass conmuta el look translúcido.
-        // Se evalúa ANTES del primer paint posible para evitar flash de la
-        // variante A. sessionStorage recuerda la elección durante la sesión
-        // para que la navegación interna no la pierda (los query params se
-        // pierden al navegar con <a>).
-        try {
-          var q = new URLSearchParams(window.location.search).get('loader');
-          if (q === 'glass' || q === 'opaque') sessionStorage.setItem('loader-variant', q);
-          var v = sessionStorage.getItem('loader-variant') || 'opaque';
-          if (v === 'glass') document.documentElement.classList.add('app-loader--glass');
-        } catch (e) { /* sin storage: variante por defecto */ }
         var ready = false;
         var mark = function () {
           if (ready) return;

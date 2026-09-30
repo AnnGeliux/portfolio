@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { cn, usePrefersReducedMotion } from '@/lib/utils';
+import { fpsGovernor } from '@/lib/fps-governor';
 
 type MembraneBackgroundProps = {
     /** Columnas de la malla en escritorio (móvil usa ~40%). Default 50. */
@@ -171,11 +172,18 @@ export function MembraneBackground({
         let lastTs = 0;
         const render = (ts: number) => {
             animationFrameId = requestAnimationFrame(render);
+            // Alimenta el governor con el cadence REAL del compositor: en CADA
+            // tick de rAF, aunque este tick salte el dibujo por el cap, para que
+            // el EMA no se retroalimente con los frames que saltamos nosotros.
+            fpsGovernor.markFrame(ts);
             // Pausa real cuando la pestaña no es visible (ahorro de CPU).
             if (document.hidden) return;
-            // Cap a ~30fps: la física es por-frame como el spec; 60fps duplicaría
-            // el coste de main-thread sin ganancia visual.
-            if (ts - lastTs < 32) return;
+            // Cap VARIABLE (antes: fijo `ts - lastTs < 32`): techo de diseño
+            // 30fps — la física es por-frame como el spec y 60fps duplicaría el
+            // coste de main-thread sin ganancia visual; el governor puede bajarlo
+            // a 24 si el main thread va cargado.
+            const minInterval = 1000 / fpsGovernor.getCap(30) - 1;
+            if (ts - lastTs < minInterval) return;
             lastTs = ts;
 
             // Aplica el último evento de puntero pendiente (batcheo por frame).

@@ -1,5 +1,26 @@
+diff --git a/dist/hooks/useHeroAnimationFrame.js b/dist/hooks/useHeroAnimationFrame.js
+index 80a9682801a1e41b699bbfc4d41841db2723be2b..1918dc8d7d97b7fe859b789a4d58129014a25c2e 100644
+--- a/dist/hooks/useHeroAnimationFrame.js	
++++ b/dist/hooks/useHeroAnimationFrame.js	
+@@ -22,6 +22,16 @@ export function useHeroAnimationFrame(ref, callback, options = {}) {
+         let inView = true;
+         const frame = (now) => {
+             raf = requestAnimationFrame(frame);
++            // FPS governor bridge (contract: window.__fpsGov, see src/lib/fps-governor.ts).
++            // markFrame runs EVERY tick so the governor measures real cadence,
++            // not our own skipped frames. Skipped ticks do not touch `last`,
++            // so the next invoked callback accumulates the full delta.
++            const fpsGov = typeof window !== 'undefined' ? window.__fpsGov : undefined;
++            if (fpsGov)
++                fpsGov.markFrame(now);
++            const fpsCap = fpsGov ? fpsGov.getCap(60) : 0;
++            if (fpsCap > 0 && now - last < 1000 / fpsCap - 1)
++                return;
+             const delta = Math.min(0.1, (now - last) / 1000); // clamp to 100ms to guard tab sleep
+             last = now;
+             if (!visible || !inView)
 diff --git a/dist/hooks/useHeroReady.js b/dist/hooks/useHeroReady.js
-index 5586f9d7d0cec5ed99b27723fd1a3a8406354f0e..05cf006a01c5eee6b9d2e01dc42ce8a7647fc6ca 100644
+index 5586f9d7d0cec5ed99b27723fd1a3a8406354f0e..931ffb7d912ba1a9b891df166cb9e204431388e5 100644
 --- a/dist/hooks/useHeroReady.js	
 +++ b/dist/hooks/useHeroReady.js	
 @@ -1,5 +1,5 @@
@@ -10,7 +31,7 @@ index 5586f9d7d0cec5ed99b27723fd1a3a8406354f0e..05cf006a01c5eee6b9d2e01dc42ce8a7
  export function HeroReadyProvider({ children }) {
      const pendingRef = React.useRef(0);
 diff --git a/dist/hooks/useStableSeed.js b/dist/hooks/useStableSeed.js
-index 09d1a991a7e6b927a9e014330e0abf1a4641566b..7cc5c8bbe04841821ff962c12fcefe96022b454f 100644
+index 09d1a991a7e6b927a9e014330e0abf1a4641566b..80d11a135a60d6adf05b9cced64e0e194ce98151 100644
 --- a/dist/hooks/useStableSeed.js	
 +++ b/dist/hooks/useStableSeed.js	
 @@ -1,5 +1,5 @@
@@ -21,7 +42,7 @@ index 09d1a991a7e6b927a9e014330e0abf1a4641566b..7cc5c8bbe04841821ff962c12fcefe96
   * Produces a stable numeric seed from any input. Unlike Math.random() this
   * stays consistent between server render and client hydration.
 diff --git a/dist/index.js b/dist/index.js
-index 9d7dc720ca8678a237a0aa27af821e3d654a6bc6..75fc43fa2a877aa9c37305408167a73cd014f9a8 100644
+index 9d7dc720ca8678a237a0aa27af821e3d654a6bc6..7313583ff9f02d7b2e73620c4d56b09ee9e7e29d 100644
 --- a/dist/index.js	
 +++ b/dist/index.js	
 @@ -1,12 +1,12 @@
@@ -50,7 +71,7 @@ index 9d7dc720ca8678a237a0aa27af821e3d654a6bc6..75fc43fa2a877aa9c37305408167a73c
 +export { createDeterministicRandom, hashSeed, } from './random/deterministic.js';
 +export { loadGoogleFont, resolveFontFamily, INHERIT_FONT, } from './fonts/loadGoogleFont.js';
 diff --git a/dist/three/loadLogo3D.js b/dist/three/loadLogo3D.js
-index fdf6fa6083f65d43d5b879811413211ac9757518..1f7a9ed3f8a91c0dae2193669fd4ae91baff94e8 100644
+index fdf6fa6083f65d43d5b879811413211ac9757518..e1b4239f7fd65a76531a4b078fae99b862fd273d 100644
 --- a/dist/three/loadLogo3D.js	
 +++ b/dist/three/loadLogo3D.js	
 @@ -11,4 +11,4 @@
@@ -60,7 +81,7 @@ index fdf6fa6083f65d43d5b879811413211ac9757518..1f7a9ed3f8a91c0dae2193669fd4ae91
 -export { loadLogo3D, loadLogoShapes } from './loadLogoShapes';
 +export { loadLogo3D, loadLogoShapes } from './loadLogoShapes.js';
 diff --git a/dist/wrapper.js b/dist/wrapper.js
-index 91c852e8fb7fbacb3c3f3f34fe8f5fe9abce30dd..fb1ce950036402d1be4d791c30992a984eb661a6 100644
+index 91c852e8fb7fbacb3c3f3f34fe8f5fe9abce30dd..763c27b14af7507b48a1ce75ed427da8c31043c5 100644
 --- a/dist/wrapper.js	
 +++ b/dist/wrapper.js	
 @@ -1,12 +1,12 @@
