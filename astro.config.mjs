@@ -35,5 +35,12 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    ssr: {
+      // @crazygl/* vienen con ESM mal emitido (imports sin extensión, JSON sin
+      // import attribute, CSS importado desde JS) que Node externo no puede
+      // cargar. Forzando a Vite a procesarlos, todo se resuelve en build.
+      // Los patch files (pnpm patch-commit) corrigen solo lo que Vite no puede.
+      noExternal: ['@crazygl/hero-sdf-lens-blur', '@crazygl/core'],
+    },
   },
 });

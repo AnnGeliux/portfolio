@@ -1,3 +1,6 @@
 allowBuilds:
   esbuild: true
   sharp: true
+patchedDependencies:
+  '@crazygl/core@0.1.1': patches/@crazygl__core@0.1.1.patch
+  '@crazygl/hero-sdf-lens-blur@0.1.1': patches/@crazygl__hero-sdf-lens-blur@0.1.1.patch

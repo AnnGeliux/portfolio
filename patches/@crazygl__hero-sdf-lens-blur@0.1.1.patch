@@ -1,0 +1,15 @@
+diff --git a/dist/index.js b/dist/index.js
+index e95f1b7ca3a39f98dc03fbcc08c694e7839cbde2..16ff6bd52fd32cfa815aeb571c5de7f97b4f9431 100644
+--- a/dist/index.js	
++++ b/dist/index.js	
+@@ -1,8 +1,8 @@
+ import { jsx as _jsx } from "react/jsx-runtime";
+ import * as React from 'react';
+ import CrazyGLWrapper, { useHeroReady, } from '@crazygl/core';
+-import metadata from './metadata.json';
+-import './style.css';
++import metadata from './metadata.json' with { type: 'json' };
++// style.css moved to site (Node ESM cannot import CSS)
+ /* ─────────────────────────────────────────────────────────────────────────
+    SDF Lens Blur
+ 

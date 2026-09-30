@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { ASMRBackground } from '../components/ui/asmr-background';
+import { MembraneBackground } from '../components/ui/membrane-background';
 import { GlassFilter } from '../components/ui/liquid-glass';
 import Navbar from '../components/Navbar';
 // Identidad canónica del autor — FUENTE ÚNICA DE VERDAD (ver src/data/profile.ts).
@@ -263,11 +263,11 @@ const isArticle = ogType === 'article';
       Saltar al contenido
     </a>
     {/* Floor ambiental estático: da color al liquid glass desde el primer paint,
-       antes de que ASMRBackground se hidrate. */}
+       antes de que MembraneBackground se hidrate. */}
     <div class="ambient-bg" aria-hidden="true"></div>
-    <!-- Fondo de partículas ASMR (vórtice magnético reactivo al cursor).
+    <!-- Fondo "Membrane" (malla interactiva de muelles, reactivo al cursor).
          Fijo detrás de todo el contenido; el Hero lleva su propio shader encima. -->
-    <ASMRBackground client:idle />
+    <MembraneBackground client:idle />
     {/* Definición única del filtro SVG de liquid glass (refracción real).
         Las superficies .glass-card/.glass-pill lo referencian por id. */}
     <GlassFilter />

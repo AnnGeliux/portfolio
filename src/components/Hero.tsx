@@ -1,5 +1,6 @@
 import { GooeyText } from './ui/gooey-text-morphing';
 import { ContactIcon, type SocialKind } from './ui/social-icons';
+import SdfName from './SdfName';
 
 interface ContactLink {
   kind: SocialKind;
@@ -46,13 +47,18 @@ export default function Hero({
         <span>{status}</span>
       </div>
 
-      <div className="flex flex-col items-center">
-        <h1 className="hero-name font-display text-5xl font-bold tracking-tight sm:text-7xl">
+      <div className="flex w-full flex-col items-center">
+        {/* Preview SDF: el nombre vive en canvas WebGL (aria-hidden). El h1
+            semántico queda sr-only para SEO y accesibilidad. */}
+        <h1 className="hero-name sr-only">
           {firstName}
         </h1>
+        <div className="hero-name-sdf">
+          <SdfName text={firstName.toUpperCase()} />
+        </div>
 
         {lastName && (
-          <span className="mt-2 text-sm font-medium uppercase tracking-[0.25em] text-(--hero-fg-muted) sm:text-base">
+          <span className="-mt-12 text-sm font-medium uppercase tracking-[0.25em] text-(--hero-fg-muted) sm:-mt-14 sm:text-base">
             {lastName}
           </span>
         )}

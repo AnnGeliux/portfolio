@@ -1,0 +1,86 @@
+diff --git a/dist/hooks/useHeroReady.js b/dist/hooks/useHeroReady.js
+index 5586f9d7d0cec5ed99b27723fd1a3a8406354f0e..05cf006a01c5eee6b9d2e01dc42ce8a7647fc6ca 100644
+--- a/dist/hooks/useHeroReady.js	
++++ b/dist/hooks/useHeroReady.js	
+@@ -1,5 +1,5 @@
+ import * as React from 'react';
+-import { INHERIT_FONT } from '../fonts/loadGoogleFont';
++import { INHERIT_FONT } from '../fonts/loadGoogleFont.js';
+ const HeroReadyContext = React.createContext(null);
+ export function HeroReadyProvider({ children }) {
+     const pendingRef = React.useRef(0);
+diff --git a/dist/hooks/useStableSeed.js b/dist/hooks/useStableSeed.js
+index 09d1a991a7e6b927a9e014330e0abf1a4641566b..7cc5c8bbe04841821ff962c12fcefe96022b454f 100644
+--- a/dist/hooks/useStableSeed.js	
++++ b/dist/hooks/useStableSeed.js	
+@@ -1,5 +1,5 @@
+ import * as React from 'react';
+-import { hashSeed } from '../random/deterministic';
++import { hashSeed } from '../random/deterministic.js';
+ /**
+  * Produces a stable numeric seed from any input. Unlike Math.random() this
+  * stays consistent between server render and client hydration.
+diff --git a/dist/index.js b/dist/index.js
+index 9d7dc720ca8678a237a0aa27af821e3d654a6bc6..75fc43fa2a877aa9c37305408167a73cd014f9a8 100644
+--- a/dist/index.js	
++++ b/dist/index.js	
+@@ -1,12 +1,12 @@
+-export { CrazyGLWrapper as default, CrazyGLWrapper } from './wrapper';
+-export { useElementSize } from './hooks/useElementSize';
+-export { usePointerTracking } from './hooks/usePointerTracking';
+-export { useScrollProgress } from './hooks/useScrollProgress';
+-export { useDeviceOrientation } from './hooks/useDeviceOrientation';
+-export { useHeroAnimationFrame } from './hooks/useHeroAnimationFrame';
+-export { useHeroReady, useHeroAssetGate } from './hooks/useHeroReady';
+-export { useContent, resolveContent } from './hooks/useContent';
+-export { useStableSeed } from './hooks/useStableSeed';
+-export { normalizeMetadata, resolveDefaults, getCustomizerFields, matchesCondition } from './metadata/normalize';
+-export { createDeterministicRandom, hashSeed, } from './random/deterministic';
+-export { loadGoogleFont, resolveFontFamily, INHERIT_FONT, } from './fonts/loadGoogleFont';
++export { CrazyGLWrapper as default, CrazyGLWrapper } from './wrapper.js';
++export { useElementSize } from './hooks/useElementSize.js';
++export { usePointerTracking } from './hooks/usePointerTracking.js';
++export { useScrollProgress } from './hooks/useScrollProgress.js';
++export { useDeviceOrientation } from './hooks/useDeviceOrientation.js';
++export { useHeroAnimationFrame } from './hooks/useHeroAnimationFrame.js';
++export { useHeroReady, useHeroAssetGate } from './hooks/useHeroReady.js';
++export { useContent, resolveContent } from './hooks/useContent.js';
++export { useStableSeed } from './hooks/useStableSeed.js';
++export { normalizeMetadata, resolveDefaults, getCustomizerFields, matchesCondition } from './metadata/normalize.js';
++export { createDeterministicRandom, hashSeed, } from './random/deterministic.js';
++export { loadGoogleFont, resolveFontFamily, INHERIT_FONT, } from './fonts/loadGoogleFont.js';
+diff --git a/dist/three/loadLogo3D.js b/dist/three/loadLogo3D.js
+index fdf6fa6083f65d43d5b879811413211ac9757518..1f7a9ed3f8a91c0dae2193669fd4ae91baff94e8 100644
+--- a/dist/three/loadLogo3D.js	
++++ b/dist/three/loadLogo3D.js	
+@@ -11,4 +11,4 @@
+  * (well-tested) shape-loading code path. This file exists to give the new
+  * helper its own import surface, exported via package.json.
+  */
+-export { loadLogo3D, loadLogoShapes } from './loadLogoShapes';
++export { loadLogo3D, loadLogoShapes } from './loadLogoShapes.js';
+diff --git a/dist/wrapper.js b/dist/wrapper.js
+index 91c852e8fb7fbacb3c3f3f34fe8f5fe9abce30dd..fb1ce950036402d1be4d791c30992a984eb661a6 100644
+--- a/dist/wrapper.js	
++++ b/dist/wrapper.js	
+@@ -1,12 +1,12 @@
+ import * as React from 'react';
+-import { useElementSize } from './hooks/useElementSize';
+-import { usePointerTracking } from './hooks/usePointerTracking';
+-import { useScrollProgress } from './hooks/useScrollProgress';
+-import { useDeviceOrientation } from './hooks/useDeviceOrientation';
+-import { loadGoogleFont, resolveFontFamily, INHERIT_FONT } from './fonts/loadGoogleFont';
+-import { normalizeMetadata } from './metadata/normalize';
+-import { useStableSeed } from './hooks/useStableSeed';
+-import { HeroReadyProvider } from './hooks/useHeroReady';
++import { useElementSize } from './hooks/useElementSize.js';
++import { usePointerTracking } from './hooks/usePointerTracking.js';
++import { useScrollProgress } from './hooks/useScrollProgress.js';
++import { useDeviceOrientation } from './hooks/useDeviceOrientation.js';
++import { loadGoogleFont, resolveFontFamily, INHERIT_FONT } from './fonts/loadGoogleFont.js';
++import { normalizeMetadata } from './metadata/normalize.js';
++import { useStableSeed } from './hooks/useStableSeed.js';
++import { HeroReadyProvider } from './hooks/useHeroReady.js';
+ const DEFAULT_STYLE_INHERITANCE = 'none';
+ const DEFAULT_MANAGED_WIDTH = true;
+ const DEFAULT_INNER_WIDTH = 1200;

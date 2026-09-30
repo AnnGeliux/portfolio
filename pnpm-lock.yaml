@@ -4,6 +4,10 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@crazygl/core@0.1.1': 1267bdb6f9a19ccc380cafe485807c358a16fc0e9a5cb9e562d45457f31f69d7
+  '@crazygl/hero-sdf-lens-blur@0.1.1': 7a4b82c0897eb30363e64decdabc66b7e70251760faea24d473901d4f20ff3e3
+
 importers:
 
   .:
@@ -17,6 +21,9 @@ importers:
       '@astrojs/sitemap':
         specifier: ^3.7.3
         version: 3.7.3
+      '@crazygl/hero-sdf-lens-blur':
+        specifier: ^0.1.1
+        version: 0.1.1(patch_hash=7a4b82c0897eb30363e64decdabc66b7e70251760faea24d473901d4f20ff3e3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@fontsource-variable/inter':
         specifier: ^5.2.8
         version: 5.2.8
@@ -216,6 +223,22 @@ packages:
   '@clack/prompts@1.5.1':
     resolution: {integrity: sha512-zccHj2z2oCCO4yrDiRSlFOxWerGqRiysP7a5jPK6uoI9URKAquwY42Dd/iUP8JWHxEzdRe4TlbvZCo8z1/mhrw==}
     engines: {node: '>= 20.12.0'}
+
+  '@crazygl/core@0.1.1':
+    resolution: {integrity: sha512-cEPr4sN5wiUdxjqkurn34zFLU8mIuhrdeF8jS/5D7fE3/ZNGVu7i49AS1dkIG01tM1dia6hbP/dq+HDYRVYLoA==}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+      three: '>=0.150.0'
+    peerDependenciesMeta:
+      three:
+        optional: true
+
+  '@crazygl/hero-sdf-lens-blur@0.1.1':
+    resolution: {integrity: sha512-+9L9hLYTvhmqtD+j7kGqtZpGomBhRvZIonayikEeKPEW2upE01YgbQNFpzl6HUi5eIoLrQRSVbHxzEAxtL66Hw==}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
 
   '@emmetio/abbreviation@2.3.3':
     resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
@@ -2505,6 +2528,19 @@ snapshots:
       fast-string-width: 3.0.2
       fast-wrap-ansi: 0.2.2
       sisteransi: 1.0.5
+
+  '@crazygl/core@0.1.1(patch_hash=1267bdb6f9a19ccc380cafe485807c358a16fc0e9a5cb9e562d45457f31f69d7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+    dependencies:
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+
+  '@crazygl/hero-sdf-lens-blur@0.1.1(patch_hash=7a4b82c0897eb30363e64decdabc66b7e70251760faea24d473901d4f20ff3e3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+    dependencies:
+      '@crazygl/core': 0.1.1(patch_hash=1267bdb6f9a19ccc380cafe485807c358a16fc0e9a5cb9e562d45457f31f69d7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+    transitivePeerDependencies:
+      - three
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:
