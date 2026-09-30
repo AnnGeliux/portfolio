@@ -36,7 +36,7 @@ export default function Navbar() {
     <nav
       ref={navRef}
       aria-label="Navegación principal"
-      className="fixed top-4 inset-x-0 z-50 mx-auto flex w-fit max-w-[calc(100vw-1.5rem)] items-center gap-1 rounded-2xl glass-card px-2 py-1.5"
+      className="fixed top-4 inset-x-0 z-50 mx-auto flex w-fit max-w-[calc(100vw-1.5rem)] items-center gap-1 rounded-2xl glass-card px-2 py-1.5 max-sm:w-[calc(100vw-1.5rem)]"
     >
       <ExpandableTabs
         tabs={TABS}
