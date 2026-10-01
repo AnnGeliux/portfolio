@@ -406,34 +406,64 @@ export function MembraneBackground({
             pendingMouse = null;
         };
 
-        init();
-
-        if (reduceMotion) {
-            renderStatic();
-        } else {
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('touchmove', handleTouchMove, {
-                passive: true,
-            });
-            window.addEventListener('mouseout', handleMouseOut);
-            requestAnimationFrame(render);
-        }
-
-        // Resize: debouncea por rAF para no reconstruir la malla en cada evento.
         let resizeRaf = 0;
         const onResize = () => {
             cancelAnimationFrame(resizeRaf);
             resizeRaf = requestAnimationFrame(() => init());
         };
-        window.addEventListener('resize', onResize);
+
+        let cleanupBoot: (() => void) | null = null;
+
+        const boot = () => {
+            init();
+
+            if (reduceMotion) {
+                renderStatic();
+            } else {
+                window.addEventListener('mousemove', handleMouseMove);
+                window.addEventListener('touchmove', handleTouchMove, {
+                    passive: true,
+                });
+                window.addEventListener('mouseout', handleMouseOut);
+                requestAnimationFrame(render);
+            }
+
+            window.addEventListener('resize', onResize);
+
+            return () => {
+                window.removeEventListener('resize', onResize);
+                window.removeEventListener('mousemove', handleMouseMove);
+                window.removeEventListener('touchmove', handleTouchMove);
+                window.removeEventListener('mouseout', handleMouseOut);
+                cancelAnimationFrame(animationFrameId);
+                cancelAnimationFrame(resizeRaf);
+            };
+        };
+
+        // Fix B del plan flujo-web-integral: la malla (construcción del grid +
+        // bucle rAF continuo) NO arranca hasta que el overlay se retiró
+        // (.app-ready). Así no compite por el main thread con la hidratación
+        // del Hero en la misma ventana `idle` ni fuerza re-composición bajo el
+        // backdrop-filter del loader. El canvas sigue en opacity 0 hasta que
+        // `init()` lo enciende, así que el arranque tardío no se ve.
+        let cancelGate: () => void;
+        const root = document.documentElement;
+        if (root.classList.contains('app-ready')) {
+            cleanupBoot = boot();
+            cancelGate = () => {};
+        } else {
+            const gate = new MutationObserver(() => {
+                if (!root.classList.contains('app-ready')) return;
+                gate.disconnect();
+                cleanupBoot = boot();
+            });
+            gate.observe(root, { attributes: true, attributeFilter: ['class'] });
+            cancelGate = () => gate.disconnect();
+        }
 
         return () => {
-            window.removeEventListener('resize', onResize);
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('touchmove', handleTouchMove);
-            window.removeEventListener('mouseout', handleMouseOut);
-            cancelAnimationFrame(animationFrameId);
-            cancelAnimationFrame(resizeRaf);
+            cancelGate();
+            cleanupBoot?.();
         };
     }, [reduceMotion, cols, hoverRadius, hoverForce]);
 

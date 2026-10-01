@@ -692,9 +692,16 @@
  * preview (?loader= / sessionStorage) y la variante opaca.
  * Coherente con .glass-card del sitio; el contenido SSR es
  * visible desde el primer paint, así que el LCP no se retrasa.
- * Retiro: clase .app-ready en <html> (Hero useEffect) con fade
- * 0.5s; failsafe CSS de auto-retiro a los 2.5s (sin JS / error de
- * hidratación el contenido SSR siempre queda accesible).
+ * Retiro: clase .app-ready en <html>. La añade el script inline de
+ * Layout.astro (window.__appReadyMark) cuando la marca el CONTENIDO
+ * REAL — GooeyText al inyectar su texto, que es el elemento LCP
+ * (fix B del plan flujo-web-integral, 2026-09-30: ya no es el doble
+ * rAF al primer paint compuesto, que retiraba el overlay ~2.6s antes
+ * de que hubiera contenido) — con fade 0.5s.
+ * Failsafe CSS de auto-retiro a los 2.4s: solo para el caso "ni JS ni
+ * señal" — sin él, con JS roto el contenido SSR quedaría tapado para
+ * siempre. Los dos tiempos deben ir en sincronía con el failsafe JS
+ * de Layout.astro.
  * ============================================================ */
 .app-loader {
   position: fixed;
@@ -730,7 +737,8 @@
   }
 }
 
-/* Retiro: cuando el hero hidrata (o por failsafe), fade + fuera del hit-testing */
+/* Retiro: cuando el contenido SSR ya se pintó (o por failsafe), fade +
+   fuera del hit-testing */
 .app-ready .app-loader {
   opacity: 0;
   visibility: hidden;
@@ -739,8 +747,12 @@
     visibility 0s linear 0.5s;
 }
 
-/* Failsafe 100% CSS: si .app-ready nunca llega, auto-retiro a los 2.5s
-   (coincide con el timeout JS de Layout.astro). */
+/* Failsafe 100% CSS: si .app-ready nunca llega, auto-retiro a los 2.4s
+   (coincide con el timeout JS de Layout.astro). El selector es
+   `html:not(.app-ready) .app-loader` a propósito: la versión anterior
+   (`.app-loader:not(.app-ready *)`) nunca hacía match — .app-loader SÍ es
+   descendiente de html.app-ready —, así que con JS roto el overlay se quedaba
+   tapando el contenido para siempre. */
 @keyframes app-loader-failsafe {
   to {
     opacity: 0;
@@ -748,8 +760,8 @@
   }
 }
 
-.app-loader:not(.app-ready *) {
-  animation: app-loader-failsafe 0.5s ease 2.5s forwards;
+html:not(.app-ready) .app-loader {
+  animation: app-loader-failsafe 0.5s ease 2.4s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -759,7 +771,7 @@
   .app-ready .app-loader {
     transition: none;
   }
-  .app-loader:not(.app-ready *) {
+  html:not(.app-ready) .app-loader {
     animation-duration: 0s;
   }
 }
