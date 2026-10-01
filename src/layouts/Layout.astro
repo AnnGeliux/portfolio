@@ -272,6 +272,14 @@ const isArticle = ogType === 'article';
         Las superficies .glass-card/.glass-pill lo referencian por id. */}
     <GlassFilter />
     <Navbar client:idle />
+    {/* App loader overlay (Task 1 del plan flujo-web-integral): cubre el
+        arranque hasta que el CONTENIDO SSR se pinta (.app-ready, fix C
+        2026-09-30) o un failsafe.
+        Variante ÚNICA: glass translúcido — elección de Angel (2026-09-30).
+        Se retiró el preview por query param/sessionStorage. */}
+    <div class="app-loader" aria-hidden="true">
+      <div class="app-loader-mark">AP</div>
+    </div>
     <slot />
     {/* Scroll reveal: conmuta .is-visible en cada .reveal-item según entre/salga
         del viewport. Reversible: al scrollear hacia arriba, lo que ya pasó se
@@ -292,6 +300,52 @@ const isArticle = ogType === 'article';
           });
         }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
         items.forEach(function (el) { io.observe(el); });
+      })();
+    </script>
+
+    {/* Contrato de retiro del loader (Task 2 del plan; reescrito por el fix B del
+        plan flujo-web-integral, 2026-09-30).
+        Este script NO retira el overlay: solo publica `window.__appReadyMark`,
+        el único punto que fija `__appReadySource`/`__appReadyAt` y añade
+        `.app-ready` (idempotente).
+        LA SEÑAL ES EL CONTENIDO REAL, no un reloj: la marca `GooeyText` en cuanto
+        inyecta su texto (src/lib/app-ready.ts → markAppReadyAfterPaint), porque
+        su span es el elemento LCP del home. El doble rAF que había aquí retiraba
+        el overlay en el primer frame compuesto —antes de que hubiera contenido—
+        y dejaba una ventana oscura vacía de ~2.6s (veredicto del fix C). El glass
+        se conserva: entra al cargar y hace fade-out al retirarse.
+        Failsafes (solo si la señal no llega): 2.4s de reloj, páginas sin hero
+        (no-hero, 0.8s), bfcache. Los tiempos DEBEN ir en sincronía con el
+        failsafe CSS de global.css. El reveal IO de arriba NO se condiciona:
+        decisión de Angel (2026-09-30).
+        Instrumentación (fuente real del retiro, para leer los traces sin
+        suponer): gooey | gooey-reduced | hero | no-hero | timeout | bfcache. */}
+    <script is:inline>
+      (function () {
+        var ready = false;
+        window.__appReadyMark = function (source) {
+          if (ready) return;
+          ready = true;
+          window.__appReadySource = source;
+          window.__appReadyAt = Math.round(performance.now());
+          document.documentElement.classList.add('app-ready');
+        };
+        // Páginas internas sin hero: sin loader perceptible.
+        if (document.getElementById('hero') === null) {
+          setTimeout(function () {
+            window.__appReadyMark('no-hero');
+          }, 800);
+        }
+        // Failsafe 1: timeout absoluto de reloj (mismo valor que el failsafe
+        // CSS). Solo actúa si ni el gooey ni el hero marcaron la salida — en la
+        // práctica, solo en equipos donde la hidratación tarda más que esto.
+        setTimeout(function () {
+          window.__appReadyMark('timeout');
+        }, 2400);
+        // Failsafe 2: bfcache — el sitio ya estaba listo.
+        window.addEventListener('pageshow', function (e) {
+          if (e.persisted) window.__appReadyMark('bfcache');
+        });
       })();
     </script>
 

@@ -1,6 +1,8 @@
 import { GooeyText } from './ui/gooey-text-morphing';
 import { ContactIcon, type SocialKind } from './ui/social-icons';
 import SdfName from './SdfName';
+import { useEffect } from 'react';
+import { markAppReadyAfterPaint } from '../lib/app-ready';
 
 interface ContactLink {
   kind: SocialKind;
@@ -37,6 +39,17 @@ export default function Hero({
   status = 'Actualmente aprendiendo',
   contacts = [],
 }: HeroProps) {
+  /* Red de seguridad del arranque (Task 2 del plan flujo-web-integral;
+     revisado por el fix B del 2026-09-30).
+     La señal real la da GooeyText al inyectar su texto (su span es el elemento
+     LCP del home). Este useEffect es la red de la isla: si el hero se hidrata
+     sin gooey (morphTexts vacío), retira el overlay igual. Los efectos del hijo
+     corren ANTES que este, así que en el caso normal el retiro lo marca el gooey
+     y aquí `markAppReady` solo encuentra el trabajo hecho (idempotente). */
+  useEffect(() => {
+    markAppReadyAfterPaint('hero');
+  }, []);
+
   return (
     <section className="hero-enter relative z-10 mx-auto flex max-w-4xl flex-col items-center px-6 py-28 text-center sm:py-36">
       <div className="mb-6 inline-flex items-center gap-2 rounded-full glass-pill px-4 py-1.5 text-sm font-medium text-(--hero-fg)">

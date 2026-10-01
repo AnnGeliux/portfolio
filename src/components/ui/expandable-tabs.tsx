@@ -60,6 +60,11 @@ export function ExpandableTabs({ tabs, className, onSelect }: ExpandableTabsProp
       ref={outsideClickRef}
       className={cn(
         "flex flex-wrap items-center gap-1 rounded-2xl p-1",
+        // Menú móvil (decisión A de Angel, Task 3 del plan): en <640px los
+        // chips hacen scroll horizontal con snap en vez de envolver en 2
+        // filas. Patrón nativo, cero JS. Scrollbar oculto (look de chip-rail).
+        "max-sm:flex-nowrap max-sm:overflow-x-auto max-sm:snap-x max-sm:snap-proximity",
+        "max-sm:[scrollbar-width:none] max-sm:*:[::-webkit-scrollbar]:hidden",
         className,
       )}
     >
@@ -84,7 +89,7 @@ export function ExpandableTabs({ tabs, className, onSelect }: ExpandableTabsProp
             aria-current={isSelected ? "page" : undefined}
             aria-label={tab.title}
             className={cn(
-              "relative flex items-center rounded-xl py-2 text-sm font-medium transition-all duration-300 ease-out motion-reduce:transition-none",
+              "relative flex items-center rounded-xl py-2 text-sm font-medium transition-all duration-300 ease-out motion-reduce:transition-none max-sm:snap-start",
               isSelected
                 ? "gap-2 px-4 bg-(--color-surface) text-(--color-accent)"
                 : "gap-0 px-2 text-(--color-muted) hover:bg-(--color-surface) hover:text-(--color-fg)",

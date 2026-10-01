@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { cn, usePrefersReducedMotion } from '@/lib/utils';
+import { fpsGovernor } from '@/lib/fps-governor';
 
 type MembraneBackgroundProps = {
     /** Columnas de la malla en escritorio (móvil usa ~40%). Default 50. */
@@ -171,11 +172,18 @@ export function MembraneBackground({
         let lastTs = 0;
         const render = (ts: number) => {
             animationFrameId = requestAnimationFrame(render);
+            // Alimenta el governor con el cadence REAL del compositor: en CADA
+            // tick de rAF, aunque este tick salte el dibujo por el cap, para que
+            // el EMA no se retroalimente con los frames que saltamos nosotros.
+            fpsGovernor.markFrame(ts);
             // Pausa real cuando la pestaña no es visible (ahorro de CPU).
             if (document.hidden) return;
-            // Cap a ~30fps: la física es por-frame como el spec; 60fps duplicaría
-            // el coste de main-thread sin ganancia visual.
-            if (ts - lastTs < 32) return;
+            // Cap VARIABLE (antes: fijo `ts - lastTs < 32`): techo de diseño
+            // 30fps — la física es por-frame como el spec y 60fps duplicaría el
+            // coste de main-thread sin ganancia visual; el governor puede bajarlo
+            // a 24 si el main thread va cargado.
+            const minInterval = 1000 / fpsGovernor.getCap(30) - 1;
+            if (ts - lastTs < minInterval) return;
             lastTs = ts;
 
             // Aplica el último evento de puntero pendiente (batcheo por frame).
@@ -398,34 +406,64 @@ export function MembraneBackground({
             pendingMouse = null;
         };
 
-        init();
-
-        if (reduceMotion) {
-            renderStatic();
-        } else {
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('touchmove', handleTouchMove, {
-                passive: true,
-            });
-            window.addEventListener('mouseout', handleMouseOut);
-            requestAnimationFrame(render);
-        }
-
-        // Resize: debouncea por rAF para no reconstruir la malla en cada evento.
         let resizeRaf = 0;
         const onResize = () => {
             cancelAnimationFrame(resizeRaf);
             resizeRaf = requestAnimationFrame(() => init());
         };
-        window.addEventListener('resize', onResize);
+
+        let cleanupBoot: (() => void) | null = null;
+
+        const boot = () => {
+            init();
+
+            if (reduceMotion) {
+                renderStatic();
+            } else {
+                window.addEventListener('mousemove', handleMouseMove);
+                window.addEventListener('touchmove', handleTouchMove, {
+                    passive: true,
+                });
+                window.addEventListener('mouseout', handleMouseOut);
+                requestAnimationFrame(render);
+            }
+
+            window.addEventListener('resize', onResize);
+
+            return () => {
+                window.removeEventListener('resize', onResize);
+                window.removeEventListener('mousemove', handleMouseMove);
+                window.removeEventListener('touchmove', handleTouchMove);
+                window.removeEventListener('mouseout', handleMouseOut);
+                cancelAnimationFrame(animationFrameId);
+                cancelAnimationFrame(resizeRaf);
+            };
+        };
+
+        // Fix B del plan flujo-web-integral: la malla (construcción del grid +
+        // bucle rAF continuo) NO arranca hasta que el overlay se retiró
+        // (.app-ready). Así no compite por el main thread con la hidratación
+        // del Hero en la misma ventana `idle` ni fuerza re-composición bajo el
+        // backdrop-filter del loader. El canvas sigue en opacity 0 hasta que
+        // `init()` lo enciende, así que el arranque tardío no se ve.
+        let cancelGate: () => void;
+        const root = document.documentElement;
+        if (root.classList.contains('app-ready')) {
+            cleanupBoot = boot();
+            cancelGate = () => {};
+        } else {
+            const gate = new MutationObserver(() => {
+                if (!root.classList.contains('app-ready')) return;
+                gate.disconnect();
+                cleanupBoot = boot();
+            });
+            gate.observe(root, { attributes: true, attributeFilter: ['class'] });
+            cancelGate = () => gate.disconnect();
+        }
 
         return () => {
-            window.removeEventListener('resize', onResize);
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('touchmove', handleTouchMove);
-            window.removeEventListener('mouseout', handleMouseOut);
-            cancelAnimationFrame(animationFrameId);
-            cancelAnimationFrame(resizeRaf);
+            cancelGate();
+            cleanupBoot?.();
         };
     }, [reduceMotion, cols, hoverRadius, hoverForce]);
 

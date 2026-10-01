@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { cn, usePrefersReducedMotion } from "@/lib/utils";
+import { markAppReadyAfterPaint } from "@/lib/app-ready";
 
 interface GooeyTextProps {
   texts: string[];
@@ -30,17 +31,41 @@ export function GooeyText({
   const reduceMotion = usePrefersReducedMotion();
 
   // Con movimiento reducido: mostrar solo el primer texto de forma estática, sin rAF.
+  // Además es la señal de retirada del overlay de arranque (fix B): el span del
+  // gooey es el elemento LCP, así que el loader solo se va cuando hay texto real.
   React.useEffect(() => {
     if (!reduceMotion || texts.length === 0) return;
     if (text1Ref.current) {
       text1Ref.current.textContent = texts[0];
       text1Ref.current.style.opacity = "100%";
       text1Ref.current.style.filter = "";
+      markAppReadyAfterPaint("gooey-reduced");
     }
   }, [reduceMotion, texts]);
 
   React.useEffect(() => {
     if (reduceMotion) return;
+    if (texts.length === 0) return;
+
+    // Pintado inmediato del primer texto (fix B, 2026-09-30). Antes los spans se
+    // rellenaban recién al agotarse el primer cooldown (~0.5s después de
+    // hidratar), así que el elemento LCP pasaba ese rato VACÍO y el overlay no
+    // tenía contenido real al que sincronizarse. `text2` es el span visible
+    // durante el cooldown, así que ahí va texts[0]; text1 queda en texts[last]
+    // (invisible) para que al agotarse el cooldown el morph arranque con
+    // text1 = texts[0], sin salto. Los estilos inline replican el estado de
+    // doCooldown(): sin ellos, ambos spans saldrían a opacity 1 durante el
+    // primer frame (doble texto superpuesto).
+    if (text1Ref.current && text2Ref.current) {
+      text1Ref.current.textContent = texts[(texts.length - 1) % texts.length];
+      text1Ref.current.style.opacity = "0%";
+      text1Ref.current.style.filter = "";
+      text2Ref.current.textContent = texts[0];
+      text2Ref.current.style.opacity = "100%";
+      text2Ref.current.style.filter = "";
+      markAppReadyAfterPaint("gooey");
+    }
+
     if (texts.length < 2) return;
 
     let rafId = 0;

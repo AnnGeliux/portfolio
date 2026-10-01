@@ -684,3 +684,94 @@
   padding: 0.1rem 0.3rem;
   border-radius: 0.25rem;
 }
+
+/* ============================================================
+ * App loader overlay (Tasks 1-2 del plan flujo-web-integral).
+ * Variante ÚNICA: glass translúcido — elección de Angel
+ * (2026-09-30, "me gusta el glass"). Se retiró el toggle de
+ * preview (?loader= / sessionStorage) y la variante opaca.
+ * Coherente con .glass-card del sitio; el contenido SSR es
+ * visible desde el primer paint, así que el LCP no se retrasa.
+ * Retiro: clase .app-ready en <html>. La añade el script inline de
+ * Layout.astro (window.__appReadyMark) cuando la marca el CONTENIDO
+ * REAL — GooeyText al inyectar su texto, que es el elemento LCP
+ * (fix B del plan flujo-web-integral, 2026-09-30: ya no es el doble
+ * rAF al primer paint compuesto, que retiraba el overlay ~2.6s antes
+ * de que hubiera contenido) — con fade 0.5s.
+ * Failsafe CSS de auto-retiro a los 2.4s: solo para el caso "ni JS ni
+ * señal" — sin él, con JS roto el contenido SSR quedaría tapado para
+ * siempre. Los dos tiempos deben ir en sincronía con el failsafe JS
+ * de Layout.astro.
+ * ============================================================ */
+.app-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Glass: fondo translúcido + blur, coherente con .glass-card */
+  background: color-mix(in srgb, var(--color-bg) 45%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  pointer-events: none;
+}
+
+.app-loader-mark {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-fg);
+  animation: app-loader-pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes app-loader-pulse {
+  from {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+/* Retiro: cuando el contenido SSR ya se pintó (o por failsafe), fade +
+   fuera del hit-testing */
+.app-ready .app-loader {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.5s ease,
+    visibility 0s linear 0.5s;
+}
+
+/* Failsafe 100% CSS: si .app-ready nunca llega, auto-retiro a los 2.4s
+   (coincide con el timeout JS de Layout.astro). El selector es
+   `html:not(.app-ready) .app-loader` a propósito: la versión anterior
+   (`.app-loader:not(.app-ready *)`) nunca hacía match — .app-loader SÍ es
+   descendiente de html.app-ready —, así que con JS roto el overlay se quedaba
+   tapando el contenido para siempre. */
+@keyframes app-loader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+html:not(.app-ready) .app-loader {
+  animation: app-loader-failsafe 0.5s ease 2.4s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-loader-mark {
+    animation: none;
+  }
+  .app-ready .app-loader {
+    transition: none;
+  }
+  html:not(.app-ready) .app-loader {
+    animation-duration: 0s;
+  }
+}

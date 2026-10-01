@@ -1,0 +1,22 @@
+diff --git a/dist/shader-mount.js b/dist/shader-mount.js
+index a257bbac8ad803a69e6d8be1aa5bccdd1a367d58..7f95763f5fd680242d40e34284a4c2979ad6acbf 100644
+--- a/dist/shader-mount.js	
++++ b/dist/shader-mount.js	
+@@ -184,6 +184,17 @@ class ShaderMount {
+       console.warn("Tried to render before program or gl was initialized");
+       return;
+     }
++    // FPS governor bridge (contract: window.__fpsGov, see src/lib/fps-governor.ts).
++    // Skipped frames do NOT touch lastRenderTime, so the next drawn frame
++    // accumulates the full dt — animation wall-clock speed is preserved.
++    const fpsGov = typeof window !== "undefined" ? window.__fpsGov : undefined;
++    const fpsCap = fpsGov ? fpsGov.getCap(60) : 0;
++    if (fpsCap > 0 && currentTime - this.lastRenderTime < 1000 / fpsCap - 1) {
++      if (this.currentSpeed !== 0) {
++        this.requestRender();
++      }
++      return;
++    }
+     const dt = currentTime - this.lastRenderTime;
+     this.lastRenderTime = currentTime;
+     if (this.currentSpeed !== 0) {
