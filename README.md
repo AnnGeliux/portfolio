@@ -1,5 +1,7 @@
 # PortFolioMk1
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/AnnGeliux/portfolio)
+
 Portafolio personal de **Angel Francisco Palestina Blancas** — full-stack con
 IA: de Transformers a sistemas multiagente.
 
