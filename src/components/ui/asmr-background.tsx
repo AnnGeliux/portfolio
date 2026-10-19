@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { cn, usePrefersReducedMotion } from '@/lib/utils';
+import { $theme, type Theme } from '@/stores/theme';
 
 type ASMRBackgroundProps = {
     /** Densidad objetivo de partículas en escritorio (móvil usa ~1/3). Default 450. */
@@ -14,8 +15,6 @@ type ASMRBackgroundProps = {
     swirlSpeed?: number;
     className?: string;
 };
-
-type Theme = 'dark' | 'light';
 
 // Paleta de Canvas (los canales glass/charcoal/glow son RGB para rgba()).
 type Palette = {
@@ -35,36 +34,12 @@ function buildPalette(theme: Theme): Palette {
           }
         : {
               fill: 'rgba(255, 255, 255, 0.20)',
-              // En claro el "vidrio" pasa al acento del portafolio para que se vea
-              // sobre blanco; el carbón sigue oscuro y visible.
               glass: '99, 102, 241',
               charcoal: '64, 64, 72',
               glow: '120, 140, 210',
           };
 }
 
-/**
- * Fondo de partículas ASMR (sistema cinético sobre Canvas).
- *
- * Adaptaciones respecto al componente original (demo.tsx):
- * - Sin overlay de demo ("Atmospheric Friction") ni cursor personalizado: aquí
- *   es solo fondo. Root fijo a -z-50 + pointer-events-none para vivir detrás de
- *   todo el contenido sin interceptar el cursor (el vórtice lee mousemove en
- *   window, que sigue disparándose con pointer-events-none).
- * - Consciente del tema claro/oscuro del portafolio: en oscuro replica el look
- *   original (carbón + vidrio sobre lienzo casi negro); en claro reescribe los
- *   colores a partículas carbón + acento sobre lienzo claro para no
- *   ensombrecer la página. El tema se lee de un ref (paletteRef) que un efecto
- *   aparte actualiza al conmutar .dark: NO se re-crea el sistema de partículas
- *   ni se rebindean listeners al cambiar el tema (antes sí → hitch visible).
- * - Respeta prefers-reduced-motion (convención del portafolio): con movimiento
- *   reducido pinta un único frame estático, sin bucle de animación.
- * - Pausa el bucle cuando la pestaña no es visible (document.hidden) y lo cap
- *   a ~30fps (el efecto es lento; visualmente idéntico, mitada el main-thread).
- * - Densidad escalada por dispositivo (móvil ~1/3) para mantener FPS.
- * - mousemove se batchea por frame (se aplica dentro de render) en vez de
- *   ejecutarse por cada evento de puntero; resize se debouncea por rAF.
- */
 export function ASMRBackground({
     particleCount = 450,
     magneticRadius = 280,
@@ -74,23 +49,12 @@ export function ASMRBackground({
 }: ASMRBackgroundProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const reduceMotion = usePrefersReducedMotion();
-    // Paleta en un ref: el efecto del tema la actualiza sin tocar el bucle.
-    const paletteRef = useRef<Palette>(buildPalette('dark'));
+    const paletteRef = useRef<Palette>(buildPalette($theme.get()));
 
-    // Sigue el tema del portafolio (la clase .dark la conmuta el script anti-FOUC
-    // de Layout.astro y el theme-toggle). Solo actualiza paletteRef.current:
-    // el bucle lee el ref cada frame, así los colores cambian sin reconstruir
-    // el sistema de partículas ni rebinear listeners.
     useEffect(() => {
-        const root = document.documentElement;
-        const read = () =>
-            (paletteRef.current = buildPalette(
-                root.classList.contains('dark') ? 'dark' : 'light',
-            ));
-        read();
-        const observer = new MutationObserver(read);
-        observer.observe(root, { attributes: true, attributeFilter: ['class'] });
-        return () => observer.disconnect();
+        return $theme.subscribe((theme) => {
+            paletteRef.current = buildPalette(theme);
+        });
     }, []);
 
     // Bucle de Canvas. Se re-crea al cambiar la preferencia de movimiento o los

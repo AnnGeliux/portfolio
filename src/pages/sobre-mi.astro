@@ -59,10 +59,10 @@ const jsonLd = {
       </ol>
     </nav>
 
-    <h1 class="reveal-item is-visible font-display text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
+    <h1 class="reveal-item is-visible font-display text-balance text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
       Sobre mí
     </h1>
-    <p class="reveal-item is-visible mt-4 max-w-2xl text-lg leading-relaxed text-(--color-muted)">
+    <p class="reveal-item is-visible mt-4 max-w-2xl text-pretty text-lg leading-relaxed text-(--color-muted)">
       {profile.blurbEs}
     </p>
 
@@ -74,20 +74,20 @@ const jsonLd = {
           <GraduationCap className="h-7 w-7" />
         </div>
         <div class="min-w-0">
-          <h2 class="text-lg font-semibold text-(--color-fg)">{profile.fullName}</h2>
-          <p class="mt-1 text-sm text-(--color-muted)">{profile.role}</p>
+          <h2 class="text-balance text-lg font-semibold text-(--color-fg)">{profile.fullName}</h2>
+          <p class="mt-1 text-pretty text-sm text-(--color-muted)">{profile.role}</p>
           <ul class="mt-4 flex flex-col gap-2 text-xs text-(--color-muted) sm:flex-row sm:flex-wrap sm:gap-x-5">
             <li class="inline-flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5" /> {profile.city}
             </li>
-            <li class="inline-flex items-center gap-1.5">
+            <li class="inline-flex items-center gap-1.5 tabular-nums">
               <Calendar className="h-3.5 w-3.5" /> {profile.education.period}
             </li>
           </ul>
         </div>
       </div>
 
-      <div class="mt-8 space-y-4 border-t border-(--color-border) pt-6 text-base leading-relaxed text-(--color-muted)">
+      <div class="mt-8 space-y-4 border-t border-(--color-border) pt-6 text-pretty text-base leading-relaxed text-(--color-muted)">
         <p>
           Soy estudiante de {profile.education.degree} en la {profile.education.institution},
           especializado en Inteligencia Artificial. Me interesa construir

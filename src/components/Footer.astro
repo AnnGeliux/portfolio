@@ -46,7 +46,7 @@ const contacts: { kind: SocialKind; label: string; value: string; href: string }
       {/* Columna izquierda: marca + micro-bio + pills sociales */}
       <div class="flex flex-col gap-4">
         <p class="text-lg font-semibold text-(--color-fg)">{shortName}</p>
-        <p class="text-sm leading-relaxed text-(--color-muted)">
+        <p class="text-pretty text-sm leading-relaxed text-(--color-muted)">
           Ingeniería en Sistemas + Deep Learning / IA.
         </p>
         <div class="flex flex-wrap gap-2">
@@ -111,7 +111,7 @@ const contacts: { kind: SocialKind; label: string; value: string; href: string }
                     </span>
                     <span class="flex flex-col">
                       <span class="text-(--color-fg)">{c.label}</span>
-                      <span class="text-xs text-(--color-muted)">{c.value}</span>
+                      <span class:list={['text-xs text-(--color-muted)', c.kind === 'phone' && 'tabular-nums']}>{c.value}</span>
                     </span>
                   </a>
                 </li>
@@ -126,7 +126,7 @@ const contacts: { kind: SocialKind; label: string; value: string; href: string }
     <div
       class="mt-8 flex flex-col items-center gap-4 border-t border-(--color-border) pt-6 text-xs text-(--color-muted) sm:flex-row sm:justify-between"
     >
-      <p>© {year} {shortName} · Hecho con Astro, React y Tailwind.</p>
+      <p class="tabular-nums">© {year} {shortName} · Hecho con Astro, React y Tailwind.</p>
       <a
         href="#hero"
         aria-label="Volver arriba"

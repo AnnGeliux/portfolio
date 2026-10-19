@@ -41,6 +41,17 @@ frame contra la especificación oficial del protocolo.
 
 ## Arquitectura
 
+```text
+[Cliente MCP / SDK] ──(STDIO NDJSON)──► [MITMPipeline (Electron Main)] ──(STDIO Spawn)──► [Servidor MCP]
+                                               │               ▲
+                                   (1) Parser + Zod Schema     │ (3) Forward / Inject / Mock
+                                               ▼               │
+                                       [Cola FIFO + Reglas] ───┘
+                                               │ (2) IPC Bridge
+                                               ▼
+                                    [Inspector UI (React)]
+```
+
 - **Proceso principal (Electron):** hace spawn del servidor MCP y monta un
   proxy STDIO bidireccional — todo el tráfico cruza un pipeline MITM antes de
   llegar a su destino, en ambas direcciones.

@@ -48,10 +48,10 @@ const itemList = {
       </ol>
     </nav>
 
-    <h1 class="reveal-item is-visible font-display text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
+    <h1 class="reveal-item is-visible font-display text-balance text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
       Blog
     </h1>
-    <p class="reveal-item is-visible mt-4 max-w-2xl text-lg leading-relaxed text-(--color-muted)">
+    <p class="reveal-item is-visible mt-4 max-w-2xl text-pretty text-lg leading-relaxed text-(--color-muted)">
       Artículos sobre Deep Learning, IA generativa y desarrollo full-stack —
       escritos mientras aprendo, no después.
     </p>
@@ -70,16 +70,19 @@ const itemList = {
           style={`--reveal-delay: ${120 + i * 60}ms`}
         >
           <div class="flex flex-1 flex-col p-6">
-            <span class="inline-flex w-fit items-center gap-1.5 rounded-full bg-(--color-bg) px-2.5 py-1 text-xs font-medium text-(--color-muted) ring-1 ring-(--color-border)">
+            <span class="inline-flex w-fit items-center gap-1.5 rounded-full bg-(--color-bg) px-2.5 py-1 text-xs font-medium tabular-nums text-(--color-muted) ring-1 ring-(--color-border)">
               <Calendar className="h-3.5 w-3.5" />
               {fmtDate(p.data.pubDate)}
             </span>
-            <h2 class="mt-4 text-lg font-semibold text-(--color-fg)">
+            <h2
+              transition:name={`blog-title-${p.id}`}
+              class="mt-4 text-balance text-lg font-semibold text-(--color-fg)"
+            >
               <a href={`${base}/blog/${p.id}/`} class="hover:text-(--color-accent) hover:underline">
                 {p.data.title}
               </a>
             </h2>
-            <p class="mt-2 flex-1 text-sm text-(--color-muted)">{p.data.summary ?? p.data.description}</p>
+            <p class="mt-2 flex-1 text-pretty text-sm text-(--color-muted)">{p.data.summary ?? p.data.description}</p>
             <ul class="mt-4 flex flex-wrap gap-2">
               {p.data.tags.map((t) => (
                 <li class="rounded-full bg-(--color-bg) px-2.5 py-1 text-xs font-medium text-(--color-muted) ring-1 ring-(--color-border)">

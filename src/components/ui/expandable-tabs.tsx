@@ -31,21 +31,44 @@ interface ExpandableTabsProps {
 export function ExpandableTabs({ tabs, className, onSelect }: ExpandableTabsProps) {
   const [selected, setSelected] = React.useState<number | null>(null);
   const outsideClickRef = React.useRef<HTMLDivElement>(null);
+  const internalNavRef = React.useRef(false);
 
   // Reemplaza useOnClickOutside (usehooks-ts) por un listener inline: mismo
   // comportamiento (cerrar al pulsar fuera del contenedor) sin arrastrar la
   // dependencia. pointerdown unifica mouse + touch.
+  // También limpia la selección si ocurre una navegación externa (Cmd+K, enlaces)
+  // o al aterrizar en una ruta interior donde los anchors de la home no aplican.
   React.useEffect(() => {
     const el = outsideClickRef.current;
     if (!el) return;
     const onPointer = (e: PointerEvent) => {
       if (!el.contains(e.target as Node)) setSelected(null);
     };
+    const onBeforePrep = () => {
+      if (!internalNavRef.current) {
+        setSelected(null);
+      }
+      internalNavRef.current = false;
+    };
+    const onPageLoad = () => {
+      const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+      const normPath = window.location.pathname.replace(/\/$/, "");
+      if (normPath !== base) {
+        setSelected(null);
+      }
+    };
     document.addEventListener("pointerdown", onPointer);
-    return () => document.removeEventListener("pointerdown", onPointer);
+    document.addEventListener("astro:before-preparation", onBeforePrep);
+    document.addEventListener("astro:page-load", onPageLoad);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("astro:before-preparation", onBeforePrep);
+      document.removeEventListener("astro:page-load", onPageLoad);
+    };
   }, []);
 
   const handleSelect = (index: number) => {
+    internalNavRef.current = true;
     setSelected(index);
     const tab = tabs[index];
     if (tab && tab.type !== "separator") onSelect?.(tab);
@@ -75,14 +98,20 @@ export function ExpandableTabs({ tabs, className, onSelect }: ExpandableTabsProp
 
         const Icon = tab.icon;
         const isSelected = selected === index;
+        const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+        const resolvedHref = tab.href
+          ? tab.href.startsWith("#")
+            ? `${base}/${tab.href}`
+            : tab.href
+          : "#";
         return (
           <a
             key={tab.title}
-            href={tab.href ?? "#"}
+            href={resolvedHref}
             onClick={(e) => {
-              // No navegación nativa: el scroll lo maneja Navbar (scrollIntoView
-              // + scroll-mt-20), sin contaminar el historial con hashes. El href
-              // queda en el DOM para crawlers y para abrir-en-nueva-pestaña.
+              // No navegación nativa directa: Navbar decide si hace scrollIntoView
+              // (en la home) o navega con ClientRouter hacia la home desde páginas
+              // interiores. El href resuelto queda en el DOM para crawlers y nueva pestaña.
               e.preventDefault();
               handleSelect(index);
             }}
