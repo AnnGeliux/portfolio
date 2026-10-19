@@ -77,7 +77,7 @@ export default function Hero({
         )}
       </div>
 
-      <p className="mt-6 text-xl font-medium text-(--hero-fg-soft) sm:text-2xl">
+      <p className="mt-6 text-balance text-xl font-medium text-(--hero-fg-soft) sm:text-2xl">
         {specialty}
       </p>
 

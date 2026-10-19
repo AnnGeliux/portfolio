@@ -1,8 +1,11 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import { getCollection } from 'astro:content';
 import { MembraneBackground } from '../components/ui/membrane-background';
 import { GlassFilter } from '../components/ui/liquid-glass';
 import Navbar from '../components/Navbar';
+import CommandPalette, { type CommandItem } from '../components/CommandPalette';
 // Identidad canónica del autor — FUENTE ÚNICA DE VERDAD (ver src/data/profile.ts).
 // Permite que <title>, meta description, JSON-LD y contactos compartan el mismo
 // vector disambiguador (rol + stack + ciudad) para que "Angel Palestina" resuelva
@@ -59,6 +62,137 @@ const robotsContent = noindex
   ? 'noindex, follow'
   : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 const isArticle = ogType === 'article';
+
+// Índice estático de colecciones para alimentar el CommandPalette (Cmd+K).
+const [allProjects, allCerts, allPosts] = await Promise.all([
+  getCollection('projects'),
+  getCollection('certifications'),
+  getCollection('blog', ({ data }) => !data.draft),
+]);
+
+const commandItems: CommandItem[] = [
+  ...allProjects
+    .sort(
+      (a, b) =>
+        Number(b.data.featured) - Number(a.data.featured) ||
+        b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+    )
+    .map((p) => ({
+      id: `project-${p.id}`,
+      title: p.data.title,
+      subtitle: p.data.description,
+      category: 'Proyectos' as const,
+      href: `${base}/proyectos/${p.id}/`,
+      keywords: [
+        ...p.data.technologies,
+        ...p.data.topics,
+        p.data.category ?? '',
+        'proyecto',
+        'caso de estudio',
+      ],
+    })),
+  ...allCerts
+    .sort((a, b) => b.data.issueDate.valueOf() - a.data.issueDate.valueOf())
+    .map((c) => ({
+      id: `cert-${c.id}`,
+      title: c.data.name,
+      subtitle: `${c.data.institution}${c.data.specialization ? ` · ${c.data.specialization}` : ''}`,
+      category: 'Certificaciones' as const,
+      href: `${base}/certificaciones/${c.id}/`,
+      keywords: [
+        c.data.institution,
+        c.data.specialization ?? '',
+        ...c.data.topics,
+        'certificacion',
+        'credencial',
+      ],
+    })),
+  ...allPosts
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+    .map((post) => ({
+      id: `blog-${post.id}`,
+      title: post.data.title,
+      subtitle: post.data.description,
+      category: 'Blog' as const,
+      href: `${base}/blog/${post.id}/`,
+      keywords: [...post.data.tags, 'blog', 'articulo', 'post'],
+    })),
+  {
+    id: 'nav-home',
+    title: 'Inicio',
+    subtitle: 'Volver a la portada principal',
+    category: 'Navegación',
+    href: `${base}/#hero`,
+    keywords: ['home', 'inicio', 'hero', 'portada'],
+  },
+  {
+    id: 'nav-projects-hub',
+    title: 'Catálogo de Proyectos',
+    subtitle: 'Todos los proyectos y casos de estudio técnicos',
+    category: 'Navegación',
+    href: `${base}/proyectos/`,
+    keywords: ['proyectos', 'catalogo', 'portafolio', 'github'],
+  },
+  {
+    id: 'nav-certs-hub',
+    title: 'Catálogo de Certificaciones',
+    subtitle: 'Especializaciones verificadas en Deep Learning, IA y Python',
+    category: 'Navegación',
+    href: `${base}/certificaciones/`,
+    keywords: ['certificaciones', 'cursos', 'deeplearning.ai', 'coursera'],
+  },
+  {
+    id: 'nav-blog-hub',
+    title: 'Blog Técnico',
+    subtitle: 'Artículos sobre IA, Deep Learning y desarrollo Full-Stack',
+    category: 'Navegación',
+    href: `${base}/blog/`,
+    keywords: ['blog', 'articulos', 'notas', 'lecturas'],
+  },
+  {
+    id: 'nav-about',
+    title: 'Sobre mí — Perfil completo',
+    subtitle: 'Trayectoria, stack tecnológico, formación y enfoque',
+    category: 'Navegación',
+    href: `${base}/sobre-mi/`,
+    keywords: ['sobre mi', 'perfil', 'cv', 'biografia', 'educacion', 'upvm'],
+  },
+  {
+    id: 'nav-contact',
+    title: 'Contacto',
+    subtitle: 'Canales directos y redes profesionales',
+    category: 'Navegación',
+    href: `${base}/#contact`,
+    keywords: ['contacto', 'correo', 'email', 'mensaje'],
+  },
+  {
+    id: 'action-copy-email',
+    title: `Copiar correo (${profile.email})`,
+    subtitle: 'Copia la dirección de correo al portapapeles',
+    category: 'Acciones',
+    action: 'copy-email',
+    payload: profile.email,
+    keywords: ['email', 'correo', 'copiar', 'contacto'],
+  },
+  {
+    id: 'action-github',
+    title: 'Abrir GitHub (@AnnGeliux)',
+    subtitle: profile.github,
+    category: 'Acciones',
+    href: profile.github,
+    external: true,
+    keywords: ['github', 'codigo', 'repositorios', 'anngeliux'],
+  },
+  {
+    id: 'action-linkedin',
+    title: 'Abrir LinkedIn',
+    subtitle: profile.linkedin,
+    category: 'Acciones',
+    href: profile.linkedin,
+    external: true,
+    keywords: ['linkedin', 'perfil', 'red', 'trabajo'],
+  },
+];
 ---
 
 <!doctype html>
@@ -67,19 +201,27 @@ const isArticle = ogType === 'article';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
+    <ClientRouter />
 
-    {/* Sin FOUC: aplica el tema antes del primer paint. La clase `.dark` se
-        conmuta en <html>; si no hay preferencia guardada, sigue al sistema. */}
+    {/* Sin FOUC: aplica el tema antes del primer paint y preserva .dark/.js
+        durante las View Transitions (astro:before-swap). */}
     <script is:inline>
       (function () {
         var k = "portfolio-theme";
-        var s;
-        try { s = localStorage.getItem(k); } catch (e) { s = null; }
-        var d = s ? s === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-        document.documentElement.classList.toggle("dark", d);
-        // Marca que JS está activo: el scroll-reveal oculta los items solo cuando
-        // esto es verdad (sin JS, todo queda visible —no se pierde contenido).
-        document.documentElement.classList.add("js");
+        function resolveDark() {
+          var s;
+          try { s = localStorage.getItem(k); } catch (e) { s = null; }
+          if (s === "dark" || s === "light") return s === "dark";
+          return window.matchMedia("(prefers-color-scheme: dark)").matches;
+        }
+        function applyRootFlags(doc) {
+          doc.documentElement.classList.toggle("dark", resolveDark());
+          doc.documentElement.classList.add("js");
+        }
+        applyRootFlags(document);
+        document.addEventListener("astro:before-swap", function (ev) {
+          applyRootFlags(ev.newDocument);
+        });
       })();
     </script>
 
@@ -254,7 +396,7 @@ const isArticle = ogType === 'article';
         EducationalOccupationalCredential, BreadcrumbList, ItemList). */}
     <slot name="head" />
   </head>
-  <body class="min-h-screen antialiased">
+  <body class="min-h-dvh antialiased">
     {/* Skip-to-content: primero en el body para que el tab lo alcance de inmediato. */}
     <a
       href="#main"
@@ -266,12 +408,18 @@ const isArticle = ogType === 'article';
        antes de que MembraneBackground se hidrate. */}
     <div class="ambient-bg" aria-hidden="true"></div>
     <!-- Fondo "Membrane" (malla interactiva de muelles, reactivo al cursor).
-         Fijo detrás de todo el contenido; el Hero lleva su propio shader encima. -->
-    <MembraneBackground client:idle />
+         Persiste entre rutas gracias a transition:persist para no reiniciar el canvas 2D. -->
+    <MembraneBackground client:idle transition:persist="membrane-bg" />
     {/* Definición única del filtro SVG de liquid glass (refracción real).
         Las superficies .glass-card/.glass-pill lo referencian por id. */}
     <GlassFilter />
-    <Navbar client:idle />
+    <Navbar client:idle transition:persist="navbar" />
+    <CommandPalette
+      items={commandItems}
+      baseUrl={base}
+      client:idle
+      transition:persist="command-palette"
+    />
     {/* App loader overlay (Task 1 del plan flujo-web-integral): cubre el
         arranque hasta que el CONTENIDO SSR se pinta (.app-ready, fix C
         2026-09-30) o un failsafe.
@@ -281,25 +429,54 @@ const isArticle = ogType === 'article';
       <div class="app-loader-mark">AP</div>
     </div>
     <slot />
-    {/* Scroll reveal: conmuta .is-visible en cada .reveal-item según entre/salga
-        del viewport. Reversible: al scrollear hacia arriba, lo que ya pasó se
-        vuelve a esconder y se re-revela al volver a bajar. Script inline (sin
-        hidratación, coherente con el ticker). Sin IntersectionObserver (JS
-        viejo), revela todo de golpe (fallback). */}
+    {/* Scroll reveal fallback: en navegadores modernos con soporte de CSS
+        Scroll-Driven Animations (animation-timeline: view()), las animaciones
+        corren en el compositor vía CSS puro (@supports en global.css) con 0 JS.
+        Este script solo actúa como fallback para navegadores sin soporte de
+        animation-timeline: view(). */}
     <script is:inline>
       (function () {
-        var items = Array.prototype.slice.call(document.querySelectorAll('.reveal-item'));
-        if (!items.length) return;
-        if (!('IntersectionObserver' in window)) {
-          items.forEach(function (el) { el.classList.add('is-visible'); });
+        if (
+          typeof CSS !== 'undefined' &&
+          typeof CSS.supports === 'function' &&
+          CSS.supports('animation-timeline', 'view()')
+        ) {
           return;
         }
-        var io = new IntersectionObserver(function (entries) {
-          entries.forEach(function (e) {
-            e.target.classList.toggle('is-visible', e.isIntersecting);
+        var activeIo = null;
+        function initRevealFallback() {
+          if (activeIo) {
+            activeIo.disconnect();
+            activeIo = null;
+          }
+          var items = Array.prototype.slice.call(
+            document.querySelectorAll('.reveal-item:not(.is-visible)'),
+          );
+          if (!items.length) return;
+          if (!('IntersectionObserver' in window)) {
+            items.forEach(function (el) {
+              el.classList.add('is-visible');
+            });
+            return;
+          }
+          var io = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (e) {
+                if (e.isIntersecting) {
+                  e.target.classList.add('is-visible');
+                  io.unobserve(e.target);
+                }
+              });
+            },
+            { threshold: 0.15, rootMargin: '0px 0px -8% 0px' },
+          );
+          activeIo = io;
+          items.forEach(function (el) {
+            io.observe(el);
           });
-        }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
-        items.forEach(function (el) { io.observe(el); });
+        }
+        initRevealFallback();
+        document.addEventListener('astro:page-load', initRevealFallback);
       })();
     </script>
 

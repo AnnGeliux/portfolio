@@ -40,6 +40,15 @@ progreso sea visible de un vistazo y cada usuario tenga su propio espacio.
 
 ## Arquitectura
 
+```text
+[Cliente Web (HTML/CSS/JS)] ──(HTTP + CSRF)──► [Vistas + Auth RBAC (Django)]
+                                                        │
+                                                 [Django ORM]
+                                                        │
+                                                        ▼
+                                       [MariaDB: Usuarios · Libros · Metas · Avances]
+```
+
 - **Backend:** Django (Python) con su ORM sobre **MariaDB**. Modelos para
   libros, lecturas, metas y usuarios; relaciones que representan el avance por
   título y por capítulo.

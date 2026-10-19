@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import SdfLensBlur from '@crazygl/hero-sdf-lens-blur';
+import { hasWebGL2 } from '@/lib/utils';
+import { useTheme } from '@/stores/theme';
 
 interface SdfNameProps {
   /** Palabra corta en MAYÚSCULAS que se rasteriza al SDF (el nombre del autor). */
@@ -12,12 +14,14 @@ interface SdfNameProps {
  *  - Probe de WebGL2 antes de montar (si falta → fallback al h1 de siempre).
  *  - prefers-reduced-motion → fallback (el efecto es esencialmente movimiento).
  *  - `transparent` para componer sobre el shader de fondo del hero del sitio.
- * El fallback es el h1 tipográfico original, así el nombre nunca desaparece
- * ni para SEO (el h1 vive en el HTML server-side del Hero.tsx padre).
+ *  - Reactividad al tema (`useTheme()` sobre nanostores): en oscuro pinta en
+ *    blanco luminoso (`#ffffff`), y en claro cambia a tinta oscura (`#0b0b14`)
+ *    con halo bokeh índigo (`#6366f1`) para mantener contraste sobre el hero claro.
  */
 export default function SdfName({ text }: SdfNameProps) {
   const [supported, setSupported] = useState<boolean | null>(null);
-  const probeRef = useRef<HTMLCanvasElement | null>(null);
+  const theme = useTheme();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -25,22 +29,11 @@ export default function SdfName({ text }: SdfNameProps) {
       setSupported(false);
       return;
     }
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl2');
-    setSupported(Boolean(gl));
-    canvas.remove?.();
+    setSupported(hasWebGL2());
   }, []);
 
-  if (supported === false) {
-    return (
-      <h1 className="hero-name font-display text-5xl font-bold tracking-tight sm:text-7xl">
-        {text}
-      </h1>
-    );
-  }
 
-  if (supported === null) {
-    // Antes del probe: pinta el h1 estático (misma forma que el fallback).
+  if (supported === false || supported === null) {
     return (
       <h1 className="hero-name font-display text-5xl font-bold tracking-tight sm:text-7xl">
         {text}
@@ -63,9 +56,10 @@ export default function SdfName({ text }: SdfNameProps) {
         lensStrength={0.05}
         lensRadius={0.24}
         chromatic={0.84}
-        glowColor="#ffffff"
-        glowIntensity={0.84}
-        textColor="#ffffff"
+        backgroundColor={isDark ? '#000000' : '#1e1b4b'}
+        glowColor={isDark ? '#ffffff' : '#6366f1'}
+        glowIntensity={isDark ? 0.84 : 0.32}
+        textColor={isDark ? '#ffffff' : '#0b0b14'}
         transparent
       />
     </div>

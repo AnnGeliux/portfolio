@@ -35,3 +35,30 @@ export function usePrefersReducedMotion(): boolean {
   }, []);
   return reduce;
 }
+
+let cachedWebGL2Support: boolean | null = null;
+
+/**
+ * Probe único y cacheado de soporte WebGL2.
+ * Libera inmediatamente el contexto de prueba (`WEBGL_lose_context`) para no
+ * consumir el cupo de contextos WebGL activos del navegador ni recrear
+ * contextos en cada re-render de las islas del Hero.
+ */
+export function hasWebGL2(): boolean {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return false;
+  }
+  if (cachedWebGL2Support !== null) {
+    return cachedWebGL2Support;
+  }
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl2');
+    cachedWebGL2Support = Boolean(gl);
+    gl?.getExtension('WEBGL_lose_context')?.loseContext();
+    canvas.remove?.();
+  } catch {
+    cachedWebGL2Support = false;
+  }
+  return cachedWebGL2Support;
+}

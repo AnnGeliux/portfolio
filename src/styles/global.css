@@ -66,14 +66,14 @@
   --font-sans: "Satoshi", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk Variable", "Satoshi", ui-sans-serif, system-ui, sans-serif;
 
-  /* Paleta principal (modo claro por defecto) */
-  --color-bg: #ffffff;
-  --color-surface: #f5f5f7;
-  --color-fg: #0b0b14;
-  --color-muted: #555562;
-  --color-accent: #6366f1;
-  --color-accent-soft: #a855f7;
-  --color-border: #e5e5ea;
+  /* Paleta principal en espacio perceptual oklch() (modo claro por defecto) */
+  --color-bg: oklch(1 0 0);                     /* #ffffff */
+  --color-surface: oklch(0.97 0.003 286);       /* #f5f5f7 */
+  --color-fg: oklch(0.15 0.02 284);             /* #0b0b14 */
+  --color-muted: oklch(0.45 0.022 285);         /* #555562 */
+  --color-accent: oklch(0.585 0.233 277);       /* #6366f1 */
+  --color-accent-soft: oklch(0.627 0.265 304);  /* #a855f7 */
+  --color-border: oklch(0.923 0.006 286);       /* #e5e5ea */
 }
 
 /*
@@ -83,13 +83,13 @@
  */
 @layer base {
   .dark {
-    --color-bg: #0a0a12;
-    --color-surface: #14141f;
-    --color-fg: #ececf2;
-    --color-muted: #9a9aae;
-    --color-accent: #818cf8;
-    --color-accent-soft: #c084fc;
-    --color-border: #232330;
+    --color-bg: oklch(0.145 0.019 284);          /* #0a0a12 */
+    --color-surface: oklch(0.196 0.023 284);     /* #14141f */
+    --color-fg: oklch(0.946 0.008 286);          /* #ececf2 */
+    --color-muted: oklch(0.692 0.027 285);       /* #9a9aae */
+    --color-accent: oklch(0.673 0.182 277);      /* #818cf8 */
+    --color-accent-soft: oklch(0.714 0.203 306); /* #c084fc */
+    --color-border: oklch(0.262 0.024 284);      /* #232330 */
   }
 
   html {
@@ -109,6 +109,18 @@
     overflow-x: clip;
   }
 
+  /* Reglas tipográficas baseline-ui: cabeceras balanceadas y párrafos sin huérfanas. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
   /* Foco visible para navegación por teclado (tabs de la navbar, toggle de tema,
      enlaces). Visible en ambos temas. */
   a:focus-visible,
@@ -118,6 +130,11 @@
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
     border-radius: 4px;
+  }
+
+  /* Mantiene la Navbar fija por encima de las tarjetas con transition:name durante View Transitions. */
+  ::view-transition-group(site-navbar) {
+    z-index: 100;
   }
 }
 
@@ -478,57 +495,113 @@
   }
 
   /*
-   * Scroll reveal: el contenido de las secciones entra con fade + slide-up al
-   * llegar al viewport. Solo se oculta con JS (la clase .js en <html> la añade
-   * el script anti-FOUC de Layout.astro); sin JS todo queda visible (no se
-   * pierde contenido ni para SEO). Título primero (delay 0), tarjetas después
-   * (stagger vía --reveal-delay inline).
-   * Usa `translate` (propiedad de transform independiente) para el slide-up en
-   * vez de `transform`, de modo que no pise el `transform: scale()` del hover de
-   * .glass-card: ambos aplican a la vez sin conflicto de transición.
+   * BorderBeam (Fase 4): realce perimetral de acento para proyectos destacados
+   * (featured). No pisa ::before, ::after ni `animation` para preservar intactas
+   * tanto las capas de refracción SVG (#glass-distortion) como `animation-timeline: view()`.
    */
-  .js .reveal-item {
-    opacity: 0;
-    translate: 0 24px;
+  main .glass-card.border-beam {
+    border-color: color-mix(in oklch, var(--color-accent) 42%, var(--color-border));
+    box-shadow:
+      0 8px 28px -8px color-mix(in oklch, var(--color-accent) 26%, transparent),
+      0 0 0 1px color-mix(in oklch, var(--color-accent-soft) 18%, transparent),
+      inset 0 1px 0 0 color-mix(in oklch, var(--color-accent) 50%, transparent);
   }
-  .reveal-item.is-visible {
-    opacity: 1;
-    translate: 0 0;
-  }
+
   /*
-   * Tarjetas glass: el panel (glass + su refracción backdrop-filter del
-   * ::before/::after) NO hace fade —durante opacity<1 el backdrop-filter deja de
-   * muestrear el fondo y el glass se "rellena" al final, que era el "fondo
-   * tardío" que se veía. Se mantiene opacity:1 para que el glass quede
-   * renderizado desde el inicio y el fondo entre a la par de la tarjeta.
-   * El CONTENIDO sí hace fade (fade de los hijos directos del .glass-card), así
-   * sigue habiendo un fade visible sobre el panel sin tocar el backdrop-filter.
-   * El panel además desliza (translate) junto con los títulos. Los pseudo-elementos
-   * ::before/::after no son hijos → no les afecta el fade (el glass queda siempre).
+   * Scroll reveal: migrado a CSS Scroll-Driven Animations (`animation-timeline: view()`)
+   * para correr en el compositor thread con cero listeners en el main-thread.
+   *
+   * Tarjetas glass (.glass-card.reveal-item): el panel mantiene opacity: 1 para que
+   * el backdrop-filter de ::before/::after muestree el fondo desde el primer frame;
+   * el panel solo desliza (`reveal-slide`) mientras sus hijos directos hacen fade
+   * (`reveal-fade`). Usa `translate` (propiedad independiente) para no pisar el
+   * `transform: scale()` del hover de .glass-card.
+   *
+   * Fallback (`@supports not (animation-timeline: view())`): conserva la transición
+   * activada por `.is-visible` desde el IntersectionObserver de Layout.astro.
    */
-  .js .glass-card.reveal-item {
-    opacity: 1;
-  }
-  .js .glass-card.reveal-item > * {
-    opacity: 0;
-    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
-  }
-  .glass-card.reveal-item.is-visible > * {
-    opacity: 1;
-  }
-  main .reveal-item {
-    transition:
-      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
-      translate 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
-      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 0.35s ease,
-      box-shadow 0.35s ease;
-  }
-  /* Movimiento reducido: sin slide (translate a 0), solo fade rápido. */
-  @media (prefers-reduced-motion: reduce) {
-    .js .reveal-item {
+  @keyframes reveal-up {
+    from {
+      opacity: 0;
+      translate: 0 24px;
+    }
+    to {
+      opacity: 1;
       translate: 0 0;
-      transition: opacity 0.4s ease var(--reveal-delay, 0ms);
+    }
+  }
+
+  @keyframes reveal-slide {
+    from {
+      translate: 0 24px;
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+
+  @keyframes reveal-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal-item:not(.glass-card):not(.is-visible) {
+        animation: reveal-up linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 22%;
+      }
+      .glass-card.reveal-item:not(.is-visible) {
+        opacity: 1;
+        animation: reveal-slide linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 22%;
+      }
+      .glass-card.reveal-item:not(.is-visible) > * {
+        animation: reveal-fade linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 22%;
+      }
+    }
+  }
+
+  @supports not (animation-timeline: view()) {
+    .js .reveal-item {
+      opacity: 0;
+      translate: 0 24px;
+    }
+    .reveal-item.is-visible {
+      opacity: 1;
+      translate: 0 0;
+    }
+    .js .glass-card.reveal-item {
+      opacity: 1;
+    }
+    .js .glass-card.reveal-item > * {
+      opacity: 0;
+      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+    }
+    .glass-card.reveal-item.is-visible > * {
+      opacity: 1;
+    }
+    main .reveal-item {
+      transition:
+        opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+        translate 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.35s ease,
+        box-shadow 0.35s ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .js .reveal-item {
+        translate: 0 0;
+        transition: opacity 0.4s ease var(--reveal-delay, 0ms);
+      }
     }
   }
 }
@@ -775,3 +848,30 @@ html:not(.app-ready) .app-loader {
     animation-duration: 0s;
   }
 }
+
+.prose-project pre {
+  margin: 1.25rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 0.875rem;
+  border: 1px solid var(--color-border);
+  background: color-mix(in oklch, var(--color-surface) 88%, transparent);
+  overflow-x: auto;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--color-fg);
+}
+.prose-project pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+.prose-project blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--color-accent);
+  background: color-mix(in oklch, var(--color-surface) 60%, transparent);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: var(--color-fg);
+}
+

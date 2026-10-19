@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NeuroNoise } from '@paper-design/shaders-react';
+import { hasWebGL2 } from '@/lib/utils';
+import { useTheme } from '@/stores/theme';
 
 /**
  * Fondo del hero con el shader "neuro-noise" de @paper-design/shaders-react.
@@ -13,17 +15,15 @@ import { NeuroNoise } from '@paper-design/shaders-react';
  * 0.4, contrast 0.4, speed 0.5 — mismos valores con los que se aprobó en la
  * galería. El blanco del hero sigue ganando el contraste vía .hero-scrim.
  *
- * Theme-aware: colorBack sigue el tema del portafolio (#050010 en oscuro,
- * #fff en claro), leyendo la clase .dark de <html> con un MutationObserver
- * (la conmuta el script anti-FOUC de Layout.astro + el theme-toggle). El
- * fallback CSS es también theme-aware (clase .hero-shader-fallback en
- * global.css, keyed por .dark) para que el color base coincida desde el
- * primer paint, antes de que el shader monte — sin flash de hidratación.
+ * Theme-aware: colorBack sigue el átomo `$theme` de nanostores (#050010 en
+ * oscuro, #fff en claro) sin MutationObserver propio. El fallback CSS es
+ * también theme-aware (clase .hero-shader-fallback en global.css, keyed por
+ * .dark) para que el color base coincide desde el primer paint — sin flash.
  *
- * Guards de rendimiento ( NeuroNoise = 15 iteraciones sin/cos fijas por
+ * Guards de rendimiento (NeuroNoise = 15 iteraciones sin/cos fijas por
  * píxel: costo constante, pero no trivial como GrainGradient):
  *  - Hidrata con client:visible (index.astro): solo carga al entrar al viewport.
- *  - WebGL2 requerido (#version 300 es): probe síncrono antes de montar;
+ *  - WebGL2 requerido (#version 300 es): probe único y cacheado antes de montar;
  *    sin soporte → fallback CSS. (iOS 15+ / Android moderno lo cumplen.)
  *  - prefers-reduced-motion → fallback CSS estático (sin WebGL).
  *  - IntersectionObserver pausa el RAF (speed=0) al salir del viewport.
@@ -48,15 +48,6 @@ function prefersReducedMotion(): boolean {
   );
 }
 
-/** Probe barato: ¿este navegador puede montar WebGL2? (requerido por paper shaders) */
-function hasWebGL2(): boolean {
-  try {
-    const canvas = document.createElement('canvas');
-    return !!canvas.getContext('webgl2');
-  } catch {
-    return false;
-  }
-}
 
 /** Cap de píxeles según potencia aproximada del device. */
 function maxPixelCountForDevice(): number {
@@ -72,19 +63,14 @@ function maxPixelCountForDevice(): number {
 export function NeuroNoiseBackground() {
   const ref = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
-  // El shader corre si está en viewport AND la pestaña es visible. Se trackean
-  // por separado para poder REANUDAR al volver de un fondo/otra app en móvil:
-  // onVisibility debe restaurar, no solo pausar, o la animación queda congelada
-  // para siempre tras la primera ocultación de la pestaña (bug histórico del
-  // hero, documentado en GrainGradientBackground.tsx).
   const [intersecting, setIntersecting] = useState(true);
   const [visible, setVisible] = useState(
     () => (typeof document !== 'undefined' ? !document.hidden : true),
   );
   const running = intersecting && visible;
 
-  // Tema del portafolio (.dark en <html>): decide el colorBack del shader.
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  // Tema del portafolio suscrito al átomo `$theme` (nanostores).
+  const theme = useTheme();
 
   // Decisión shader-vs-fallback. Tras el mount y solo en el cliente (evita
   // mismatch de hidratación: SSR y primer render del cliente usan el fallback).
@@ -96,17 +82,6 @@ export function NeuroNoiseBackground() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
-
-  // Sigue el tema (.dark en <html>) para conmutar colorBack en caliente.
-  useEffect(() => {
-    const root = document.documentElement;
-    const read = () =>
-      setTheme(root.classList.contains('dark') ? 'dark' : 'light');
-    read();
-    const observer = new MutationObserver(read);
-    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {

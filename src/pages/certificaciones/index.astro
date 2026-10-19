@@ -47,10 +47,10 @@ const itemList = {
       </ol>
     </nav>
 
-    <h1 class="reveal-item is-visible font-display text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
+    <h1 class="reveal-item is-visible font-display text-balance text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
       Certificaciones
     </h1>
-    <p class="reveal-item is-visible mt-4 max-w-2xl text-lg leading-relaxed text-(--color-muted)">
+    <p class="reveal-item is-visible mt-4 max-w-2xl text-pretty text-lg leading-relaxed text-(--color-muted)">
       Credenciales en Deep Learning e IA, centradas en la especialización de
       DeepLearning.AI. Cada una tiene su página con el temario y lo que aprendí.
     </p>
@@ -66,6 +66,7 @@ const itemList = {
     <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
       {certifications.map((c, i) => (
         <li
+          transition:name={`cert-card-${c.id}`}
           class="reveal-item is-visible flex items-start gap-4 rounded-2xl glass-card p-6"
           style={`--reveal-delay: ${120 + i * 60}ms`}
         >
@@ -74,24 +75,27 @@ const itemList = {
             alt={`Logo de ${c.data.institution}`}
             width={56}
             height={56}
-            loading="lazy"
+            loading={i < 4 ? 'eager' : 'lazy'}
+            decoding="async"
+            transition:name={`cert-logo-${c.id}`}
             class="h-14 w-14 shrink-0 rounded-xl"
           />
           <div class="min-w-0">
-            <h2 class="flex items-start gap-1.5 text-base font-semibold text-(--color-fg)">
+            <h2 class="flex items-start gap-1.5 text-balance text-base font-semibold text-(--color-fg)">
               <a
                 href={`${base}/certificaciones/${c.id}/`}
+                transition:name={`cert-title-${c.id}`}
                 class="flex-1 hover:text-(--color-accent) hover:underline"
               >
                 {c.data.name}
               </a>
               <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-(--color-accent)" />
             </h2>
-            <p class="mt-0.5 text-sm text-(--color-muted)">
+            <p class="mt-0.5 text-sm tabular-nums text-(--color-muted)">
               {c.data.institution} · {fmtDate(c.data.issueDate)}
             </p>
             {c.data.specialization && (
-              <p class="mt-1 text-xs font-medium text-(--color-accent)">{c.data.specialization}</p>
+              <p class="mt-1 text-pretty text-xs font-medium text-(--color-accent)">{c.data.specialization}</p>
             )}
             {c.data.credentialUrl && (
               <a

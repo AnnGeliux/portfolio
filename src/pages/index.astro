@@ -196,10 +196,10 @@ const fmtDate = (d: Date) =>
 
   <main id="main" class="mx-auto max-w-6xl px-6 pb-24 xl:max-w-7xl 2xl:max-w-[88rem]">
     <!-- Proyectos -->
-    <section id="projects" scroll-mt-20 aria-labelledby="projects-heading">
+    <section id="projects" class="scroll-mt-20" aria-labelledby="projects-heading">
       <h2
         id="projects-heading"
-        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+        class="reveal-item mb-8 text-balance text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
       >
         Proyectos
       </h2>
@@ -207,7 +207,11 @@ const fmtDate = (d: Date) =>
       <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {projects.map((p, i) => (
           <li
-            class="reveal-item flex flex-col overflow-hidden rounded-2xl glass-card"
+            transition:name={`project-card-${p.id}`}
+            class:list={[
+              'reveal-item relative flex flex-col overflow-hidden rounded-2xl glass-card',
+              p.data.featured && 'border-beam',
+            ]}
             style={`--reveal-delay: ${120 + i * 60}ms`}
           >
             <a
@@ -221,19 +225,29 @@ const fmtDate = (d: Date) =>
                 width={1600}
                 height={1000}
                 loading="lazy"
+                decoding="async"
+                transition:name={`project-cover-${p.id}`}
                 class="aspect-[8/5] w-full object-cover transition group-hover:opacity-90"
               />
             </a>
             <div class="flex flex-1 flex-col p-6">
-              <h3 class="text-lg font-semibold text-(--color-fg)">
-                <a
-                  href={`${base}/proyectos/${p.id}/`}
-                  class="hover:text-(--color-accent) hover:underline"
-                >
-                  {p.data.title}
-                </a>
-              </h3>
-              <p class="mt-2 flex-1 text-sm text-(--color-muted)">
+              <div class="flex items-start justify-between gap-2">
+                <h3 class="text-balance text-lg font-semibold text-(--color-fg)">
+                  <a
+                    href={`${base}/proyectos/${p.id}/`}
+                    transition:name={`project-title-${p.id}`}
+                    class="hover:text-(--color-accent) hover:underline"
+                  >
+                    {p.data.title}
+                  </a>
+                </h3>
+                {p.data.featured && (
+                  <span class="shrink-0 rounded-full border border-(--color-accent)/30 bg-(--color-accent)/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-(--color-accent)">
+                    Destacado
+                  </span>
+                )}
+              </div>
+              <p class="mt-2 flex-1 text-pretty text-sm text-(--color-muted)">
                 {p.data.description}
               </p>
 
@@ -266,7 +280,7 @@ const fmtDate = (d: Date) =>
                     <ExternalLink className="h-4 w-4" /> Demo
                   </a>
                 )}
-                <span class="ml-auto text-xs text-(--color-muted)">
+                <span class="ml-auto text-xs tabular-nums text-(--color-muted)">
                   {fmtDate(p.data.pubDate)}
                 </span>
               </div>
@@ -284,10 +298,10 @@ const fmtDate = (d: Date) =>
       class="my-16"
     />
     <!-- Habilidades -->
-    <section id="skills" scroll-mt-20 aria-labelledby="skills-heading">
+    <section id="skills" class="scroll-mt-20" aria-labelledby="skills-heading">
       <h2
         id="skills-heading"
-        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+        class="reveal-item mb-8 text-balance text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
       >
         Habilidades
       </h2>
@@ -320,10 +334,10 @@ const fmtDate = (d: Date) =>
       class="my-16"
     />
     <!-- Sobre mí -->
-    <section id="about" scroll-mt-20 aria-labelledby="about-heading">
+    <section id="about" class="scroll-mt-20" aria-labelledby="about-heading">
       <h2
         id="about-heading"
-        class="reveal-item mb-6 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+        class="reveal-item mb-6 text-balance text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
       >
         Sobre mí
       </h2>
@@ -331,7 +345,7 @@ const fmtDate = (d: Date) =>
         <p class="text-xl font-bold tracking-tight text-(--color-fg)">
           Hola, soy {profile.shortName} 👋
         </p>
-        <p class="mt-3 text-base leading-relaxed text-(--color-muted)">
+        <p class="mt-3 text-pretty text-base leading-relaxed text-(--color-muted)">
           {summaryLead}
         </p>
         <div class="mt-6 grid gap-4 sm:grid-cols-3">
@@ -344,11 +358,11 @@ const fmtDate = (d: Date) =>
                 <area.icon className="h-5 w-5 text-(--color-accent)" />
                 <h3 class="text-sm font-bold tracking-tight text-(--color-fg)">{area.title}</h3>
               </div>
-              <p class="mt-2 text-sm leading-relaxed text-(--color-muted)">{area.text}</p>
+              <p class="mt-2 text-pretty text-sm leading-relaxed text-(--color-muted)">{area.text}</p>
             </div>
           ))}
         </div>
-        <p class="mt-6 text-base leading-relaxed text-(--color-muted)">
+        <p class="mt-6 text-pretty text-base leading-relaxed text-(--color-muted)">
           Si te interesa saber más sobre mí,{' '}
           <a
             href={`${base}/sobre-mi/`}
@@ -368,10 +382,10 @@ const fmtDate = (d: Date) =>
       class="my-16"
     />
     <!-- Educación -->
-    <section id="education" scroll-mt-20 aria-labelledby="education-heading">
+    <section id="education" class="scroll-mt-20" aria-labelledby="education-heading">
       <h2
         id="education-heading"
-        class="reveal-item mb-6 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+        class="reveal-item mb-6 text-balance text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
       >
         Educación
       </h2>
@@ -385,17 +399,17 @@ const fmtDate = (d: Date) =>
           <GraduationCap className="h-6 w-6" />
         </div>
         <div class="min-w-0">
-          <h3 class="text-lg font-semibold text-(--color-fg)">
+          <h3 class="text-balance text-lg font-semibold text-(--color-fg)">
             {education.institution}
           </h3>
-          <p class="mt-1 text-sm text-(--color-muted)">{education.degree}</p>
+          <p class="mt-1 text-pretty text-sm text-(--color-muted)">{education.degree}</p>
           <ul
             class="mt-3 flex flex-col gap-1.5 text-xs text-(--color-muted) sm:flex-row sm:flex-wrap sm:gap-x-5"
           >
             <li class="inline-flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5" /> {education.location}
             </li>
-            <li class="inline-flex items-center gap-1.5">
+            <li class="inline-flex items-center gap-1.5 tabular-nums">
               <Calendar className="h-3.5 w-3.5" /> {education.period}
             </li>
           </ul>
@@ -411,10 +425,10 @@ const fmtDate = (d: Date) =>
       class="my-16"
     />
     <!-- Certificaciones -->
-    <section id="certs" scroll-mt-20 aria-labelledby="certs-heading">
+    <section id="certs" class="scroll-mt-20" aria-labelledby="certs-heading">
       <h2
         id="certs-heading"
-        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+        class="reveal-item mb-8 text-balance text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
       >
         Certificaciones
       </h2>
@@ -422,6 +436,7 @@ const fmtDate = (d: Date) =>
       <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {certifications.map((c, i) => (
           <li
+            transition:name={`cert-card-${c.id}`}
             class="reveal-item flex items-start gap-4 rounded-2xl glass-card p-6"
             style={`--reveal-delay: ${120 + i * 60}ms`}
           >
@@ -431,19 +446,22 @@ const fmtDate = (d: Date) =>
               width={56}
               height={56}
               loading="lazy"
+              decoding="async"
+              transition:name={`cert-logo-${c.id}`}
               class="h-14 w-14 shrink-0 rounded-xl"
             />
             <div class="min-w-0">
-              <h3 class="flex items-start gap-1.5 text-base font-semibold text-(--color-fg)">
+              <h3 class="flex items-start gap-1.5 text-balance text-base font-semibold text-(--color-fg)">
                 <a
                   href={`${base}/certificaciones/${c.id}/`}
+                  transition:name={`cert-title-${c.id}`}
                   class="flex-1 hover:text-(--color-accent) hover:underline"
                 >
                   {c.data.name}
                 </a>
                 <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-(--color-accent)" />
               </h3>
-              <p class="mt-0.5 text-sm text-(--color-muted)">
+              <p class="mt-0.5 text-sm tabular-nums text-(--color-muted)">
                 {c.data.institution} · {fmtDate(c.data.issueDate)}
               </p>
               {c.data.credentialUrl && (
@@ -471,10 +489,10 @@ const fmtDate = (d: Date) =>
       class="my-16"
     />
     <!-- Explorando ahora -->
-    <section id="learning" scroll-mt-20 aria-labelledby="learning-heading">
+    <section id="learning" class="scroll-mt-20" aria-labelledby="learning-heading">
       <h2
         id="learning-heading"
-        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+        class="reveal-item mb-8 text-balance text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
       >
         Explorando ahora
       </h2>
@@ -490,10 +508,10 @@ const fmtDate = (d: Date) =>
               <BookOpen className="h-5 w-5" />
             </div>
             <div class="min-w-0">
-              <h3 class="flex flex-wrap items-center gap-2 text-base font-semibold text-(--color-fg)">
+              <h3 class="flex flex-wrap items-center gap-2 text-balance text-base font-semibold text-(--color-fg)">
                 {item.title}
               </h3>
-              <p class="mt-0.5 text-sm text-(--color-muted)">{item.detail}</p>
+              <p class="mt-0.5 text-pretty text-sm text-(--color-muted)">{item.detail}</p>
             </div>
           </li>
         ))}
@@ -508,10 +526,10 @@ const fmtDate = (d: Date) =>
       class="my-16"
     />
     <!-- Idiomas -->
-    <section id="languages" scroll-mt-20 aria-labelledby="languages-heading">
+    <section id="languages" class="scroll-mt-20" aria-labelledby="languages-heading">
       <h2
         id="languages-heading"
-        class="reveal-item mb-8 text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
+        class="reveal-item mb-8 text-balance text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl"
       >
         Idiomas
       </h2>
@@ -527,10 +545,10 @@ const fmtDate = (d: Date) =>
               <LanguagesIcon className="h-5 w-5" />
             </div>
             <div>
-              <h3 class="text-base font-semibold text-(--color-fg)">
+              <h3 class="text-balance text-base font-semibold text-(--color-fg)">
                 {lang.name}
               </h3>
-              <p class="text-sm text-(--color-muted)">{lang.level}</p>
+              <p class="text-pretty text-sm text-(--color-muted)">{lang.level}</p>
             </div>
           </li>
         ))}

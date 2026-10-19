@@ -42,6 +42,16 @@ administrador global.
 
 ## Arquitectura
 
+```text
+[Next.js App Router (apps/web)] ──(JWT + org_id Clerk)──► [NestJS API Modular (apps/api)]
+                                                                 │
+                                                    [Guardia Auth + RBAC Local]
+                                                                 │
+                                                                 ▼
+                                                 [Prisma ORM ──► PostgreSQL]
+                                            (Aislamiento por sucursal + Roles finos)
+```
+
 - **Monorepo:** pnpm workspaces + Turborepo — `apps/web` (Next.js) y
   `apps/api` (NestJS) comparten tipos y scripts.
 - **Autenticación:** Clerk para staff y clientes; cada sucursal mapea 1:1 a

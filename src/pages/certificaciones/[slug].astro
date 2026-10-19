@@ -2,7 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Ticker from '../../components/Ticker.astro';
-import { BadgeCheck, ExternalLink, ArrowLeft, Calendar } from 'lucide-react';
+import { BadgeCheck, ExternalLink, ArrowLeft } from 'lucide-react';
 import { profile } from '../../data/profile';
 import { asset } from '../../lib/asset';
 
@@ -86,18 +86,22 @@ const jsonLd = {
           alt={`Logo de ${c.institution}`}
           width={56}
           height={56}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          transition:name={`cert-logo-${entry.id}`}
           class="reveal-item is-visible h-14 w-14 shrink-0 rounded-xl"
         />
         <div class="min-w-0">
-          <h1 class="reveal-item is-visible flex items-start gap-1.5 font-display text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl">
-            <span class="flex-1">{c.name}</span>
+          <h1 class="reveal-item is-visible flex items-start gap-1.5 font-display text-balance text-2xl font-bold tracking-tight text-(--color-fg) sm:text-3xl xl:text-4xl">
+            <span transition:name={`cert-title-${entry.id}`} class="flex-1">{c.name}</span>
             <BadgeCheck className="mt-1 h-5 w-5 shrink-0 text-(--color-accent)" />
           </h1>
-          <p class="reveal-item is-visible mt-1 text-sm text-(--color-muted)">
+          <p class="reveal-item is-visible mt-1 text-sm tabular-nums text-(--color-muted)">
             {c.institution} · {fmtDate(c.issueDate)}
           </p>
           {c.specialization && (
-            <p class="reveal-item is-visible mt-2 text-sm font-medium text-(--color-accent)">
+            <p class="reveal-item is-visible mt-2 text-pretty text-sm font-medium text-(--color-accent)">
               {c.specialization}
             </p>
           )}

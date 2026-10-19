@@ -82,14 +82,17 @@ const jsonLd = {
 
     <article>
       <header class="mb-8">
-        <h1 class="reveal-item is-visible font-display text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
+        <h1
+          transition:name={`project-title-${entry.id}`}
+          class="reveal-item is-visible font-display text-balance text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl"
+        >
           {p.title}
         </h1>
-        <p class="reveal-item is-visible mt-4 text-lg leading-relaxed text-(--color-muted)">
+        <p class="reveal-item is-visible mt-4 text-pretty text-lg leading-relaxed text-(--color-muted)">
           {p.summary ?? p.description}
         </p>
         <div class="reveal-item is-visible mt-5 flex flex-wrap items-center gap-4 text-sm text-(--color-muted)">
-          <span class="inline-flex items-center gap-1.5">
+          <span class="inline-flex items-center gap-1.5 tabular-nums">
             <Calendar className="h-4 w-4" /> {fmtDate(p.pubDate)}
           </span>
           {p.category && (
@@ -106,6 +109,10 @@ const jsonLd = {
         alt={`Portada de ${p.title}`}
         width={1600}
         height={1000}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        transition:name={`project-cover-${entry.id}`}
         class="reveal-item is-visible aspect-[8/5] w-full rounded-2xl object-cover"
       />
 

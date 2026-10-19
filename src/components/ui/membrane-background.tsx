@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { cn, usePrefersReducedMotion } from '@/lib/utils';
 import { fpsGovernor } from '@/lib/fps-governor';
+import { $theme, type Theme } from '@/stores/theme';
 
 type MembraneBackgroundProps = {
     /** Columnas de la malla en escritorio (móvil usa ~40%). Default 50. */
@@ -13,8 +14,6 @@ type MembraneBackgroundProps = {
     hoverForce?: number;
     className?: string;
 };
-
-type Theme = 'dark' | 'light';
 
 // Paleta en canales RGB para rgba(): línea de malla, borde (frío), centro
 // (cálido teñido al lila del portafolio, en vez del marfil del spec) y
@@ -74,9 +73,9 @@ type Vertex = {
  *   pointer-events-none, escuchando mousemove en window. El contenido demo
  *   (badge, título, botones, avatares) no se replica; solo el mesh.
  * - Sin GSAP: el fade-in del canvas es una CSS transition de opacity.
- * - Theme-aware como ASMRBackground: paleta en un ref actualizada por
- *   MutationObserver sobre .dark en <html>; el bucle la lee cada frame sin
- *   reconstruir la malla ni reasignar listeners.
+ * - Theme-aware vía nanostores (`$theme`): paleta en un ref actualizada por
+ *   suscripción al átomo; el bucle la lee cada frame sin reconstruir la malla
+ *   ni instanciar MutationObservers duplicados.
  * - Sin el dimming elíptico del spec: era para legibilidad del contenido
  *   centrado del hero demo; como fondo global no hay zona fija que proteger.
  * - Guards del portafolio: prefers-reduced-motion → frame estático, pausa con
@@ -91,20 +90,14 @@ export function MembraneBackground({
 }: MembraneBackgroundProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const reduceMotion = usePrefersReducedMotion();
-    const paletteRef = useRef<Palette>(buildPalette('dark'));
+    const paletteRef = useRef<Palette>(buildPalette($theme.get()));
 
-    // Sigue el tema del portafolio (patrón de ASMRBackground): solo actualiza
-    // paletteRef.current; el bucle lee el ref cada frame.
+    // Sigue el átomo `$theme` (nanostores): actualiza paletteRef.current sin
+    // re-render de React ni MutationObserver propio.
     useEffect(() => {
-        const root = document.documentElement;
-        const read = () =>
-            (paletteRef.current = buildPalette(
-                root.classList.contains('dark') ? 'dark' : 'light',
-            ));
-        read();
-        const observer = new MutationObserver(read);
-        observer.observe(root, { attributes: true, attributeFilter: ['class'] });
-        return () => observer.disconnect();
+        return $theme.subscribe((theme) => {
+            paletteRef.current = buildPalette(theme);
+        });
     }, []);
 
     useEffect(() => {

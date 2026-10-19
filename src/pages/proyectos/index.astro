@@ -50,10 +50,10 @@ const itemList = {
       </ol>
     </nav>
 
-    <h1 class="reveal-item is-visible font-display text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
+    <h1 class="reveal-item is-visible font-display text-balance text-3xl font-bold tracking-tight text-(--color-fg) sm:text-4xl xl:text-5xl">
       Proyectos
     </h1>
-    <p class="reveal-item is-visible mt-4 max-w-2xl text-lg leading-relaxed text-(--color-muted)">
+    <p class="reveal-item is-visible mt-4 max-w-2xl text-pretty text-lg leading-relaxed text-(--color-muted)">
       Aplicaciones full-stack y experimentos de Deep Learning e IA. Cada proyecto
       tiene su página con contexto, arquitectura y lo que aprendí.
     </p>
@@ -68,7 +68,11 @@ const itemList = {
     <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
       {projects.map((p, i) => (
         <li
-          class="reveal-item is-visible flex flex-col overflow-hidden rounded-2xl glass-card"
+          transition:name={`project-card-${p.id}`}
+          class:list={[
+            'reveal-item is-visible relative flex flex-col overflow-hidden rounded-2xl glass-card',
+            p.data.featured && 'border-beam',
+          ]}
           style={`--reveal-delay: ${120 + i * 60}ms`}
         >
           <a href={`${base}/proyectos/${p.id}/`} class="group block">
@@ -77,17 +81,31 @@ const itemList = {
               alt={`Portada de ${p.data.title}`}
               width={1600}
               height={1000}
-              loading="lazy"
+              loading={i < 2 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : undefined}
+              decoding="async"
+              transition:name={`project-cover-${p.id}`}
               class="aspect-[8/5] w-full object-cover transition group-hover:opacity-90"
             />
           </a>
           <div class="flex flex-1 flex-col p-6">
-            <h2 class="text-lg font-semibold text-(--color-fg)">
-              <a href={`${base}/proyectos/${p.id}/`} class="hover:text-(--color-accent) hover:underline">
-                {p.data.title}
-              </a>
-            </h2>
-            <p class="mt-2 flex-1 text-sm text-(--color-muted)">{p.data.description}</p>
+            <div class="flex items-start justify-between gap-2">
+              <h2 class="text-balance text-lg font-semibold text-(--color-fg)">
+                <a
+                  href={`${base}/proyectos/${p.id}/`}
+                  transition:name={`project-title-${p.id}`}
+                  class="hover:text-(--color-accent) hover:underline"
+                >
+                  {p.data.title}
+                </a>
+              </h2>
+              {p.data.featured && (
+                <span class="shrink-0 rounded-full border border-(--color-accent)/30 bg-(--color-accent)/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-(--color-accent)">
+                  Destacado
+                </span>
+              )}
+            </div>
+            <p class="mt-2 flex-1 text-pretty text-sm text-(--color-muted)">{p.data.description}</p>
             <ul class="mt-4 flex flex-wrap gap-2">
               {p.data.technologies.map((t) => (
                 <li class="rounded-full bg-(--color-bg) px-2.5 py-1 text-xs font-medium text-(--color-muted) ring-1 ring-(--color-border)">
@@ -116,7 +134,7 @@ const itemList = {
                   <ExternalLink className="h-4 w-4" /> Demo
                 </a>
               )}
-              <span class="ml-auto text-xs text-(--color-muted)">{fmtDate(p.data.pubDate)}</span>
+              <span class="ml-auto text-xs tabular-nums text-(--color-muted)">{fmtDate(p.data.pubDate)}</span>
             </div>
           </div>
         </li>

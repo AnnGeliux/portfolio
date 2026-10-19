@@ -1,50 +1,24 @@
-import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const STORAGE_KEY = "portfolio-theme";
+import { toggleTheme, useTheme } from "@/stores/theme";
 
 /**
- * Toggle de tema claro/oscuro.
+ * Toggle de tema claro/oscuro conectado al átomo persistente `$theme`
+ * (`src/stores/theme.ts`).
  *
- * El tema real se aplica en `Layout.astro` con un script `is:inline` que corre
- * antes del primer paint (sin FOUC) y conmuta la clase `.dark` en `<html>`.
- * Este componente solo refleja y muta ese estado: lee la clase del `<html>` al
- * montarse y, al pulsar, la invierte + persiste en `localStorage`.
- *
- * Reutiliza `.glass-pill` para heredar el liquid glass (SVG distortion) y la
- * regla `z-index:-1` que mantiene el texto nítido.
+ * El tema inicial se aplica en `Layout.astro` con un script `is:inline` antes
+ * del primer paint (sin FOUC). Al conmutar aquí, `$theme` actualiza
+ * `localStorage("portfolio-theme")`, la clase `.dark` en `<html>` y notifica
+ * atómicamente a todas las islas suscritas (Membrane, NeuroNoise, SdfName, etc.).
  */
 export function ThemeToggle({ className }: { className?: string }) {
-  // Estado inicial desde el DOM: el script anti-FOUC ya puso la clase correcta
-  // antes del primer paint, así que el inicializador perezoso la lee sin flicker
-  // del icono (antes arrancaba en `true` y se corregía recién en el effect).
-  const [isDark, setIsDark] = useState(
-    () =>
-      typeof document !== "undefined" &&
-      document.documentElement.classList.contains("dark"),
-  );
-
-  // Sincronización defensiva por si la clase cambiara desde fuera del toggle.
-  useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"));
-  }, []);
-
-  const toggle = () => {
-    const next = !isDark;
-    document.documentElement.classList.toggle("dark", next);
-    try {
-      localStorage.setItem(STORAGE_KEY, next ? "dark" : "light");
-    } catch {
-      /* localStorage puede estar bloqueado; el toggle visual sigue funcionando. */
-    }
-    setIsDark(next);
-  };
+  const theme = useTheme();
+  const isDark = theme === "dark";
 
   const handleKey = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      toggle();
+      toggleTheme();
     }
   };
 
@@ -54,7 +28,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       role="switch"
       aria-checked={isDark}
       aria-label="Cambiar tema entre claro y oscuro"
-      onClick={toggle}
+      onClick={() => toggleTheme()}
       onKeyDown={handleKey}
       className={cn(
         "glass-pill relative flex h-9 w-16 shrink-0 cursor-pointer items-center rounded-full px-1 transition-colors",
